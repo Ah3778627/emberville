@@ -1,0 +1,2339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Embervale Platformer</title>
+  <meta name="description" content="A procedural 2D HTML5 Canvas platformer with responsive physics, 3 atmospheric levels, enemies, moving platforms, particle effects, and synthesized Web Audio." />
+  <meta property="og:title" content="Embervale Platformer" />
+  <meta property="og:description" content="A procedural 2D HTML5 Canvas platformer with responsive physics, 3 atmospheric levels, enemies, moving platforms, particle effects, and synthesized Web Audio." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --surface: #131822;
+      --border: rgba(255, 255, 255, 0.1);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #f59e0b;
+      --accent-hover: #fbbf24;
+      --danger: #ef4444;
+      --emerald: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .shell {
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .cabinet {
+      width: 100%;
+      max-width: 1060px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hud {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 18px;
+      background: #0f141d;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      line-height: 1;
+      flex-wrap: wrap;
+    }
+
+    .hud-group {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .hud-title {
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .hud-sep {
+      color: rgba(148, 163, 184, 0.4);
+    }
+
+    .hud-level {
+      color: var(--muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 14px;
+    }
+
+    .hearts {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .heart {
+      width: 15px;
+      height: 14px;
+      display: inline-block;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .heart.lost {
+      opacity: 0.22;
+      transform: scale(0.85);
+    }
+
+    .hud-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-ghost {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 7px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .btn-ghost:focus-visible,
+    .btn-primary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .stage-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 960 / 560;
+      background: #07090e;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 11, 18, 0.78);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(15, 20, 29, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      transform: translateY(6px);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .overlay.visible .modal {
+      transform: translateY(0);
+    }
+
+    .modal-kicker {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .modal-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .modal-desc {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      text-align: left;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      margin-bottom: 22px;
+      font-size: 13px;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+    }
+
+    .keycap {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 5px;
+      padding: 3px 7px;
+      white-space: nowrap;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 14px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      margin-bottom: 22px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary-item-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .summary-item-val {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      appearance: none;
+      background: var(--accent);
+      color: #0b0e14;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .touch-bar {
+      display: none;
+      width: 100%;
+      max-width: 1060px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 2px;
+    }
+
+    .touch-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .touch-btn {
+      appearance: none;
+      min-width: 64px;
+      height: 52px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+      touch-action: none;
+      cursor: pointer;
+    }
+
+    .touch-btn.active {
+      background: rgba(245, 158, 11, 0.25);
+      border-color: var(--accent);
+    }
+
+    @media (pointer: coarse), (max-width: 720px) {
+      .touch-bar {
+        display: flex;
+      }
+      .shell {
+        padding: 10px;
+      }
+      .hud {
+        padding: 10px 12px;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="cabinet">
+      <header class="hud" aria-label="Game Status">
+        <div class="hud-group">
+          <span class="hud-title">Embervale</span>
+          <span class="hud-sep" aria-hidden="true">/</span>
+          <span class="hud-level" id="hudLevel">Level 1 of 3 · Sunlit Ruins</span>
+        </div>
+
+        <div class="hud-group">
+          <div class="stat">
+            <span class="stat-label">Lives</span>
+            <span class="hearts" id="hudHearts" aria-label="Lives remaining"></span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Coins</span>
+            <span class="stat-value" id="hudCoins">0</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Score</span>
+            <span class="stat-value" id="hudScore">0000</span>
+          </div>
+        </div>
+
+        <div class="hud-actions">
+          <button type="button" class="btn-ghost" id="btnMute" title="Toggle Sound (M)">Sound On</button>
+          <button type="button" class="btn-ghost" id="btnRestart" title="Restart Run (R)">Restart</button>
+        </div>
+      </header>
+
+      <div class="stage-wrap">
+        <canvas id="gameCanvas" width="960" height="560"></canvas>
+
+        <!-- Start Screen -->
+        <div class="overlay visible" id="overlayStart">
+          <div class="modal">
+            <div class="modal-kicker">Three-Stage Atmospheric Platformer</div>
+            <h1 class="modal-title">Embervale</h1>
+            <p class="modal-desc">
+              Traverse ancient cliffside ruins, ride moving stone lifts, stomp patrolling sentinels, and reach each summit portal.
+            </p>
+            <div class="controls-grid">
+              <div class="control-row"><span>Move</span><span class="keycap">A / D · ← / →</span></div>
+              <div class="control-row"><span>Jump</span><span class="keycap">W · ↑ · Space</span></div>
+              <div class="control-row"><span>Pause</span><span class="keycap">P / Esc</span></div>
+              <div class="control-row"><span>Restart</span><span class="keycap">R</span></div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn-primary" id="btnStart">Start Game</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pause Screen -->
+        <div class="overlay" id="overlayPause">
+          <div class="modal">
+            <div class="modal-kicker" id="pauseLevelLabel">Level 1 of 3</div>
+            <h2 class="modal-title">Paused</h2>
+            <p class="modal-desc">Take a breath before your next leap.</p>
+            <div class="modal-actions">
+              <button type="button" class="btn-primary" id="btnResume">Resume</button>
+              <button type="button" class="btn-ghost" id="btnPauseRestart">Restart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div class="overlay" id="overlayGameOver">
+          <div class="modal">
+            <div class="modal-kicker" id="gameOverLevelLabel">Fell in Sunlit Ruins</div>
+            <h2 class="modal-title">Game Over</h2>
+            <p class="modal-desc">Your journey ended before reaching the summit portal.</p>
+            <div class="summary-grid">
+              <div>
+                <div class="summary-item-label">Final Score</div>
+                <div class="summary-item-val" id="goScore">0</div>
+              </div>
+              <div>
+                <div class="summary-item-label">Coins</div>
+                <div class="summary-item-val" id="goCoins">0</div>
+              </div>
+              <div>
+                <div class="summary-item-label">Stage</div>
+                <div class="summary-item-val" id="goStage">1 / 3</div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn-primary" id="btnGameOverRestart">Try Again (R)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div class="overlay" id="overlayVictory">
+          <div class="modal">
+            <div class="modal-kicker">All Stages Cleared</div>
+            <h2 class="modal-title">Victory</h2>
+            <p class="modal-desc">You crossed the Obsidian Spire and conquered Embervale.</p>
+            <div class="summary-grid">
+              <div>
+                <div class="summary-item-label">Total Score</div>
+                <div class="summary-item-val" id="vicScore">0</div>
+              </div>
+              <div>
+                <div class="summary-item-label">Coins</div>
+                <div class="summary-item-val" id="vicCoins">0</div>
+              </div>
+              <div>
+                <div class="summary-item-label">Lives Bonus</div>
+                <div class="summary-item-val" id="vicBonus">+0</div>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn-primary" id="btnVictoryRestart">Play Again (R)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="touch-bar" aria-label="Touch Controls">
+      <div class="touch-group">
+        <button type="button" class="touch-btn" id="touchLeft">← Left</button>
+        <button type="button" class="touch-btn" id="touchRight">Right →</button>
+      </div>
+      <div class="touch-group">
+        <button type="button" class="touch-btn" id="touchJump">Jump</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // =========================================================================
+      // CONSTANTS & LEVEL DATA (Clean editable tilemaps & platform definitions)
+      // Legend:
+      //   '.' = Empty sky
+      //   '#' = Solid terrain block
+      //   '=' = Stone platform slab
+      //   '^' = Hazard spikes
+      //   'C' = Gold coin (10 pts)
+      //   'G' = Sky gem (50 pts)
+      //   'E' = Patrolling beetle sentinel
+      //   'F' = Fast obsidian stalker
+      //   'K' = Checkpoint brazier
+      //   'P' = Player spawn
+      //   'X' = Exit portal
+      // =========================================================================
+      const TILE = 40;
+      const VIEW_W = 960;
+      const VIEW_H = 560;
+      const MAP_ROWS = 14;
+
+      const LEVELS = [
+        {
+          name: 'Sunlit Ruins',
+          theme: {
+            skyTop: '#131b3a',
+            skyMid: '#2d2b55',
+            skyBot: '#c26d48',
+            sunColor: '#ffd28a',
+            farMountain: '#1b2042',
+            midRuins: '#242347',
+            nearHaze: 'rgba(244, 162, 97, 0.08)',
+            stoneBase: '#333b4d',
+            stoneDark: '#232938',
+            stoneCap: '#4c8f68',
+            stoneCapHighlight: '#73ba89',
+            slabColor: '#485269',
+            portalColor: '#38bdf8',
+            moteColor: 'rgba(255, 224, 150, 0.65)'
+          },
+          map: [
+            '....................................................................',
+            '....................................................................',
+            '....................................................................',
+            '....................................................................',
+            '....................................................................',
+            '....................................................................',
+            '..............................C.G.C.................................',
+            '..................C.G.C.......=====.................................',
+            '..................=====.............................................',
+            '........C.C.C...........................C.C.C......C.G.C............',
+            '........=====......................................=====.........X..',
+            '.P...............E.............^^..K....................E.....######',
+            '############..###########...##########........#############...######',
+            '############..###########...##########........#############...######'
+          ],
+          movingPlatforms: [
+            { startX: 38.4 * TILE, startY: 11.4 * TILE, endX: 43.1 * TILE, endY: 11.4 * TILE, w: 104, h: 18, speed: 105 }
+          ]
+        },
+        {
+          name: 'Mossy Aqueduct',
+          theme: {
+            skyTop: '#0b1d26',
+            skyMid: '#12313b',
+            skyBot: '#295f63',
+            sunColor: '#a7f3d0',
+            farMountain: '#0f2730',
+            midRuins: '#163942',
+            nearHaze: 'rgba(110, 231, 183, 0.07)',
+            stoneBase: '#2a3d45',
+            stoneDark: '#1c2b32',
+            stoneCap: '#2e8b76',
+            stoneCapHighlight: '#52b79c',
+            slabColor: '#3a535e',
+            portalColor: '#34d399',
+            moteColor: 'rgba(167, 243, 208, 0.55)'
+          },
+          map: [
+            '............................................................................',
+            '............................................................................',
+            '............................................................................',
+            '............................................................................',
+            '............................................................................',
+            '............................................................................',
+            '..............C.G.C..........C.C.C..........................................',
+            '..............=====.........=======.........................................',
+            '...............................................C.G.C........................',
+            '..........==...................................=====...........E............',
+            '......===...............................................===...===........X..',
+            '.P.............E.....^^...............E...K..........................#######',
+            '#########...#############..........##########...........#..^^....^^..#######',
+            '#########...#############..........##########...........####################'
+          ],
+          movingPlatforms: [
+            { startX: 25.0 * TILE, startY: 11.5 * TILE, endX: 25.0 * TILE, endY: 7.4 * TILE, w: 96, h: 18, speed: 95 },
+            { startX: 45.4 * TILE, startY: 11.3 * TILE, endX: 52.8 * TILE, endY: 11.3 * TILE, w: 104, h: 18, speed: 120 }
+          ]
+        },
+        {
+          name: 'Obsidian Spire',
+          theme: {
+            skyTop: '#110a1c',
+            skyMid: '#2a1228',
+            skyBot: '#7c242b',
+            sunColor: '#fb7185',
+            farMountain: '#1b0f26',
+            midRuins: '#29152c',
+            nearHaze: 'rgba(251, 113, 133, 0.08)',
+            stoneBase: '#272230',
+            stoneDark: '#191520',
+            stoneCap: '#9f3342',
+            stoneCapHighlight: '#e15b64',
+            slabColor: '#3a3147',
+            portalColor: '#f59e0b',
+            moteColor: 'rgba(253, 186, 116, 0.7)'
+          },
+          map: [
+            '....................................................................................',
+            '....................................................................................',
+            '....................................................................................',
+            '............................................G.C.G...................................',
+            '............................................=====...................................',
+            '....................................................................................',
+            '.........................................==.........................................',
+            '......................C.G.C.............K....F....^^................................',
+            '............C.C.......=====............################.C...........................',
+            '............===........................################.==..........................',
+            '.........==......==....................################..........................X..',
+            '.P......................F..............################..............F..^....######',
+            '########.^^^^^^^^^^.#########..........################..........##########...######',
+            '#############################..........################..........##########...######'
+          ],
+          movingPlatforms: [
+            { startX: 29.4 * TILE, startY: 11.3 * TILE, endX: 32.8 * TILE, endY: 11.3 * TILE, w: 92, h: 18, speed: 125 },
+            { startX: 35.8 * TILE, startY: 11.3 * TILE, endX: 35.8 * TILE, endY: 7.9 * TILE, w: 92, h: 18, speed: 110 },
+            { startX: 57.5 * TILE, startY: 11.2 * TILE, endX: 62.2 * TILE, endY: 11.2 * TILE, w: 92, h: 18, speed: 130 }
+          ]
+        }
+      ];
+
+      // =========================================================================
+      // SOUND ENGINE (Procedural Web Audio API Synthesizer)
+      // =========================================================================
+      class SoundEngine {
+        constructor() {
+          this.ctx = null;
+          this.muted = false;
+        }
+
+        unlock() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+              this.ctx = new AudioCtx();
+            }
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+        }
+
+        toggleMute() {
+          this.muted = !this.muted;
+          return this.muted;
+        }
+
+        _tone({ type = 'square', startFreq, endFreq, duration, gain = 0.12, delay = 0 }) {
+          if (this.muted || !this.ctx) return;
+          const now = this.ctx.currentTime + delay;
+          const osc = this.ctx.createOscillator();
+          const amp = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(startFreq, now);
+          if (endFreq !== undefined && endFreq !== startFreq) {
+            osc.frequency.exponentialRampToValueAtTime(Math.max(20, endFreq), now + duration);
+          }
+          amp.gain.setValueAtTime(0.0001, now);
+          amp.gain.linearRampToValueAtTime(gain, now + 0.01);
+          amp.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+          osc.connect(amp);
+          amp.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + duration + 0.02);
+        }
+
+        jump() {
+          this._tone({ type: 'square', startFreq: 210, endFreq: 520, duration: 0.13, gain: 0.08 });
+          this._tone({ type: 'triangle', startFreq: 180, endFreq: 420, duration: 0.12, gain: 0.09 });
+        }
+
+        coin(isGem = false) {
+          if (isGem) {
+            this._tone({ type: 'triangle', startFreq: 784, endFreq: 784, duration: 0.07, gain: 0.12, delay: 0 });
+            this._tone({ type: 'triangle', startFreq: 988, endFreq: 988, duration: 0.07, gain: 0.12, delay: 0.06 });
+            this._tone({ type: 'triangle', startFreq: 1318, endFreq: 1318, duration: 0.18, gain: 0.13, delay: 0.12 });
+          } else {
+            this._tone({ type: 'square', startFreq: 988, endFreq: 988, duration: 0.06, gain: 0.07, delay: 0 });
+            this._tone({ type: 'square', startFreq: 1319, endFreq: 1319, duration: 0.14, gain: 0.07, delay: 0.055 });
+          }
+        }
+
+        stomp() {
+          this._tone({ type: 'sawtooth', startFreq: 240, endFreq: 75, duration: 0.11, gain: 0.12, delay: 0 });
+          this._tone({ type: 'triangle', startFreq: 320, endFreq: 540, duration: 0.09, gain: 0.1, delay: 0.04 });
+        }
+
+        hurt() {
+          this._tone({ type: 'sawtooth', startFreq: 220, endFreq: 68, duration: 0.24, gain: 0.14, delay: 0 });
+          this._tone({ type: 'square', startFreq: 150, endFreq: 55, duration: 0.22, gain: 0.09, delay: 0.03 });
+        }
+
+        checkpoint() {
+          this._tone({ type: 'triangle', startFreq: 523, endFreq: 523, duration: 0.09, gain: 0.11, delay: 0 });
+          this._tone({ type: 'triangle', startFreq: 659, endFreq: 659, duration: 0.09, gain: 0.11, delay: 0.08 });
+          this._tone({ type: 'triangle', startFreq: 784, endFreq: 784, duration: 0.16, gain: 0.12, delay: 0.16 });
+        }
+
+        levelClear() {
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((n, idx) => {
+            this._tone({ type: 'triangle', startFreq: n, endFreq: n, duration: 0.16, gain: 0.13, delay: idx * 0.09 });
+          });
+        }
+
+        gameOver() {
+          const notes = [392.0, 349.23, 311.13, 261.63];
+          notes.forEach((n, idx) => {
+            this._tone({ type: 'sawtooth', startFreq: n, endFreq: n * 0.96, duration: 0.22, gain: 0.08, delay: idx * 0.14 });
+          });
+        }
+
+        victory() {
+          const notes = [523.25, 659.25, 783.99, 1046.5, 987.77, 1046.5, 1318.5];
+          const delays = [0, 0.09, 0.18, 0.27, 0.42, 0.52, 0.64];
+          notes.forEach((n, idx) => {
+            this._tone({ type: 'triangle', startFreq: n, endFreq: n, duration: idx === 6 ? 0.35 : 0.14, gain: 0.14, delay: delays[idx] });
+          });
+        }
+      }
+
+      // =========================================================================
+      // INPUT MANAGER (Keyboard + Touch with edge detection)
+      // =========================================================================
+      class InputManager {
+        constructor(sound) {
+          this.sound = sound;
+          this.keys = new Set();
+          this.prevKeys = new Set();
+          this.touch = { left: false, right: false, jump: false };
+          this.prevTouch = { left: false, right: false, jump: false };
+
+          this._bindKeyboard();
+          this._bindTouch();
+        }
+
+        _bindKeyboard() {
+          const prevent = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space']);
+          window.addEventListener('keydown', (e) => {
+            this.sound.unlock();
+            if (prevent.has(e.code)) e.preventDefault();
+            this.keys.add(e.code);
+          });
+          window.addEventListener('keyup', (e) => {
+            this.keys.delete(e.code);
+          });
+          window.addEventListener('blur', () => {
+            this.keys.clear();
+            this.touch.left = false;
+            this.touch.right = false;
+            this.touch.jump = false;
+          });
+        }
+
+        _bindTouch() {
+          const bindBtn = (id, key) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const down = (e) => {
+              e.preventDefault();
+              this.sound.unlock();
+              this.touch[key] = true;
+              el.classList.add('active');
+            };
+            const up = (e) => {
+              e.preventDefault();
+              this.touch[key] = false;
+              el.classList.remove('active');
+            };
+            el.addEventListener('pointerdown', down);
+            el.addEventListener('pointerup', up);
+            el.addEventListener('pointercancel', up);
+            el.addEventListener('pointerleave', up);
+          };
+          bindBtn('touchLeft', 'left');
+          bindBtn('touchRight', 'right');
+          bindBtn('touchJump', 'jump');
+        }
+
+        isDown(action) {
+          switch (action) {
+            case 'left':
+              return this.keys.has('ArrowLeft') || this.keys.has('KeyA') || this.touch.left;
+            case 'right':
+              return this.keys.has('ArrowRight') || this.keys.has('KeyD') || this.touch.right;
+            case 'jump':
+              return this.keys.has('ArrowUp') || this.keys.has('KeyW') || this.keys.has('Space') || this.touch.jump;
+            default:
+              return this.keys.has(action);
+          }
+        }
+
+        wasDown(action) {
+          switch (action) {
+            case 'left':
+              return this.prevKeys.has('ArrowLeft') || this.prevKeys.has('KeyA') || this.prevTouch.left;
+            case 'right':
+              return this.prevKeys.has('ArrowRight') || this.prevKeys.has('KeyD') || this.prevTouch.right;
+            case 'jump':
+              return this.prevKeys.has('ArrowUp') || this.prevKeys.has('KeyW') || this.prevKeys.has('Space') || this.prevTouch.jump;
+            default:
+              return this.prevKeys.has(action);
+          }
+        }
+
+        justPressed(action) {
+          return this.isDown(action) && !this.wasDown(action);
+        }
+
+        justReleased(action) {
+          return !this.isDown(action) && this.wasDown(action);
+        }
+
+        endFrame() {
+          this.prevKeys = new Set(this.keys);
+          this.prevTouch = { ...this.touch };
+        }
+      }
+
+      // =========================================================================
+      // PARTICLE SYSTEM & FLOATING SCORE POPUPS
+      // =========================================================================
+      class ParticleSystem {
+        constructor() {
+          this.particles = [];
+          this.texts = [];
+        }
+
+        clear() {
+          this.particles.length = 0;
+          this.texts.length = 0;
+        }
+
+        burst(x, y, color, count = 12, speed = 170, gravity = 460, size = 4) {
+          for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+            const mag = speed * (0.4 + Math.random() * 0.75);
+            this.particles.push({
+              x,
+              y,
+              vx: Math.cos(angle) * mag,
+              vy: Math.sin(angle) * mag - 45,
+              life: 0,
+              maxLife: 0.35 + Math.random() * 0.3,
+              color,
+              size: size * (0.65 + Math.random() * 0.7),
+              gravity
+            });
+          }
+        }
+
+        dust(x, y, dir = 0) {
+          for (let i = 0; i < 6; i++) {
+            this.particles.push({
+              x: x + (Math.random() - 0.5) * 14,
+              y: y - 2,
+              vx: dir * -45 + (Math.random() - 0.5) * 70,
+              vy: -20 - Math.random() * 55,
+              life: 0,
+              maxLife: 0.25 + Math.random() * 0.2,
+              color: 'rgba(226, 232, 240, 0.65)',
+              size: 3 + Math.random() * 2.5,
+              gravity: 90
+            });
+          }
+        }
+
+        popup(x, y, text, color = '#fbbf24') {
+          this.texts.push({
+            x,
+            y,
+            text,
+            color,
+            life: 0,
+            maxLife: 0.75
+          });
+        }
+
+        update(dt) {
+          for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.life += dt;
+            if (p.life >= p.maxLife) {
+              this.particles.splice(i, 1);
+              continue;
+            }
+            p.vy += p.gravity * dt;
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+          }
+
+          for (let i = this.texts.length - 1; i >= 0; i--) {
+            const t = this.texts[i];
+            t.life += dt;
+            if (t.life >= t.maxLife) {
+              this.texts.splice(i, 1);
+              continue;
+            }
+            t.y -= 42 * dt;
+          }
+        }
+
+        draw(ctx, cam) {
+          for (const p of this.particles) {
+            const alpha = Math.max(0, 1 - p.life / p.maxLife);
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = p.color;
+            const s = p.size * (0.5 + 0.5 * alpha);
+            ctx.fillRect(p.x - cam.x - s * 0.5, p.y - cam.y - s * 0.5, s, s);
+            ctx.restore();
+          }
+
+          ctx.save();
+          ctx.font = '700 13px ui-monospace, SFMono-Regular, Menlo, monospace';
+          ctx.textAlign = 'center';
+          for (const t of this.texts) {
+            const alpha = Math.max(0, 1 - t.life / t.maxLife);
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillText(t.text, t.x - cam.x + 1, t.y - cam.y + 1);
+            ctx.fillStyle = t.color;
+            ctx.fillText(t.text, t.x - cam.x, t.y - cam.y);
+          }
+          ctx.restore();
+        }
+      }
+
+      // =========================================================================
+      // CAMERA (Smooth look-ahead tracking & micro screen-shake)
+      // =========================================================================
+      class Camera {
+        constructor() {
+          this.x = 0;
+          this.y = 0;
+          this.shakeTime = 0;
+          this.shakeMag = 0;
+        }
+
+        reset(player, level) {
+          this.x = Math.max(0, Math.min(level.width - VIEW_W, player.x + player.w * 0.5 - VIEW_W * 0.38));
+          this.y = 0;
+          this.shakeTime = 0;
+          this.shakeMag = 0;
+        }
+
+        shake(mag = 6, duration = 0.16) {
+          this.shakeMag = Math.max(this.shakeMag, mag);
+          this.shakeTime = Math.max(this.shakeTime, duration);
+        }
+
+        update(dt, player, level) {
+          const lookAhead = player.facing * 56;
+          const targetX = player.x + player.w * 0.5 + lookAhead - VIEW_W * 0.44;
+          const clampedTargetX = Math.max(0, Math.min(level.width - VIEW_W, targetX));
+          const lerpX = 1 - Math.exp(-8.5 * dt);
+          this.x += (clampedTargetX - this.x) * lerpX;
+
+          const clampedTargetY = Math.max(0, Math.min(level.height - VIEW_H, player.y - VIEW_H * 0.55));
+          const lerpY = 1 - Math.exp(-6.0 * dt);
+          this.y += (clampedTargetY - this.y) * lerpY;
+
+          if (this.shakeTime > 0) {
+            this.shakeTime = Math.max(0, this.shakeTime - dt);
+            if (this.shakeTime === 0) this.shakeMag = 0;
+          }
+        }
+
+        get renderOffset() {
+          if (this.shakeTime <= 0) return { x: Math.round(this.x), y: Math.round(this.y) };
+          const sx = (Math.random() - 0.5) * 2 * this.shakeMag;
+          const sy = (Math.random() - 0.5) * 2 * this.shakeMag;
+          return { x: Math.round(this.x + sx), y: Math.round(this.y + sy) };
+        }
+      }
+
+      // =========================================================================
+      // ENTITIES: MovingPlatform, Enemy, Collectible, Checkpoint, Portal
+      // =========================================================================
+      class MovingPlatform {
+        constructor(cfg) {
+          this.startX = cfg.startX;
+          this.startY = cfg.startY;
+          this.endX = cfg.endX;
+          this.endY = cfg.endY;
+          this.x = cfg.startX;
+          this.y = cfg.startY;
+          this.prevX = this.x;
+          this.prevY = this.y;
+          this.dx = 0;
+          this.dy = 0;
+          this.w = cfg.w;
+          this.h = cfg.h;
+          this.speed = cfg.speed;
+          const dist = Math.hypot(this.endX - this.startX, this.endY - this.startY);
+          this.period = dist > 0 ? (dist / this.speed) * 2 : 1;
+          this.elapsed = 0;
+        }
+
+        update(dt) {
+          this.prevX = this.x;
+          this.prevY = this.y;
+          this.elapsed += dt;
+          // Smooth cosine ping-pong between start and end
+          const phase = (this.elapsed / this.period) * Math.PI * 2;
+          const t = (1 - Math.cos(phase)) * 0.5;
+          this.x = this.startX + (this.endX - this.startX) * t;
+          this.y = this.startY + (this.endY - this.startY) * t;
+          this.dx = this.x - this.prevX;
+          this.dy = this.y - this.prevY;
+        }
+
+        draw(ctx, cam, theme) {
+          const sx = this.startX + this.w * 0.5 - cam.x;
+          const sy = this.startY + this.h * 0.5 - cam.y;
+          const ex = this.endX + this.w * 0.5 - cam.x;
+          const ey = this.endY + this.h * 0.5 - cam.y;
+
+          // Subtle guide rail
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 6]);
+          ctx.beginPath();
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(ex, ey);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+          ctx.beginPath();
+          ctx.arc(sx, sy, 3, 0, Math.PI * 2);
+          ctx.arc(ex, ey, 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Platform body
+          const px = Math.round(this.x - cam.x);
+          const py = Math.round(this.y - cam.y);
+          ctx.fillStyle = theme.stoneDark;
+          ctx.fillRect(px, py, this.w, this.h);
+          ctx.fillStyle = theme.slabColor;
+          ctx.fillRect(px + 2, py + 2, this.w - 4, this.h - 5);
+          // Glowing rune bar
+          ctx.fillStyle = theme.portalColor;
+          ctx.globalAlpha = 0.75;
+          ctx.fillRect(px + 10, py + this.h * 0.5 - 1, this.w - 20, 3);
+          ctx.globalAlpha = 1;
+          // Top specular rim
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+          ctx.fillRect(px + 2, py + 1, this.w - 4, 2);
+          ctx.restore();
+        }
+      }
+
+      class Enemy {
+        constructor(x, y, kind = 'crawler') {
+          this.kind = kind;
+          this.w = 30;
+          this.h = kind === 'sentinel' ? 28 : 24;
+          this.x = x + (TILE - this.w) * 0.5;
+          this.y = y + (TILE - this.h);
+          this.vx = kind === 'sentinel' ? 128 : 78;
+          this.dir = -1;
+          this.alive = true;
+          this.squashTimer = 0;
+          this.animTime = Math.random() * 10;
+        }
+
+        update(dt, level) {
+          if (!this.alive) {
+            if (this.squashTimer > 0) this.squashTimer = Math.max(0, this.squashTimer - dt);
+            return;
+          }
+
+          this.animTime += dt;
+          const nextX = this.x + this.dir * this.vx * dt;
+
+          // Wall check
+          const leadingX = this.dir > 0 ? nextX + this.w : nextX;
+          const topRow = Math.floor((this.y + 3) / TILE);
+          const botRow = Math.floor((this.y + this.h - 3) / TILE);
+          const leadCol = Math.floor(leadingX / TILE);
+
+          let hitWall = leadingX <= 0 || leadingX >= level.width;
+          if (!hitWall) {
+            for (let r = topRow; r <= botRow; r++) {
+              if (level.isSolid(leadCol, r)) {
+                hitWall = true;
+                break;
+              }
+            }
+          }
+
+          // Ledge awareness (don't walk off ledges or into spikes)
+          const footRow = Math.floor((this.y + this.h + 3) / TILE);
+          const aheadFootCol = Math.floor((this.dir > 0 ? nextX + this.w + 2 : nextX - 2) / TILE);
+          const hasFloorAhead = level.isSolid(aheadFootCol, footRow);
+          const spikeAhead = level.getTile(aheadFootCol, botRow) === '^';
+
+          if (hitWall || !hasFloorAhead || spikeAhead) {
+            this.dir *= -1;
+          } else {
+            this.x = nextX;
+          }
+        }
+
+        draw(ctx, cam) {
+          if (!this.alive && this.squashTimer <= 0) return;
+
+          const px = this.x - cam.x;
+          const py = this.y - cam.y;
+          ctx.save();
+
+          if (!this.alive) {
+            ctx.globalAlpha = this.squashTimer / 0.25;
+            ctx.translate(px + this.w * 0.5, py + this.h);
+            ctx.scale(1.35, 0.35);
+            ctx.translate(-(px + this.w * 0.5), -(py + this.h));
+          }
+
+          const isSentinel = this.kind === 'sentinel';
+          const shellColor = isSentinel ? '#7f1d1d' : '#475569';
+          const shellHighlight = isSentinel ? '#ef4444' : '#94a3b8';
+          const eyeColor = isSentinel ? '#fde047' : '#38bdf8';
+
+          // Scuttling legs
+          const legSwing = Math.sin(this.animTime * (isSentinel ? 18 : 12)) * 3;
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 3;
+          ctx.lineCap = 'round';
+          for (let i = 0; i < 3; i++) {
+            const lx = px + 6 + i * 9;
+            const offset = i % 2 === 0 ? legSwing : -legSwing;
+            ctx.beginPath();
+            ctx.moveTo(lx, py + this.h - 5);
+            ctx.lineTo(lx + offset, py + this.h);
+            ctx.stroke();
+          }
+
+          // Carapace dome
+          ctx.fillStyle = shellColor;
+          ctx.beginPath();
+          ctx.roundRect(px + 1, py + 4, this.w - 2, this.h - 7, [12, 12, 5, 5]);
+          ctx.fill();
+
+          // Rim highlight
+          ctx.fillStyle = shellHighlight;
+          ctx.beginPath();
+          ctx.roundRect(px + 4, py + 6, this.w - 8, 5, 3);
+          ctx.fill();
+
+          // Horns / spikes on back
+          ctx.fillStyle = isSentinel ? '#fca5a5' : '#cbd5e1';
+          ctx.beginPath();
+          ctx.moveTo(px + this.w * 0.35, py + 5);
+          ctx.lineTo(px + this.w * 0.5, py - 2);
+          ctx.lineTo(px + this.w * 0.65, py + 5);
+          ctx.fill();
+
+          // Glowing eye facing direction
+          const eyeX = this.dir > 0 ? px + this.w - 10 : px + 5;
+          ctx.fillStyle = eyeColor;
+          ctx.beginPath();
+          ctx.arc(eyeX + 2.5, py + 13, 3.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#090d16';
+          ctx.beginPath();
+          ctx.arc(eyeX + (this.dir > 0 ? 3.5 : 1.5), py + 13, 1.3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+        }
+      }
+
+      class Collectible {
+        constructor(x, y, kind = 'coin') {
+          this.kind = kind;
+          this.x = x + TILE * 0.5;
+          this.y = y + TILE * 0.5;
+          this.radius = kind === 'gem' ? 11 : 9;
+          this.collected = false;
+          this.phase = x * 0.05;
+        }
+
+        draw(ctx, cam, time) {
+          if (this.collected) return;
+          const bob = Math.sin(time * 3.5 + this.phase) * 4;
+          const cx = this.x - cam.x;
+          const cy = this.y + bob - cam.y;
+          const spinWidth = Math.max(0.28, Math.abs(Math.cos(time * 3.2 + this.phase)));
+
+          ctx.save();
+          // Atmospheric halo
+          const glow = ctx.createRadialGradient(cx, cy, 2, cx, cy, this.radius * 2.3);
+          if (this.kind === 'gem') {
+            glow.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+            glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+          } else {
+            glow.addColorStop(0, 'rgba(251, 191, 36, 0.3)');
+            glow.addColorStop(1, 'rgba(251, 191, 36, 0)');
+          }
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(cx, cy, this.radius * 2.3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.translate(cx, cy);
+          ctx.scale(spinWidth, 1);
+
+          if (this.kind === 'gem') {
+            // Faceted sky gem
+            ctx.fillStyle = '#0284c7';
+            ctx.beginPath();
+            ctx.moveTo(0, -12);
+            ctx.lineTo(10, 0);
+            ctx.lineTo(0, 12);
+            ctx.lineTo(-10, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.moveTo(0, -12);
+            ctx.lineTo(10, 0);
+            ctx.lineTo(0, 2);
+            ctx.lineTo(-10, 0);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#e0f2fe';
+            ctx.beginPath();
+            ctx.moveTo(0, -8);
+            ctx.lineTo(4, -1);
+            ctx.lineTo(0, 1);
+            ctx.lineTo(-4, -1);
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            // Gold coin
+            ctx.fillStyle = '#d97706';
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#fbbf24';
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius - 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#fef3c7';
+            ctx.fillRect(-1.5, -5, 3, 10);
+          }
+
+          ctx.restore();
+        }
+      }
+
+      class Checkpoint {
+        constructor(col, row) {
+          this.x = col * TILE + TILE * 0.5;
+          this.y = (row + 1) * TILE;
+          this.spawnX = col * TILE + 7;
+          this.spawnY = row * TILE + 6;
+          this.activated = false;
+        }
+
+        draw(ctx, cam, time) {
+          const cx = this.x - cam.x;
+          const cy = this.y - cam.y;
+          ctx.save();
+
+          // Stone pedestal
+          ctx.fillStyle = '#475569';
+          ctx.fillRect(cx - 8, cy - 12, 16, 12);
+          ctx.fillStyle = '#64748b';
+          ctx.fillRect(cx - 11, cy - 16, 22, 4);
+
+          if (this.activated) {
+            const pulse = 0.85 + Math.sin(time * 6) * 0.15;
+            const glow = ctx.createRadialGradient(cx, cy - 26, 2, cx, cy - 26, 36 * pulse);
+            glow.addColorStop(0, 'rgba(56, 189, 248, 0.55)');
+            glow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(cx, cy - 26, 36 * pulse, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cyan flame
+            ctx.fillStyle = '#38bdf8';
+            ctx.beginPath();
+            ctx.moveTo(cx - 7, cy - 16);
+            ctx.quadraticCurveTo(cx, cy - 38 - Math.sin(time * 10) * 3, cx + 7, cy - 16);
+            ctx.fill();
+
+            ctx.fillStyle = '#e0f2fe';
+            ctx.beginPath();
+            ctx.moveTo(cx - 3.5, cy - 16);
+            ctx.quadraticCurveTo(cx, cy - 28, cx + 3.5, cy - 16);
+            ctx.fill();
+          } else {
+            ctx.fillStyle = '#334155';
+            ctx.beginPath();
+            ctx.arc(cx, cy - 20, 4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.restore();
+        }
+      }
+
+      class Portal {
+        constructor(col, row) {
+          this.x = col * TILE + TILE * 0.5;
+          this.y = (row + 1) * TILE - 34;
+          this.rx = 20;
+          this.ry = 34;
+        }
+
+        draw(ctx, cam, time, color) {
+          const cx = this.x - cam.x;
+          const cy = this.y - cam.y;
+          ctx.save();
+
+          // Outer glow
+          const glow = ctx.createRadialGradient(cx, cy, 6, cx, cy, 58);
+          glow.addColorStop(0, color);
+          glow.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
+          glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.globalAlpha = 0.55;
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 58, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+
+          // Stone archway
+          ctx.strokeStyle = '#64748b';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, this.rx + 4, this.ry + 4, 0, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Swirling vortex core
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, this.rx, this.ry, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.5;
+          for (let i = 0; i < 3; i++) {
+            const scale = 0.35 + ((time * 0.9 + i / 3) % 1) * 0.65;
+            ctx.globalAlpha = 1 - scale * 0.6;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, this.rx * scale, this.ry * scale, time * (i % 2 === 0 ? 1 : -1), 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          // Orbiting sparks
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = '#ffffff';
+          for (let i = 0; i < 4; i++) {
+            const a = time * 3 + (Math.PI * 2 * i) / 4;
+            const ox = cx + Math.cos(a) * (this.rx + 2);
+            const oy = cy + Math.sin(a) * (this.ry + 2);
+            ctx.beginPath();
+            ctx.arc(ox, oy, 2.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.restore();
+        }
+      }
+
+      // =========================================================================
+      // LEVEL PARSER & TILEMAP MANAGER
+      // =========================================================================
+      class Level {
+        constructor(config) {
+          this.name = config.name;
+          this.theme = config.theme;
+          this.rows = MAP_ROWS;
+          this.cols = Math.max(...config.map.map((r) => r.length));
+          this.width = this.cols * TILE;
+          this.height = this.rows * TILE;
+
+          this.grid = [];
+          this.spawn = { x: TILE * 1.5, y: TILE * 10 };
+          this.activeSpawn = { ...this.spawn };
+          this.collectibles = [];
+          this.enemies = [];
+          this.checkpoints = [];
+          this.portal = null;
+          this.movingPlatforms = (config.movingPlatforms || []).map((p) => new MovingPlatform(p));
+
+          this._parse(config.map);
+        }
+
+        _parse(rawMap) {
+          for (let r = 0; r < this.rows; r++) {
+            const rowStr = (rawMap[r] || '').padEnd(this.cols, '.');
+            const rowArr = [];
+            for (let c = 0; c < this.cols; c++) {
+              const ch = rowStr[c];
+              if (ch === '#' || ch === '=' || ch === '^') {
+                rowArr.push(ch);
+              } else {
+                rowArr.push('.');
+                if (ch === 'P') {
+                  this.spawn = { x: c * TILE + 7, y: r * TILE + 6 };
+                  this.activeSpawn = { ...this.spawn };
+                } else if (ch === 'C') {
+                  this.collectibles.push(new Collectible(c * TILE, r * TILE, 'coin'));
+                } else if (ch === 'G') {
+                  this.collectibles.push(new Collectible(c * TILE, r * TILE, 'gem'));
+                } else if (ch === 'E') {
+                  this.enemies.push(new Enemy(c * TILE, r * TILE, 'crawler'));
+                } else if (ch === 'F') {
+                  this.enemies.push(new Enemy(c * TILE, r * TILE, 'sentinel'));
+                } else if (ch === 'K') {
+                  this.checkpoints.push(new Checkpoint(c, r));
+                } else if (ch === 'X') {
+                  this.portal = new Portal(c, r);
+                }
+              }
+            }
+            this.grid.push(rowArr);
+          }
+        }
+
+        getTile(col, row) {
+          if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) return '.';
+          return this.grid[row][col];
+        }
+
+        isSolid(col, row) {
+          if (col < 0 || col >= this.cols) return false;
+          if (row < 0) return false;
+          if (row >= this.rows) return false;
+          const t = this.grid[row][col];
+          return t === '#' || t === '=';
+        }
+      }
+
+      // =========================================================================
+      // PLAYER (Physics, Coyote Time, Jump Buffer, Variable Jump, Squash/Stretch)
+      // =========================================================================
+      class Player {
+        constructor(x, y) {
+          this.w = 26;
+          this.h = 34;
+          this.reset(x, y);
+        }
+
+        reset(x, y) {
+          this.x = x;
+          this.y = y;
+          this.vx = 0;
+          this.vy = 0;
+          this.facing = 1;
+          this.grounded = false;
+          this.standingPlatform = null;
+          this.coyoteTimer = 0;
+          this.jumpBufferTimer = 0;
+          this.invulnTimer = 0;
+          this.scaleX = 1;
+          this.scaleY = 1;
+          this.runAnim = 0;
+          this.scarfWave = 0;
+          this.prevBottom = y + this.h;
+        }
+
+        update(dt, input, level, particles, sound, cam) {
+          this.prevBottom = this.y + this.h;
+
+          // Carry player if riding a moving platform
+          if (this.standingPlatform) {
+            this.x += this.standingPlatform.dx;
+            this.y += this.standingPlatform.dy;
+            this.x = Math.max(0, Math.min(level.width - this.w, this.x));
+          }
+
+          if (this.invulnTimer > 0) {
+            this.invulnTimer = Math.max(0, this.invulnTimer - dt);
+          }
+
+          // Horizontal input with acceleration, turn boost, and friction
+          const moveDir = (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
+          const maxSpeed = 290;
+          const accel = this.grounded ? 2350 : 1650;
+          const friction = this.grounded ? 2500 : 520;
+
+          if (moveDir !== 0) {
+            this.facing = moveDir;
+            const reversing = this.vx !== 0 && Math.sign(this.vx) !== moveDir;
+            const effectiveAccel = reversing && this.grounded ? accel * 1.65 : accel;
+            this.vx += moveDir * effectiveAccel * dt;
+            if (Math.abs(this.vx) > maxSpeed) {
+              this.vx = moveDir * maxSpeed;
+            }
+          } else {
+            const decel = friction * dt;
+            if (Math.abs(this.vx) <= decel) {
+              this.vx = 0;
+            } else {
+              this.vx -= Math.sign(this.vx) * decel;
+            }
+          }
+
+          // Coyote time & jump buffer
+          if (this.grounded) {
+            this.coyoteTimer = 0.11;
+          } else {
+            this.coyoteTimer = Math.max(0, this.coyoteTimer - dt);
+          }
+
+          if (input.justPressed('jump')) {
+            this.jumpBufferTimer = 0.12;
+          } else {
+            this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - dt);
+          }
+
+          // Execute buffered / coyote jump
+          if (this.jumpBufferTimer > 0 && this.coyoteTimer > 0) {
+            this.vy = -585;
+            this.grounded = false;
+            this.standingPlatform = null;
+            this.coyoteTimer = 0;
+            this.jumpBufferTimer = 0;
+            this.scaleX = 0.76;
+            this.scaleY = 1.28;
+            particles.dust(this.x + this.w * 0.5, this.y + this.h, this.facing);
+            sound.jump();
+          }
+
+          // Variable jump height (cut upward velocity on early release)
+          if (input.justReleased('jump') && this.vy < -120) {
+            this.vy *= 0.48;
+          }
+
+          // Gravity with apex hang & brisk fall
+          const baseG = 1520;
+          let gMult = 1.0;
+          if (Math.abs(this.vy) < 70 && input.isDown('jump') && !this.grounded) {
+            gMult = 0.68;
+          } else if (this.vy > 0) {
+            gMult = 1.24;
+          }
+          this.vy = Math.min(760, this.vy + baseG * gMult * dt);
+
+          // Move & resolve X axis
+          this.x += this.vx * dt;
+          if (this.x < 0) {
+            this.x = 0;
+            this.vx = 0;
+          } else if (this.x + this.w > level.width) {
+            this.x = level.width - this.w;
+            this.vx = 0;
+          }
+          this._resolveX(level);
+
+          // Move & resolve Y axis
+          const wasGrounded = this.grounded;
+          const preLandVy = this.vy;
+          this.y += this.vy * dt;
+          this.grounded = false;
+          this.standingPlatform = null;
+          this._resolveY(level);
+
+          // Landing squash & dust
+          if (!wasGrounded && this.grounded && preLandVy > 130) {
+            const intensity = Math.min(1, preLandVy / 650);
+            this.scaleX = 1 + 0.28 * intensity;
+            this.scaleY = 1 - 0.24 * intensity;
+            particles.dust(this.x + this.w * 0.5, this.y + this.h, 0);
+            if (preLandVy > 560) cam.shake(3.5, 0.1);
+          }
+
+          // Spring squash & stretch back to (1, 1)
+          const spring = 1 - Math.exp(-16 * dt);
+          this.scaleX += (1 - this.scaleX) * spring;
+          this.scaleY += (1 - this.scaleY) * spring;
+
+          // Run & scarf animation
+          if (this.grounded && Math.abs(this.vx) > 25) {
+            this.runAnim += dt * (Math.abs(this.vx) / 28);
+          } else {
+            this.runAnim = 0;
+          }
+          this.scarfWave += dt * (4 + Math.abs(this.vx) * 0.04);
+        }
+
+        _resolveX(level) {
+          const topRow = Math.floor((this.y + 2) / TILE);
+          const botRow = Math.floor((this.y + this.h - 2) / TILE);
+
+          if (this.vx > 0) {
+            const rightCol = Math.floor((this.x + this.w) / TILE);
+            for (let r = topRow; r <= botRow; r++) {
+              if (level.isSolid(rightCol, r)) {
+                this.x = rightCol * TILE - this.w;
+                this.vx = 0;
+                break;
+              }
+            }
+          } else if (this.vx < 0) {
+            const leftCol = Math.floor(this.x / TILE);
+            for (let r = topRow; r <= botRow; r++) {
+              if (level.isSolid(leftCol, r)) {
+                this.x = (leftCol + 1) * TILE;
+                this.vx = 0;
+                break;
+              }
+            }
+          }
+
+          // Against moving platforms
+          for (const p of level.movingPlatforms) {
+            if (this.overlapsRect(p.x, p.y, p.w, p.h)) {
+              const overlapLeft = this.x + this.w - p.x;
+              const overlapRight = p.x + p.w - this.x;
+              if (overlapLeft < overlapRight) {
+                this.x = p.x - this.w;
+              } else {
+                this.x = p.x + p.w;
+              }
+              this.vx = 0;
+            }
+          }
+        }
+
+        _resolveY(level) {
+          const leftCol = Math.floor((this.x + 2) / TILE);
+          const rightCol = Math.floor((this.x + this.w - 2) / TILE);
+
+          if (this.vy >= 0) {
+            const botRow = Math.floor((this.y + this.h) / TILE);
+            for (let c = leftCol; c <= rightCol; c++) {
+              if (level.isSolid(c, botRow)) {
+                this.y = botRow * TILE - this.h;
+                this.vy = 0;
+                this.grounded = true;
+                break;
+              }
+            }
+          } else {
+            const topRow = Math.floor(this.y / TILE);
+            for (let c = leftCol; c <= rightCol; c++) {
+              if (level.isSolid(c, topRow)) {
+                this.y = (topRow + 1) * TILE;
+                this.vy = 0;
+                break;
+              }
+            }
+          }
+
+          // Against moving platforms
+          for (const p of level.movingPlatforms) {
+            if (this.overlapsRect(p.x, p.y, p.w, p.h)) {
+              if (this.vy >= 0 && this.prevBottom <= p.y + 14) {
+                this.y = p.y - this.h;
+                this.vy = 0;
+                this.grounded = true;
+                this.standingPlatform = p;
+              } else if (this.vy < 0) {
+                this.y = p.y + p.h;
+                this.vy = 0;
+              }
+            }
+          }
+        }
+
+        overlapsRect(rx, ry, rw, rh) {
+          return this.x < rx + rw && this.x + this.w > rx && this.y < ry + rh && this.y + this.h > ry;
+        }
+
+        draw(ctx, cam, time) {
+          if (this.invulnTimer > 0 && Math.floor(this.invulnTimer * 16) % 2 === 0) {
+            return;
+          }
+
+          const footX = this.x + this.w * 0.5 - cam.x;
+          const footY = this.y + this.h - cam.y;
+
+          ctx.save();
+          ctx.translate(footX, footY);
+          ctx.scale(this.scaleX, this.scaleY);
+
+          // Trailing scarf behind player
+          const scarfDir = -this.facing;
+          const speedFactor = Math.min(1, Math.abs(this.vx) / 280);
+          const waveY = Math.sin(this.scarfWave) * (2.5 + speedFactor * 3.5);
+          ctx.strokeStyle = '#f59e0b';
+          ctx.lineWidth = 4.5;
+          ctx.lineCap = 'round';
+          ctx.beginPath();
+          ctx.moveTo(scarfDir * 4, -20);
+          ctx.quadraticCurveTo(
+            scarfDir * (12 + speedFactor * 8),
+            -20 + waveY,
+            scarfDir * (19 + speedFactor * 11),
+            -16 - waveY * 0.6
+          );
+          ctx.stroke();
+
+          // Legs
+          const stride = this.grounded ? Math.sin(this.runAnim) * 5 : 4;
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(-7 + stride * 0.5, -9, 5, 9);
+          ctx.fillRect(2 - stride * 0.5, -9, 5, 9);
+
+          // Cloak / torso
+          ctx.fillStyle = '#1e293b';
+          ctx.beginPath();
+          ctx.roundRect(-11, -24, 22, 17, 5);
+          ctx.fill();
+
+          // Chest sash
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillRect(-10, -21, 20, 4);
+
+          // Head & hood
+          ctx.fillStyle = '#334155';
+          ctx.beginPath();
+          ctx.roundRect(-10, -34, 20, 14, [7, 7, 4, 4]);
+          ctx.fill();
+
+          // Visor / face shadow
+          ctx.fillStyle = '#090d16';
+          const faceX = this.facing > 0 ? -3 : -8;
+          ctx.beginPath();
+          ctx.roundRect(faceX, -30, 11, 7, 3);
+          ctx.fill();
+
+          // Glowing eyes (periodic blink)
+          const blinking = Math.sin(time * 2.1) > 0.985;
+          ctx.fillStyle = '#fde68a';
+          if (blinking) {
+            ctx.fillRect(faceX + 2, -27, 3, 1.5);
+            ctx.fillRect(faceX + 7, -27, 3, 1.5);
+          } else {
+            const eyeShift = this.facing > 0 ? 1 : -1;
+            ctx.fillRect(faceX + 2 + eyeShift, -28.5, 2.5, 4);
+            ctx.fillRect(faceX + 6.5 + eyeShift, -28.5, 2.5, 4);
+          }
+
+          ctx.restore();
+        }
+      }
+
+      // =========================================================================
+      // RENDERER (Multi-layer Parallax, Atmospheric Lighting, Procedural Tiles)
+      // =========================================================================
+      class Renderer {
+        constructor(ctx) {
+          this.ctx = ctx;
+          this.stars = Array.from({ length: 48 }, (_, i) => ({
+            x: ((i * 197) % 960),
+            y: ((i * 113) % 300),
+            r: (i % 3) * 0.6 + 0.7,
+            phase: i * 0.7
+          }));
+        }
+
+        drawBackground(cam, level, time) {
+          const ctx = this.ctx;
+          const th = level.theme;
+
+          // Sky gradient
+          const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+          sky.addColorStop(0, th.skyTop);
+          sky.addColorStop(0.55, th.skyMid);
+          sky.addColorStop(1, th.skyBot);
+          ctx.fillStyle = sky;
+          ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+          // Twinkling stars in upper sky
+          ctx.fillStyle = '#ffffff';
+          for (const s of this.stars) {
+            const tw = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(time * 2 + s.phase));
+            ctx.globalAlpha = tw;
+            const sx = (s.x - cam.x * 0.04 + VIEW_W) % VIEW_W;
+            ctx.beginPath();
+            ctx.arc(sx, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+
+          // Celestial body with atmospheric halo
+          const sunX = 720 - cam.x * 0.05;
+          const sunY = 128;
+          const sunGlow = ctx.createRadialGradient(sunX, sunY, 18, sunX, sunY, 150);
+          sunGlow.addColorStop(0, th.sunColor);
+          sunGlow.addColorStop(0.35, 'rgba(255, 255, 255, 0.14)');
+          sunGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = sunGlow;
+          ctx.beginPath();
+          ctx.arc(sunX, sunY, 150, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = th.sunColor;
+          ctx.beginPath();
+          ctx.arc(sunX, sunY, 34, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Parallax Layer 1: Far jagged mountains (0.12x)
+          this._drawMountainLayer(cam.x * 0.12, 330, 110, 220, th.farMountain);
+
+          // Parallax Layer 2: Midground ancient aqueducts & pillars (0.28x)
+          this._drawRuinsLayer(cam.x * 0.28, th.midRuins);
+
+          // Parallax Layer 3: Soft atmospheric mist band
+          ctx.fillStyle = th.nearHaze;
+          ctx.fillRect(0, VIEW_H - 180, VIEW_W, 180);
+
+          // Ambient floating dust/ember motes (0.5x)
+          ctx.fillStyle = th.moteColor;
+          for (let i = 0; i < 24; i++) {
+            const mx = ((i * 157 - cam.x * 0.5 + time * 14) % VIEW_W + VIEW_W) % VIEW_W;
+            const my = ((i * 89 - time * (8 + (i % 4) * 3)) % VIEW_H + VIEW_H) % VIEW_H;
+            ctx.beginPath();
+            ctx.arc(mx, my, 1.5 + (i % 2), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        _drawMountainLayer(offset, baseY, amp, step, color) {
+          const ctx = this.ctx;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.moveTo(0, VIEW_H);
+          const startIdx = Math.floor(offset / step) - 1;
+          const count = Math.ceil(VIEW_W / step) + 3;
+          for (let i = 0; i <= count; i++) {
+            const idx = startIdx + i;
+            const x = idx * step - offset;
+            const h = Math.abs(Math.sin(idx * 1.7 + 0.5)) * amp + Math.abs(Math.cos(idx * 0.9)) * (amp * 0.45);
+            ctx.lineTo(x, baseY - h);
+          }
+          ctx.lineTo(VIEW_W, VIEW_H);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        _drawRuinsLayer(offset, color) {
+          const ctx = this.ctx;
+          ctx.fillStyle = color;
+          const span = 180;
+          const startIdx = Math.floor(offset / span) - 1;
+          const count = Math.ceil(VIEW_W / span) + 3;
+
+          for (let i = 0; i < count; i++) {
+            const idx = startIdx + i;
+            const x = idx * span - offset;
+            const h = 120 + ((Math.abs(idx * 73) % 5) * 26);
+            // Pillar
+            ctx.fillRect(x, VIEW_H - h, 34, h);
+            // Broken arch beam on alternating pillars
+            if (Math.abs(idx) % 2 === 0) {
+              ctx.fillRect(x, VIEW_H - h, span - 30, 18);
+            }
+          }
+        }
+
+        drawTiles(cam, level) {
+          const ctx = this.ctx;
+          const th = level.theme;
+          const startCol = Math.max(0, Math.floor(cam.x / TILE) - 1);
+          const endCol = Math.min(level.cols - 1, Math.ceil((cam.x + VIEW_W) / TILE) + 1);
+
+          for (let r = 0; r < level.rows; r++) {
+            for (let c = startCol; c <= endCol; c++) {
+              const t = level.grid[r][c];
+              if (t === '.') continue;
+              const px = c * TILE - cam.x;
+              const py = r * TILE - cam.y;
+
+              if (t === '#') {
+                // Stone base
+                ctx.fillStyle = th.stoneBase;
+                ctx.fillRect(px, py, TILE + 0.5, TILE + 0.5);
+
+                // Subtle ashlar stone seams
+                ctx.fillStyle = th.stoneDark;
+                ctx.fillRect(px, py + TILE - 2, TILE, 2);
+                ctx.fillRect(px + (r % 2 === 0 ? 18 : 6), py, 2, TILE);
+
+                // Exposed top surface cap
+                if (!level.isSolid(c, r - 1)) {
+                  ctx.fillStyle = th.stoneCap;
+                  ctx.fillRect(px, py, TILE + 0.5, 9);
+                  ctx.fillStyle = th.stoneCapHighlight;
+                  ctx.fillRect(px, py, TILE + 0.5, 3);
+                }
+              } else if (t === '=') {
+                // Floating carved stone slab
+                ctx.fillStyle = th.stoneDark;
+                ctx.fillRect(px, py, TILE + 0.5, 22);
+                ctx.fillStyle = th.slabColor;
+                ctx.fillRect(px + 1, py + 2, TILE - 2, 16);
+                ctx.fillStyle = th.stoneCapHighlight;
+                ctx.fillRect(px + 1, py + 1, TILE - 2, 3);
+              } else if (t === '^') {
+                // Dual metallic/obsidian spikes
+                for (let s = 0; s < 2; s++) {
+                  const sx = px + 3 + s * 17;
+                  ctx.fillStyle = '#94a3b8';
+                  ctx.beginPath();
+                  ctx.moveTo(sx, py + TILE);
+                  ctx.lineTo(sx + 8.5, py + 12);
+                  ctx.lineTo(sx + 17, py + TILE);
+                  ctx.closePath();
+                  ctx.fill();
+
+                  // Left-side specular highlight
+                  ctx.fillStyle = '#e2e8f0';
+                  ctx.beginPath();
+                  ctx.moveTo(sx, py + TILE);
+                  ctx.lineTo(sx + 8.5, py + 12);
+                  ctx.lineTo(sx + 8.5, py + TILE);
+                  ctx.closePath();
+                  ctx.fill();
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // =========================================================================
+      // MAIN GAME CONTROLLER (State Machine & Structured Game Loop)
+      // =========================================================================
+      class Game {
+        constructor() {
+          this.canvas = document.getElementById('gameCanvas');
+          this.ctx = this.canvas.getContext('2d');
+
+          this.sound = new SoundEngine();
+          this.input = new InputManager(this.sound);
+          this.particles = new ParticleSystem();
+          this.camera = new Camera();
+          this.renderer = new Renderer(this.ctx);
+
+          this.state = 'START'; // START | PLAYING | PAUSED | GAME_OVER | VICTORY
+          this.levelIndex = 0;
+          this.score = 0;
+          this.coins = 0;
+          this.lives = 3;
+          this.maxLives = 3;
+          this.time = 0;
+          this.transitionFlash = 0;
+
+          this.level = new Level(LEVELS[0]);
+          this.player = new Player(this.level.spawn.x, this.level.spawn.y);
+          this.camera.reset(this.player, this.level);
+
+          this._bindUI();
+          this._syncHUD();
+
+          this.lastFrame = performance.now();
+          requestAnimationFrame((now) => this._loop(now));
+        }
+
+        _bindUI() {
+          this.overlays = {
+            START: document.getElementById('overlayStart'),
+            PAUSED: document.getElementById('overlayPause'),
+            GAME_OVER: document.getElementById('overlayGameOver'),
+            VICTORY: document.getElementById('overlayVictory')
+          };
+
+          this.ui = {
+            level: document.getElementById('hudLevel'),
+            hearts: document.getElementById('hudHearts'),
+            coins: document.getElementById('hudCoins'),
+            score: document.getElementById('hudScore'),
+            btnMute: document.getElementById('btnMute'),
+            pauseLevelLabel: document.getElementById('pauseLevelLabel'),
+            gameOverLevelLabel: document.getElementById('gameOverLevelLabel'),
+            goScore: document.getElementById('goScore'),
+            goCoins: document.getElementById('goCoins'),
+            goStage: document.getElementById('goStage'),
+            vicScore: document.getElementById('vicScore'),
+            vicCoins: document.getElementById('vicCoins'),
+            vicBonus: document.getElementById('vicBonus')
+          };
+
+          const startAction = () => {
+            this.sound.unlock();
+            this.startNewRun();
+          };
+
+          document.getElementById('btnStart').addEventListener('click', startAction);
+          document.getElementById('btnRestart').addEventListener('click', startAction);
+          document.getElementById('btnPauseRestart').addEventListener('click', startAction);
+          document.getElementById('btnGameOverRestart').addEventListener('click', startAction);
+          document.getElementById('btnVictoryRestart').addEventListener('click', startAction);
+
+          document.getElementById('btnResume').addEventListener('click', () => {
+            this.sound.unlock();
+            if (this.state === 'PAUSED') this._setState('PLAYING');
+          });
+
+          this.ui.btnMute.addEventListener('click', () => {
+            this.sound.unlock();
+            const muted = this.sound.toggleMute();
+            this.ui.btnMute.textContent = muted ? 'Muted' : 'Sound On';
+          });
+        }
+
+        _setState(nextState) {
+          this.state = nextState;
+          Object.entries(this.overlays).forEach(([key, el]) => {
+            el.classList.toggle('visible', key === nextState);
+          });
+
+          if (nextState === 'PAUSED') {
+            this.ui.pauseLevelLabel.textContent = `Level ${this.levelIndex + 1} of ${LEVELS.length} · ${this.level.name}`;
+          } else if (nextState === 'GAME_OVER') {
+            this.ui.gameOverLevelLabel.textContent = `Fell in ${this.level.name}`;
+            this.ui.goScore.textContent = this.score;
+            this.ui.goCoins.textContent = this.coins;
+            this.ui.goStage.textContent = `${this.levelIndex + 1} / ${LEVELS.length}`;
+          } else if (nextState === 'VICTORY') {
+            const livesBonus = this.lives * 250;
+            this.score += livesBonus;
+            this._syncHUD();
+            this.ui.vicScore.textContent = this.score;
+            this.ui.vicCoins.textContent = this.coins;
+            this.ui.vicBonus.textContent = `+${livesBonus}`;
+          }
+        }
+
+        _syncHUD() {
+          this.ui.level.textContent = `Level ${this.levelIndex + 1} of ${LEVELS.length} · ${this.level.name}`;
+          this.ui.coins.textContent = String(this.coins);
+          this.ui.score.textContent = String(this.score).padStart(4, '0');
+
+          let heartsHtml = '';
+          for (let i = 0; i < this.maxLives; i++) {
+            const lost = i >= this.lives ? ' lost' : '';
+            heartsHtml += `<svg class="heart${lost}" viewBox="0 0 16 15" fill="${i < this.lives ? '#ef4444' : '#475569'}" aria-hidden="true"><path d="M8 14s-6.5-4.1-6.5-8.5C1.5 3.1 3.3 1.5 5.4 1.5c1.2 0 2.2.6 2.6 1.5.4-.9 1.4-1.5 2.6-1.5 2.1 0 3.9 1.6 3.9 4C14.5 9.9 8 14 8 14z"/></svg>`;
+          }
+          this.ui.hearts.innerHTML = heartsHtml;
+        }
+
+        startNewRun() {
+          this.score = 0;
+          this.coins = 0;
+          this.lives = this.maxLives;
+          this.loadLevel(0);
+          this._setState('PLAYING');
+        }
+
+        loadLevel(idx) {
+          this.levelIndex = idx;
+          this.level = new Level(LEVELS[idx]);
+          this.player.reset(this.level.spawn.x, this.level.spawn.y);
+          this.particles.clear();
+          this.camera.reset(this.player, this.level);
+          this.transitionFlash = 0.35;
+          this._syncHUD();
+        }
+
+        _damagePlayer(knockDir = 0, fromPit = false) {
+          if (!fromPit && this.player.invulnTimer > 0) return;
+          this.lives -= 1;
+          this.sound.hurt();
+          this.camera.shake(7, 0.2);
+          this.particles.burst(
+            this.player.x + this.player.w * 0.5,
+            this.player.y + this.player.h * 0.5,
+            '#ef4444',
+            16,
+            210
+          );
+          this._syncHUD();
+
+          if (this.lives <= 0) {
+            this.sound.gameOver();
+            this._setState('GAME_OVER');
+            return;
+          }
+
+          if (fromPit) {
+            this.player.reset(this.level.activeSpawn.x, this.level.activeSpawn.y);
+            this.player.invulnTimer = 1.4;
+            this.camera.reset(this.player, this.level);
+            this.particles.burst(
+              this.player.x + this.player.w * 0.5,
+              this.player.y + this.player.h * 0.5,
+              '#38bdf8',
+              14,
+              150,
+              120
+            );
+          } else {
+            this.player.invulnTimer = 1.45;
+            this.player.vy = -340;
+            this.player.vx = (knockDir !== 0 ? knockDir : -this.player.facing) * 230;
+            this.player.grounded = false;
+            this.player.standingPlatform = null;
+          }
+        }
+
+        _handleGlobalShortcuts() {
+          if (this.input.justPressed('KeyM')) {
+            const muted = this.sound.toggleMute();
+            this.ui.btnMute.textContent = muted ? 'Muted' : 'Sound On';
+          }
+
+          if (this.input.justPressed('KeyR')) {
+            this.sound.unlock();
+            this.startNewRun();
+            return true;
+          }
+
+          if (this.state === 'START' && (this.input.justPressed('Enter') || this.input.justPressed('Space'))) {
+            this.sound.unlock();
+            this.startNewRun();
+            return true;
+          }
+
+          if (this.input.justPressed('KeyP') || this.input.justPressed('Escape')) {
+            if (this.state === 'PLAYING') {
+              this._setState('PAUSED');
+              return true;
+            } else if (this.state === 'PAUSED') {
+              this._setState('PLAYING');
+              return true;
+            }
+          }
+
+          return false;
+        }
+
+        _updatePlaying(dt) {
+          if (this.transitionFlash > 0) {
+            this.transitionFlash = Math.max(0, this.transitionFlash - dt);
+          }
+
+          // Update moving platforms first so dx/dy are ready for player carry
+          for (const plat of this.level.movingPlatforms) {
+            plat.update(dt);
+          }
+
+          this.player.update(dt, this.input, this.level, this.particles, this.sound, this.camera);
+
+          // Bottomless pit check
+          if (this.player.y > this.level.height + 48) {
+            this._damagePlayer(0, true);
+            if (this.state !== 'PLAYING') return;
+          }
+
+          // Spike collision check (forgiving inset)
+          const p = this.player;
+          const minCol = Math.max(0, Math.floor(p.x / TILE));
+          const maxCol = Math.min(this.level.cols - 1, Math.floor((p.x + p.w) / TILE));
+          const minRow = Math.max(0, Math.floor(p.y / TILE));
+          const maxRow = Math.min(this.level.rows - 1, Math.floor((p.y + p.h) / TILE));
+          for (let r = minRow; r <= maxRow; r++) {
+            for (let c = minCol; c <= maxCol; c++) {
+              if (this.level.grid[r][c] === '^') {
+                const sx = c * TILE + 5;
+                const sy = r * TILE + 15;
+                const sw = TILE - 10;
+                const sh = TILE - 15;
+                if (p.overlapsRect(sx, sy, sw, sh)) {
+                  const dir = p.x + p.w * 0.5 < c * TILE + TILE * 0.5 ? -1 : 1;
+                  this._damagePlayer(dir, false);
+                  if (this.state !== 'PLAYING') return;
+                }
+              }
+            }
+          }
+
+          // Checkpoints
+          for (const cp of this.level.checkpoints) {
+            if (!cp.activated && Math.abs(p.x + p.w * 0.5 - cp.x) < 26 && Math.abs(p.y + p.h - cp.y) < 42) {
+              cp.activated = true;
+              this.level.activeSpawn = { x: cp.spawnX, y: cp.spawnY };
+              this.sound.checkpoint();
+              this.particles.burst(cp.x, cp.y - 24, '#38bdf8', 14, 160, 120);
+              this.particles.popup(cp.x, cp.y - 40, 'Checkpoint', '#7dd3fc');
+            }
+          }
+
+          // Collectibles
+          const pcx = p.x + p.w * 0.5;
+          const pcy = p.y + p.h * 0.5;
+          for (const item of this.level.collectibles) {
+            if (item.collected) continue;
+            if (Math.hypot(pcx - item.x, pcy - item.y) < item.radius + 16) {
+              item.collected = true;
+              const isGem = item.kind === 'gem';
+              const pts = isGem ? 50 : 10;
+              this.coins += 1;
+              this.score += pts;
+              this.sound.coin(isGem);
+              this.particles.burst(item.x, item.y, isGem ? '#38bdf8' : '#fbbf24', isGem ? 16 : 10, 165, 220);
+              this.particles.popup(item.x, item.y - 12, `+${pts}`, isGem ? '#7dd3fc' : '#fde047');
+              this._syncHUD();
+            }
+          }
+
+          // Patrolling enemies & Mario-style head stomp
+          for (const enemy of this.level.enemies) {
+            enemy.update(dt, this.level);
+            if (!enemy.alive) continue;
+
+            if (p.overlapsRect(enemy.x + 2, enemy.y + 2, enemy.w - 4, enemy.h - 2)) {
+              const stomping = p.vy > 0 && p.prevBottom <= enemy.y + enemy.h * 0.58;
+              if (stomping) {
+                enemy.alive = false;
+                enemy.squashTimer = 0.25;
+                p.vy = this.input.isDown('jump') ? -500 : -370;
+                p.scaleX = 1.24;
+                p.scaleY = 0.78;
+                this.score += 100;
+                this.sound.stomp();
+                this.camera.shake(4, 0.12);
+                this.particles.burst(enemy.x + enemy.w * 0.5, enemy.y + enemy.h * 0.5, '#fbbf24', 14, 180);
+                this.particles.popup(enemy.x + enemy.w * 0.5, enemy.y - 8, '+100', '#fbbf24');
+                this._syncHUD();
+              } else {
+                const dir = p.x + p.w * 0.5 < enemy.x + enemy.w * 0.5 ? -1 : 1;
+                this._damagePlayer(dir, false);
+                if (this.state !== 'PLAYING') return;
+              }
+            }
+          }
+
+          // Exit portal check
+          if (this.level.portal) {
+            const portal = this.level.portal;
+            if (Math.hypot(pcx - portal.x, pcy - portal.y) < 30) {
+              if (this.levelIndex + 1 < LEVELS.length) {
+                this.score += 200;
+                this.sound.levelClear();
+                this.loadLevel(this.levelIndex + 1);
+              } else {
+                this.score += 300;
+                this.sound.victory();
+                this._setState('VICTORY');
+              }
+              return;
+            }
+          }
+
+          this.particles.update(dt);
+          this.camera.update(dt, this.player, this.level);
+        }
+
+        _render() {
+          const cam = this.camera.renderOffset;
+          this.renderer.drawBackground(cam, this.level, this.time);
+          this.renderer.drawTiles(cam, this.level);
+
+          for (const plat of this.level.movingPlatforms) {
+            plat.draw(this.ctx, cam, this.level.theme);
+          }
+          for (const cp of this.level.checkpoints) {
+            cp.draw(this.ctx, cam, this.time);
+          }
+          if (this.level.portal) {
+            this.level.portal.draw(this.ctx, cam, this.time, this.level.theme.portalColor);
+          }
+          for (const item of this.level.collectibles) {
+            item.draw(this.ctx, cam, this.time);
+          }
+          for (const enemy of this.level.enemies) {
+            enemy.draw(this.ctx, cam);
+          }
+
+          this.player.draw(this.ctx, cam, this.time);
+          this.particles.draw(this.ctx, cam);
+
+          if (this.transitionFlash > 0) {
+            this.ctx.fillStyle = `rgba(255, 255, 255, ${(this.transitionFlash / 0.35) * 0.32})`;
+            this.ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+          }
+        }
+
+        _loop(now) {
+          const dt = Math.min((now - this.lastFrame) / 1000, 0.033);
+          this.lastFrame = now;
+          this.time += dt;
+
+          const consumed = this._handleGlobalShortcuts();
+
+          if (!consumed && this.state === 'PLAYING') {
+            this._updatePlaying(dt);
+          } else if (this.state === 'START') {
+            // Subtle idle camera drift on start screen
+            this.camera.x = Math.sin(this.time * 0.25) * 40 + 40;
+          }
+
+          this._render();
+          this.input.endFrame();
+          requestAnimationFrame((t) => this._loop(t));
+        }
+      }
+
+      new Game();
+    })();
+  </script>
+</body>
+</html>
