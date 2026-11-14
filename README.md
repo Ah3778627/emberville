@@ -1,20 +1,50 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Embervale
 
-# Run and deploy your AI Studio app
+A procedural 2D HTML5 Canvas platformer featuring responsive platforming physics, three atmospheric stages, patrolling enemies, moving stone lifts, particle effects, and synthesized Web Audio sound effects.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/2b4f2bc6-ae8e-47c5-b584-5c38f6be32d9
+- **3 Atmospheric Stages**:
+  1. **Sunlit Ruins** — Golden-hour cliffside ruins and ancient stone bridges
+  2. **Mossy Aqueduct** — Emerald-lit waterways with vertical and horizontal moving lifts
+  3. **Obsidian Spire** — Crimson volcanic spire guarded by fast obsidian stalkers
+- **Responsive Physics**: Variable jump height, coyote time, jump buffering, one-way stone slabs, and moving platform momentum
+- **Combat & Checkpoints**: Head-stomp patrolling sentinels, activate checkpoint braziers, and collect coins and sky gems
+- **Synthesized Web Audio**: Zero-dependency procedural sound effects with mute toggle
+- **Desktop & Touch Support**: Full keyboard controls plus on-screen touch controls for mobile and tablet devices
 
-## Run Locally
+## Controls
 
-**Prerequisites:**  Node.js
+| Action | Keys |
+| :--- | :--- |
+| **Move Left / Right** | `A` / `D` or `←` / `→` |
+| **Jump** | `W`, `↑`, or `Space` |
+| **Pause** | `P` or `Esc` |
+| **Restart Run** | `R` |
+| **Toggle Sound** | `M` |
 
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+
+### Installation & Development
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:3000` in your browser.
+
+### Build for Production
+
+```bash
+npm run build
+npm run preview
+```
