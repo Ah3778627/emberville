@@ -1,8 +1,5 @@
 {
   "name": "Embervale Platformer",
   "description": "A procedural 2D HTML5 Canvas platformer with responsive physics, 3 atmospheric levels, enemies, moving platforms, particle effects, and synthesized Web Audio.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "requestFramePermissions": []
 }
