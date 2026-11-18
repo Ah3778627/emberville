@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>Embervale Platformer</title>
   <meta name="description" content="A procedural 2D HTML5 Canvas platformer with infinite generated stages, enrage-and-hunt enemy AI, jetpack & volatile firearms marketplace, profiles, and live chat." />
   <meta property="og:title" content="Embervale Platformer" />
@@ -31,30 +33,42 @@
     }
 
     html, body {
+      position: fixed;
+      inset: 0;
       width: 100%;
-      height: 100%;
+      height: 100vh;
+      height: 100dvh;
       background-color: var(--bg);
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: none;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .shell {
+      position: fixed;
+      inset: 0;
       width: 100%;
+      height: 100vh;
       height: 100dvh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 14px;
-      gap: 10px;
+      padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
     }
 
     .cabinet {
       width: 100%;
-      max-width: 1080px;
+      max-width: 1200px;
+      height: 100%;
+      max-height: 100%;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -68,19 +82,21 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      padding: 10px 16px;
+      gap: 10px 14px;
+      padding: 9px 14px;
       background: var(--panel);
       border-bottom: 1px solid var(--border);
       font-size: 13px;
       line-height: 1;
       flex-wrap: wrap;
+      flex-shrink: 0;
+      z-index: 10;
     }
 
     .hud-group {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px 12px;
       flex-wrap: wrap;
     }
 
@@ -113,7 +129,7 @@
     .stat {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
@@ -160,7 +176,7 @@
     }
 
     .fuel-track {
-      width: 56px;
+      width: 52px;
       height: 7px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
@@ -201,6 +217,11 @@
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      touch-action: manipulation;
       transition: background-color 0.15s ease, border-color 0.15s ease;
     }
 
@@ -209,46 +230,64 @@
       border-color: rgba(255, 255, 255, 0.24);
     }
 
+    .btn-ghost.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--accent);
+      color: var(--accent-hover);
+    }
+
+    .btn-icon-svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      display: block;
+    }
+
     .btn-ghost:focus-visible,
     .btn-primary:focus-visible,
-    .input-field:focus-visible {
+    .input-field:focus-visible,
+    .chat-input:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 2px;
     }
 
     .stage-wrap {
       position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
       width: 100%;
-      aspect-ratio: 960 / 560;
       background: #07090e;
       overflow: hidden;
     }
 
-    canvas {
+    canvas#gameCanvas {
       display: block;
       width: 100%;
       height: 100%;
       cursor: crosshair;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
-    /* Interactive Chat Overlay (Bottom-Left) */
+    /* Interactive Chat Overlay */
     .chat-box {
       position: absolute;
       left: 12px;
       bottom: 12px;
-      width: 340px;
-      max-width: calc(100% - 24px);
+      width: min(340px, calc(100% - 24px));
       display: flex;
       flex-direction: column;
       gap: 6px;
-      z-index: 15;
+      z-index: 22;
       pointer-events: none;
     }
 
     .chat-box.open {
       pointer-events: auto;
-      background: rgba(11, 14, 20, 0.82);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(11, 14, 20, 0.86);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 9px;
       padding: 8px;
       backdrop-filter: blur(6px);
@@ -258,8 +297,9 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      max-height: 132px;
+      max-height: 120px;
       overflow-y: auto;
+      touch-action: pan-y;
       scrollbar-width: none;
     }
 
@@ -340,10 +380,13 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.16);
       border-radius: 6px;
-      padding: 6px 9px;
+      padding: 7px 9px;
       color: var(--text);
-      font-size: 12px;
+      font-size: 14px;
       font-family: inherit;
+      touch-action: auto;
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     .chat-hint {
@@ -357,19 +400,122 @@
       display: none;
     }
 
-    /* Overlays & Modals */
-    .overlay {
+    /* Overlaid Mobile Touch Controls (Bottom-Left D-Pad + Bottom-Right Actions) */
+    .touch-overlay {
+      display: none;
       position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .touch-pad-left {
+      position: absolute;
+      left: max(12px, env(safe-area-inset-left));
+      bottom: max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .touch-pad-right {
+      position: absolute;
+      right: max(12px, env(safe-area-inset-right));
+      bottom: max(12px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .touch-btn {
+      appearance: none;
+      min-width: 56px;
+      min-height: 56px;
+      padding: 0 12px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255, 255, 255, 0.22);
+      background: rgba(15, 20, 29, 0.58);
+      backdrop-filter: blur(4px);
+      color: #f8fafc;
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      transition: transform 0.08s ease, background-color 0.08s ease, border-color 0.08s ease;
+    }
+
+    .touch-btn.touch-primary {
+      min-width: 64px;
+      min-height: 64px;
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .touch-btn.active {
+      background: rgba(245, 158, 11, 0.36);
+      border-color: var(--accent-hover);
+      transform: scale(0.94);
+    }
+
+    /* Portrait Orientation Prompt */
+    .rotate-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 35;
+      background: rgba(7, 9, 14, 0.72);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+
+    .rotate-overlay.visible {
+      display: flex;
+    }
+
+    .rotate-card {
+      width: 100%;
+      max-width: 340px;
+      background: rgba(15, 20, 29, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+    }
+
+    .rotate-icon {
+      width: 40px;
+      height: 40px;
+      color: var(--accent);
+      margin: 0 auto 10px;
+      display: block;
+    }
+
+    /* Overlays & Modals (Responsive 90dvh + Safe-Area Padding) */
+    .overlay {
+      position: fixed;
       inset: 0;
       background: rgba(8, 11, 18, 0.8);
       backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: max(12px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
       opacity: 0;
       pointer-events: none;
-      z-index: 25;
+      z-index: 45;
       transition: opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -381,12 +527,15 @@
     .modal {
       width: 100%;
       max-width: 500px;
-      max-height: 100%;
+      max-height: 90vh;
+      max-height: 90dvh;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
       background: rgba(15, 20, 29, 0.97);
       border: 1px solid rgba(255, 255, 255, 0.13);
       border-radius: 12px;
-      padding: 24px;
+      padding: clamp(14px, 2.5vh, 24px) clamp(14px, 3vw, 24px);
       text-align: center;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
     }
@@ -397,37 +546,37 @@
     }
 
     .modal-kicker {
-      font-size: 12px;
+      font-size: clamp(11px, 1.6vw, 12px);
       font-weight: 600;
       color: var(--accent);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .modal-title {
-      font-size: 28px;
+      font-size: clamp(20px, 4vw, 28px);
       font-weight: 800;
       letter-spacing: -0.025em;
       color: var(--text);
-      margin-bottom: 8px;
+      margin-bottom: clamp(4px, 1vh, 8px);
     }
 
     .modal-desc {
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: clamp(12px, 1.8vw, 13px);
+      line-height: 1.45;
       color: var(--muted);
-      margin-bottom: 18px;
+      margin-bottom: clamp(10px, 2vh, 18px);
     }
 
     .controls-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      gap: 7px;
       text-align: left;
-      padding: 12px 14px;
+      padding: 10px 12px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
-      margin-bottom: 16px;
+      margin-bottom: clamp(10px, 2vh, 16px);
       font-size: 12px;
     }
 
@@ -435,7 +584,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       color: var(--muted);
     }
 
@@ -455,23 +604,24 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
+      gap: 10px;
+      padding: 10px 12px;
       background: rgba(255, 255, 255, 0.035);
       border: 1px solid rgba(255, 255, 255, 0.09);
       border-radius: 8px;
-      margin-bottom: 16px;
+      margin-bottom: clamp(10px, 2vh, 16px);
       text-align: left;
     }
 
     .profile-id {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      min-width: 0;
     }
 
     .profile-name {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text);
     }
@@ -486,12 +636,12 @@
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      padding: 12px;
+      gap: 8px;
+      padding: 10px;
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
-      margin-bottom: 18px;
+      margin-bottom: clamp(12px, 2vh, 18px);
       font-variant-numeric: tabular-nums;
       text-align: center;
     }
@@ -499,11 +649,11 @@
     .summary-item-label {
       font-size: 11px;
       color: var(--muted);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .summary-item-val {
-      font-size: 17px;
+      font-size: clamp(15px, 2.5vw, 17px);
       font-weight: 700;
       color: var(--text);
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -523,11 +673,13 @@
       color: #0b0e14;
       border: none;
       border-radius: 8px;
-      padding: 10px 22px;
+      padding: 10px 20px;
+      min-height: 44px;
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
+      touch-action: manipulation;
       transition: background-color 0.15s ease, transform 0.1s ease;
     }
 
@@ -547,21 +699,21 @@
     /* Profile Setup Form */
     .form-grid {
       display: grid;
-      grid-template-columns: 140px 1fr;
-      gap: 18px;
+      grid-template-columns: 130px 1fr;
+      gap: 14px;
       align-items: start;
-      margin-bottom: 18px;
+      margin-bottom: clamp(10px, 2vh, 16px);
     }
 
     .avatar-preview-box {
       background: rgba(7, 9, 14, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 10px;
-      padding: 14px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .field-label {
@@ -569,7 +721,7 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--muted);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
 
     .input-field {
@@ -579,15 +731,18 @@
       border-radius: 7px;
       padding: 8px 11px;
       color: var(--text);
-      font-size: 13px;
-      margin-bottom: 12px;
+      font-size: 14px;
+      margin-bottom: 10px;
+      touch-action: auto;
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     .swatch-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .swatch {
@@ -596,6 +751,7 @@
       border-radius: 6px;
       border: 2px solid transparent;
       cursor: pointer;
+      touch-action: manipulation;
       transition: transform 0.12s ease, border-color 0.12s ease;
     }
 
@@ -617,9 +773,11 @@
       color: var(--muted);
       border-radius: 6px;
       padding: 7px 6px;
+      min-height: 36px;
       font-size: 12px;
       font-weight: 600;
       cursor: pointer;
+      touch-action: manipulation;
     }
 
     .visor-btn.selected {
@@ -634,14 +792,14 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 14px;
-      padding-bottom: 12px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .shop-purse {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 18px;
+      font-size: clamp(15px, 2.6vw, 18px);
       font-weight: 800;
       color: var(--accent);
       white-space: nowrap;
@@ -650,25 +808,25 @@
     .shop-next-info {
       font-size: 12px;
       color: var(--muted);
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
 
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
+      gap: 8px;
+      margin-bottom: clamp(12px, 2vh, 18px);
     }
 
     .shop-card {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
 
     .shop-card.rare {
@@ -684,7 +842,7 @@
     }
 
     .shop-card-title {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--text);
     }
@@ -693,12 +851,14 @@
       font-size: 11px;
       color: var(--cyan);
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: nowrap;
     }
 
     .shop-card-desc {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
-      line-height: 1.4;
+      line-height: 1.35;
+      margin-top: 3px;
     }
 
     .shop-card-foot {
@@ -710,52 +870,137 @@
 
     .shop-price {
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--accent);
     }
 
-    /* Touch Bar */
-    .touch-bar {
+    .shop-card .btn-primary {
+      min-height: 36px;
+      padding: 6px 14px;
+    }
+
+    /* Mobile / Touch Responsive Rules */
+    @media (pointer: coarse), (hover: none) {
+      .touch-overlay {
+        display: block;
+      }
+      .chat-hint {
+        display: none;
+      }
+      .chat-box {
+        top: 8px;
+        bottom: auto;
+        left: max(10px, env(safe-area-inset-left));
+        width: min(300px, calc(100% - 20px));
+      }
+      .chat-log {
+        max-height: 92px;
+      }
+    }
+
+    body.touch-enabled .touch-overlay {
+      display: block;
+    }
+    body.touch-enabled .chat-hint {
       display: none;
-      width: 100%;
-      max-width: 1080px;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 4px 2px;
+    }
+    body.touch-enabled .chat-box {
+      top: 8px;
+      bottom: auto;
+      left: max(10px, env(safe-area-inset-left));
+      width: min(300px, calc(100% - 20px));
     }
 
-    .touch-group {
-      display: flex;
-      gap: 8px;
+    @media (max-width: 920px), (max-height: 540px) {
+      .shell {
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      .cabinet {
+        max-width: 100%;
+        border-radius: 0;
+        border: none;
+      }
+      .hud {
+        padding: 6px 10px;
+        gap: 6px 10px;
+        font-size: 12px;
+      }
+      .hud-title, .hud-sep:first-of-type {
+        display: none;
+      }
+      .hud-actions .btn-ghost {
+        padding: 6px 8px;
+        min-height: 34px;
+        min-width: 34px;
+      }
+      .btn-label-mobile-hide {
+        display: none;
+      }
     }
 
-    .touch-btn {
-      appearance: none;
-      min-width: 58px;
-      height: 46px;
-      border-radius: 9px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.07);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      touch-action: none;
-      cursor: pointer;
+    /* Short Landscape Phone Modal Compaction (all buttons visible without scroll) */
+    @media (max-height: 460px) {
+      .modal-desc {
+        display: none;
+      }
+      .controls-grid {
+        display: none;
+      }
+      .profile-banner {
+        padding: 8px 10px;
+        margin-bottom: 10px;
+      }
+      .summary-grid {
+        padding: 8px;
+        margin-bottom: 10px;
+      }
+      .shop-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .shop-card {
+        padding: 8px;
+        gap: 6px;
+      }
+      .shop-card-desc {
+        display: none;
+      }
+      .form-grid {
+        grid-template-columns: 104px 1fr;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .avatar-preview-box {
+        padding: 8px;
+      }
+      .input-field {
+        margin-bottom: 8px;
+        padding: 6px 9px;
+      }
+      .swatch-row {
+        margin-bottom: 8px;
+      }
     }
 
-    .touch-btn.active {
-      background: rgba(245, 158, 11, 0.25);
-      border-color: var(--accent);
-    }
-
-    @media (pointer: coarse), (max-width: 760px) {
-      .touch-bar { display: flex; }
-      .shell { padding: 8px; }
-      .hud { padding: 8px 10px; gap: 8px; }
-      .form-grid, .shop-grid { grid-template-columns: 1fr; }
-      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 560px) {
+      .controls-grid {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        padding: 8px 10px;
+      }
+      .form-grid, .shop-grid {
+        grid-template-columns: 1fr;
+      }
+      .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hud-level {
+        max-width: 130px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   </style>
 </head>
@@ -795,17 +1040,23 @@
         </div>
 
         <div class="hud-actions">
-          <button type="button" class="btn-ghost" id="btnNewSeed" title="Generate a new random seed for this stage">New Seed</button>
-          <button type="button" class="btn-ghost" id="btnChatToggle" title="Toggle Chat (T)">Chat</button>
+          <button type="button" class="btn-ghost" id="btnNewSeed" title="Generate a new random seed for this stage">
+            <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            <span class="btn-label-mobile-hide">New Seed</span>
+          </button>
+          <button type="button" class="btn-ghost" id="btnChatToggle" title="Toggle Chat (T)" aria-label="Toggle Chat">
+            <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span class="btn-label-mobile-hide">Chat</span>
+          </button>
           <button type="button" class="btn-ghost" id="btnMute" title="Toggle Sound (M)">Sound On</button>
           <button type="button" class="btn-ghost" id="btnRestart" title="Restart Run (R)">Restart</button>
         </div>
       </header>
 
-      <div class="stage-wrap">
+      <div class="stage-wrap" id="stageWrap">
         <canvas id="gameCanvas" width="960" height="560"></canvas>
 
-        <!-- Bottom-left Interactive Chat Overlay -->
+        <!-- Interactive Chat Overlay -->
         <div class="chat-box" id="chatBox">
           <div class="chat-log" id="chatLog"></div>
           <div class="chat-hint" id="chatHint">Press T to chat</div>
@@ -815,170 +1066,188 @@
           </form>
         </div>
 
-        <!-- Start Screen -->
-        <div class="overlay visible" id="overlayStart">
-          <div class="modal">
-            <div class="modal-kicker" id="startSeedLabel">Infinite Procedural Platformer · Seed #1042</div>
-            <h1 class="modal-title">Embervale</h1>
-            <p class="modal-desc">
-              Conquer infinite procedural ruins, outrun enraged hunters, unlock your jetpack, and scavenge volatile firepower.
-            </p>
-
-            <div class="profile-banner">
-              <div class="profile-id">
-                <canvas id="startAvatarCanvas" width="40" height="40"></canvas>
-                <div>
-                  <div class="profile-name" id="startProfileName">Runner_01</div>
-                  <div class="profile-meta" id="startProfileStats">Best Stage 1 · 0 Kills · 0 Coins</div>
-                </div>
-              </div>
-              <button type="button" class="btn-ghost" id="btnOpenProfile">Profile</button>
-            </div>
-
-            <div class="controls-grid">
-              <div class="control-row"><span>Move</span><span class="keycap">A / D · ← / →</span></div>
-              <div class="control-row"><span>Jump / Jetpack</span><span class="keycap">W · Space · Shift</span></div>
-              <div class="control-row"><span>Fire Weapon</span><span class="keycap">F · J · Click</span></div>
-              <div class="control-row"><span>Chat / Pause</span><span class="keycap">T · P / Esc</span></div>
-            </div>
-
-            <div class="modal-actions">
-              <button type="button" class="btn-primary" id="btnStart">Start Run</button>
-              <button type="button" class="btn-ghost" id="btnStartSeed">New Seed</button>
-            </div>
+        <!-- On-Screen Touch Controls (Overlaid inside Safe Area) -->
+        <div class="touch-overlay" id="touchOverlay" aria-label="Touch Controls">
+          <div class="touch-pad-left">
+            <button type="button" class="touch-btn" id="touchLeft" aria-label="Move Left">←</button>
+            <button type="button" class="touch-btn" id="touchRight" aria-label="Move Right">→</button>
           </div>
-        </div>
-
-        <!-- Profile Setup & Career Stats Modal -->
-        <div class="overlay" id="overlayProfile">
-          <div class="modal wide">
-            <div class="modal-kicker">Runner Identity & Career</div>
-            <h2 class="modal-title">Player Profile</h2>
-            <p class="modal-desc">Customize your runner badge for gameplay and live chat. Stats persist locally across runs.</p>
-
-            <div class="form-grid">
-              <div class="avatar-preview-box">
-                <canvas id="profilePreviewCanvas" width="84" height="84"></canvas>
-                <span class="stat-label" id="profilePreviewTag">Runner_01</span>
-              </div>
-              <div>
-                <label class="field-label" for="inputUsername">Username</label>
-                <input type="text" class="input-field" id="inputUsername" maxlength="16" placeholder="Enter runner name" />
-
-                <span class="field-label">Cloak & Scarf Color</span>
-                <div class="swatch-row" id="swatchRow"></div>
-
-                <span class="field-label">Visor Style</span>
-                <div class="visor-row" id="visorRow">
-                  <button type="button" class="visor-btn" data-visor="dual">Dual</button>
-                  <button type="button" class="visor-btn" data-visor="cyclops">Cyclops</button>
-                  <button type="button" class="visor-btn" data-visor="visor">Slit</button>
-                  <button type="button" class="visor-btn" data-visor="crest">Crest</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="summary-grid">
-              <div>
-                <div class="summary-item-label">Highest Stage</div>
-                <div class="summary-item-val" id="profHighest">1</div>
-              </div>
-              <div>
-                <div class="summary-item-label">Total Kills</div>
-                <div class="summary-item-val" id="profKills">0</div>
-              </div>
-              <div>
-                <div class="summary-item-label">Total Coins</div>
-                <div class="summary-item-val" id="profCoins">0</div>
-              </div>
-              <div>
-                <div class="summary-item-label">Enraged Escapes</div>
-                <div class="summary-item-val" id="profEscapes">0</div>
-              </div>
-            </div>
-
-            <div class="modal-actions">
-              <button type="button" class="btn-primary" id="btnSaveProfile">Save & Return</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Between-Level Marketplace -->
-        <div class="overlay" id="overlayShop">
-          <div class="modal wide">
-            <div class="shop-header">
-              <div>
-                <div class="modal-kicker" id="shopClearedLabel">Stage 1 Cleared</div>
-                <h2 class="modal-title" style="margin-bottom:0;">Supply Outpost</h2>
-              </div>
-              <div class="shop-purse" id="shopPurse">0 Coins</div>
-            </div>
-
-            <div class="shop-next-info" id="shopNextInfo">Next: Stage 2 · Mossy Aqueduct · Standard</div>
-            <div class="shop-grid" id="shopGrid"></div>
-
-            <div class="modal-actions">
-              <button type="button" class="btn-primary" id="btnNextStage">Enter Next Stage</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Pause Screen -->
-        <div class="overlay" id="overlayPause">
-          <div class="modal">
-            <div class="modal-kicker" id="pauseLevelLabel">Stage 1</div>
-            <h2 class="modal-title">Paused</h2>
-            <p class="modal-desc">Catch your breath before the hunters close in.</p>
-            <div class="modal-actions">
-              <button type="button" class="btn-primary" id="btnResume">Resume</button>
-              <button type="button" class="btn-ghost" id="btnPauseNewSeed">New Seed</button>
-              <button type="button" class="btn-ghost" id="btnPauseRestart">Restart Run</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Game Over Screen -->
-        <div class="overlay" id="overlayGameOver">
-          <div class="modal">
-            <div class="modal-kicker" id="gameOverLevelLabel">Fell on Stage 1</div>
-            <h2 class="modal-title">Run Ended</h2>
-            <p class="modal-desc">Your runner fell before reaching the exit portal.</p>
-            <div class="summary-grid">
-              <div>
-                <div class="summary-item-label">Score</div>
-                <div class="summary-item-val" id="goScore">0</div>
-              </div>
-              <div>
-                <div class="summary-item-label">Stage</div>
-                <div class="summary-item-val" id="goStage">1</div>
-              </div>
-              <div>
-                <div class="summary-item-label">Kills</div>
-                <div class="summary-item-val" id="goKills">0</div>
-              </div>
-              <div>
-                <div class="summary-item-label">Escapes</div>
-                <div class="summary-item-val" id="goEscapes">0</div>
-              </div>
-            </div>
-            <div class="modal-actions">
-              <button type="button" class="btn-primary" id="btnGameOverRestart">Try Again (R)</button>
-              <button type="button" class="btn-ghost" id="btnGameOverProfile">Profile</button>
-            </div>
+          <div class="touch-pad-right">
+            <button type="button" class="touch-btn" id="touchShoot" aria-label="Fire Weapon">Fire</button>
+            <button type="button" class="touch-btn" id="touchJet" aria-label="Jetpack Thrust">Jet</button>
+            <button type="button" class="touch-btn touch-primary" id="touchJump" aria-label="Jump">Jump</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="touch-bar" aria-label="Touch Controls">
-      <div class="touch-group">
-        <button type="button" class="touch-btn" id="touchLeft">←</button>
-        <button type="button" class="touch-btn" id="touchRight">→</button>
+    <!-- Clean Non-Intrusive Portrait Orientation Prompt -->
+    <div class="rotate-overlay" id="overlayRotate" role="dialog" aria-modal="false" aria-label="Orientation Tip">
+      <div class="rotate-card">
+        <svg class="rotate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="6" y="3" width="12" height="18" rx="2"/>
+          <path d="M12 17h.01"/>
+          <path d="M2 12a10 10 0 0 1 10-10"/>
+          <polyline points="9 2 12 2 12 5"/>
+        </svg>
+        <h2 class="modal-title" style="font-size:19px;">Rotate Device to Landscape</h2>
+        <p class="modal-desc" style="margin-bottom:14px;">Landscape view gives the widest sightline for platforming and dodging hunters.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="btnDismissRotate">Continue in Portrait</button>
+        </div>
       </div>
-      <div class="touch-group">
-        <button type="button" class="touch-btn" id="touchShoot">Fire</button>
-        <button type="button" class="touch-btn" id="touchJet">Jet</button>
-        <button type="button" class="touch-btn" id="touchJump">Jump</button>
+    </div>
+
+    <!-- Start Screen -->
+    <div class="overlay visible" id="overlayStart">
+      <div class="modal">
+        <div class="modal-kicker" id="startSeedLabel">Infinite Procedural Platformer · Seed #1042</div>
+        <h1 class="modal-title">Embervale</h1>
+        <p class="modal-desc">
+          Conquer infinite procedural ruins, outrun enraged hunters, unlock your jetpack, and scavenge volatile firepower.
+        </p>
+
+        <div class="profile-banner">
+          <div class="profile-id">
+            <canvas id="startAvatarCanvas" width="40" height="40"></canvas>
+            <div>
+              <div class="profile-name" id="startProfileName">Runner_01</div>
+              <div class="profile-meta" id="startProfileStats">Best Stage 1 · 0 Kills · 0 Coins</div>
+            </div>
+          </div>
+          <button type="button" class="btn-ghost" id="btnOpenProfile">Profile</button>
+        </div>
+
+        <div class="controls-grid">
+          <div class="control-row"><span>Move</span><span class="keycap">A / D · ← / →</span></div>
+          <div class="control-row"><span>Jump / Jetpack</span><span class="keycap">W · Space · Shift</span></div>
+          <div class="control-row"><span>Fire Weapon</span><span class="keycap">F · J · Click</span></div>
+          <div class="control-row"><span>Chat / Pause</span><span class="keycap">T · P / Esc</span></div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="btnStart">Start Run</button>
+          <button type="button" class="btn-ghost" id="btnStartSeed">New Seed</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Setup & Career Stats Modal -->
+    <div class="overlay" id="overlayProfile">
+      <div class="modal wide">
+        <div class="modal-kicker">Runner Identity & Career</div>
+        <h2 class="modal-title">Player Profile</h2>
+        <p class="modal-desc">Customize your runner badge for gameplay and live chat. Stats persist locally across runs.</p>
+
+        <div class="form-grid">
+          <div class="avatar-preview-box">
+            <canvas id="profilePreviewCanvas" width="84" height="84"></canvas>
+            <span class="stat-label" id="profilePreviewTag">Runner_01</span>
+          </div>
+          <div>
+            <label class="field-label" for="inputUsername">Username</label>
+            <input type="text" class="input-field" id="inputUsername" maxlength="16" placeholder="Enter runner name" />
+
+            <span class="field-label">Cloak & Scarf Color</span>
+            <div class="swatch-row" id="swatchRow"></div>
+
+            <span class="field-label">Visor Style</span>
+            <div class="visor-row" id="visorRow">
+              <button type="button" class="visor-btn" data-visor="dual">Dual</button>
+              <button type="button" class="visor-btn" data-visor="cyclops">Cyclops</button>
+              <button type="button" class="visor-btn" data-visor="visor">Slit</button>
+              <button type="button" class="visor-btn" data-visor="crest">Crest</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-grid">
+          <div>
+            <div class="summary-item-label">Highest Stage</div>
+            <div class="summary-item-val" id="profHighest">1</div>
+          </div>
+          <div>
+            <div class="summary-item-label">Total Kills</div>
+            <div class="summary-item-val" id="profKills">0</div>
+          </div>
+          <div>
+            <div class="summary-item-label">Total Coins</div>
+            <div class="summary-item-val" id="profCoins">0</div>
+          </div>
+          <div>
+            <div class="summary-item-label">Enraged Escapes</div>
+            <div class="summary-item-val" id="profEscapes">0</div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="btnSaveProfile">Save & Return</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Between-Level Marketplace -->
+    <div class="overlay" id="overlayShop">
+      <div class="modal wide">
+        <div class="shop-header">
+          <div>
+            <div class="modal-kicker" id="shopClearedLabel">Stage 1 Cleared</div>
+            <h2 class="modal-title" style="margin-bottom:0;">Supply Outpost</h2>
+          </div>
+          <div class="shop-purse" id="shopPurse">0 Coins</div>
+        </div>
+
+        <div class="shop-next-info" id="shopNextInfo">Next: Stage 2 · Mossy Aqueduct · Standard</div>
+        <div class="shop-grid" id="shopGrid"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="btnNextStage">Enter Next Stage</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pause Screen -->
+    <div class="overlay" id="overlayPause">
+      <div class="modal">
+        <div class="modal-kicker" id="pauseLevelLabel">Stage 1</div>
+        <h2 class="modal-title">Paused</h2>
+        <p class="modal-desc">Catch your breath before the hunters close in.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="btnResume">Resume</button>
+          <button type="button" class="btn-ghost" id="btnPauseNewSeed">New Seed</button>
+          <button type="button" class="btn-ghost" id="btnPauseRestart">Restart Run</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="overlay" id="overlayGameOver">
+      <div class="modal">
+        <div class="modal-kicker" id="gameOverLevelLabel">Fell on Stage 1</div>
+        <h2 class="modal-title">Run Ended</h2>
+        <p class="modal-desc">Your runner fell before reaching the exit portal.</p>
+        <div class="summary-grid">
+          <div>
+            <div class="summary-item-label">Score</div>
+            <div class="summary-item-val" id="goScore">0</div>
+          </div>
+          <div>
+            <div class="summary-item-label">Stage</div>
+            <div class="summary-item-val" id="goStage">1</div>
+          </div>
+          <div>
+            <div class="summary-item-label">Kills</div>
+            <div class="summary-item-val" id="goKills">0</div>
+          </div>
+          <div>
+            <div class="summary-item-label">Escapes</div>
+            <div class="summary-item-val" id="goEscapes">0</div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="btnGameOverRestart">Try Again (R)</button>
+          <button type="button" class="btn-ghost" id="btnGameOverProfile">Profile</button>
+        </div>
       </div>
     </div>
   </div>
@@ -988,9 +1257,9 @@
       'use strict';
 
       const TILE = 40;
-      const VIEW_W = 960;
-      const VIEW_H = 560;
       const MAP_ROWS = 14;
+      const WORLD_H = MAP_ROWS * TILE;
+      const MIN_VIEW_W = 640;
       const STORAGE_KEY = 'embervale_profile_v1';
 
       const AVATAR_COLORS = ['#f59e0b', '#38bdf8', '#10b981', '#fb7185', '#a78bfa', '#e2e8f0'];
@@ -1274,30 +1543,59 @@
           });
           window.addEventListener('blur', () => {
             this.keys.clear();
-            Object.keys(this.touch).forEach((k) => { this.touch[k] = false; });
+            this._clearTouch();
           });
+
+          // Prevent Safari pinch-to-zoom / double-tap zoom gestures during play
+          ['gesturestart', 'gesturechange', 'gestureend'].forEach((evt) => {
+            document.addEventListener(evt, (e) => e.preventDefault(), { passive: false });
+          });
+        }
+
+        _clearTouch() {
+          Object.keys(this.touch).forEach((k) => { this.touch[k] = false; });
+          document.querySelectorAll('.touch-btn.active').forEach((b) => b.classList.remove('active'));
         }
 
         _bindTouch() {
           const bindBtn = (id, key) => {
             const el = document.getElementById(id);
             if (!el) return;
-            const down = (e) => {
+            const activePointers = new Set();
+
+            const sync = () => {
+              const pressed = activePointers.size > 0;
+              this.touch[key] = pressed;
+              el.classList.toggle('active', pressed);
+            };
+
+            el.addEventListener('pointerdown', (e) => {
               e.preventDefault();
+              e.stopPropagation();
               this.sound.unlock();
-              this.touch[key] = true;
-              el.classList.add('active');
-            };
-            const up = (e) => {
+              document.body.classList.add('touch-enabled');
+              activePointers.add(e.pointerId);
+              if (el.setPointerCapture) {
+                try { el.setPointerCapture(e.pointerId); } catch {}
+              }
+              sync();
+            }, { passive: false });
+
+            const release = (e) => {
               e.preventDefault();
-              this.touch[key] = false;
-              el.classList.remove('active');
+              activePointers.delete(e.pointerId);
+              sync();
             };
-            el.addEventListener('pointerdown', down);
-            el.addEventListener('pointerup', up);
-            el.addEventListener('pointercancel', up);
-            el.addEventListener('pointerleave', up);
+
+            el.addEventListener('pointerup', release, { passive: false });
+            el.addEventListener('pointercancel', release, { passive: false });
+            el.addEventListener('lostpointercapture', (e) => {
+              activePointers.delete(e.pointerId);
+              sync();
+            });
+            el.addEventListener('contextmenu', (e) => e.preventDefault());
           };
+
           bindBtn('touchLeft', 'left');
           bindBtn('touchRight', 'right');
           bindBtn('touchJump', 'jump');
@@ -1380,14 +1678,17 @@
         open() {
           this.isOpen = true;
           this.box.classList.add('open');
+          document.getElementById('btnChatToggle')?.classList.add('active');
           this.game.input.typingBlocked = true;
           this.game.input.keys.clear();
+          this.game.input._clearTouch();
           setTimeout(() => this.input.focus(), 10);
         }
 
         close() {
           this.isOpen = false;
           this.box.classList.remove('open');
+          document.getElementById('btnChatToggle')?.classList.remove('active');
           this.input.blur();
           this.game.input.typingBlocked = false;
         }
@@ -1630,9 +1931,10 @@
           this.shakeMag = 0;
         }
 
-        reset(player, level) {
-          this.x = Math.max(0, Math.min(level.width - VIEW_W, player.x + player.w * 0.5 - VIEW_W * 0.38));
-          this.y = 0;
+        reset(player, level, viewW = 960, viewH = WORLD_H) {
+          const maxCamX = Math.max(0, level.width - viewW);
+          this.x = Math.max(0, Math.min(maxCamX, player.x + player.w * 0.5 - viewW * 0.38));
+          this.y = viewH > WORLD_H ? -Math.round((viewH - WORLD_H) * 0.45) : 0;
           this.shakeTime = 0;
           this.shakeMag = 0;
         }
@@ -1642,14 +1944,19 @@
           this.shakeTime = Math.max(this.shakeTime, duration);
         }
 
-        update(dt, player, level) {
+        update(dt, player, level, viewW = 960, viewH = WORLD_H) {
           const lookAhead = player.facing * 60;
-          const targetX = player.x + player.w * 0.5 + lookAhead - VIEW_W * 0.44;
-          const clampedTargetX = Math.max(0, Math.min(level.width - VIEW_W, targetX));
+          const targetX = player.x + player.w * 0.5 + lookAhead - viewW * 0.44;
+          const maxCamX = Math.max(0, level.width - viewW);
+          const clampedTargetX = Math.max(0, Math.min(maxCamX, targetX));
           this.x += (clampedTargetX - this.x) * (1 - Math.exp(-8.5 * dt));
 
-          const clampedTargetY = Math.max(0, Math.min(level.height - VIEW_H, player.y - VIEW_H * 0.55));
-          this.y += (clampedTargetY - this.y) * (1 - Math.exp(-6.0 * dt));
+          if (viewH > WORLD_H) {
+            this.y = -Math.round((viewH - WORLD_H) * 0.45);
+          } else {
+            const clampedTargetY = Math.max(0, Math.min(level.height - viewH, player.y - viewH * 0.55));
+            this.y += (clampedTargetY - this.y) * (1 - Math.exp(-6.0 * dt));
+          }
 
           if (this.shakeTime > 0) {
             this.shakeTime = Math.max(0, this.shakeTime - dt);
@@ -2803,38 +3110,42 @@
       class Renderer {
         constructor(ctx) {
           this.ctx = ctx;
-          this.stars = Array.from({ length: 48 }, (_, i) => ({
-            x: ((i * 197) % 960),
+          this.stars = Array.from({ length: 56 }, (_, i) => ({
+            u: ((i * 197) % 1000) / 1000,
             y: ((i * 113) % 300),
             r: (i % 3) * 0.6 + 0.7,
             phase: i * 0.7
           }));
         }
 
-        drawBackground(cam, level, time) {
+        drawBackground(cam, level, time, viewW, viewH) {
           const ctx = this.ctx;
           const th = level.theme;
+          const horizonY = WORLD_H - cam.y;
 
-          const sky = ctx.createLinearGradient(0, 0, 0, VIEW_H);
+          const sky = ctx.createLinearGradient(0, 0, 0, Math.max(viewH, horizonY));
           sky.addColorStop(0, th.skyTop);
           sky.addColorStop(0.55, th.skyMid);
           sky.addColorStop(1, th.skyBot);
           ctx.fillStyle = sky;
-          ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+          ctx.fillRect(0, 0, viewW, viewH);
 
           ctx.fillStyle = '#ffffff';
           for (const s of this.stars) {
             const tw = 0.25 + 0.55 * (0.5 + 0.5 * Math.sin(time * 2 + s.phase));
             ctx.globalAlpha = tw;
-            const sx = (s.x - cam.x * 0.04 + VIEW_W) % VIEW_W;
-            ctx.beginPath();
-            ctx.arc(sx, s.y, s.r, 0, Math.PI * 2);
-            ctx.fill();
+            const sx = ((s.u * viewW - cam.x * 0.04) % viewW + viewW) % viewW;
+            const sy = s.y - cam.y * 0.45;
+            if (sy >= -4 && sy <= horizonY) {
+              ctx.beginPath();
+              ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+              ctx.fill();
+            }
           }
           ctx.globalAlpha = 1;
 
-          const sunX = 720 - cam.x * 0.05;
-          const sunY = 128;
+          const sunX = viewW * 0.75 - cam.x * 0.05;
+          const sunY = 128 - cam.y * 0.5;
           const sunGlow = ctx.createRadialGradient(sunX, sunY, 18, sunX, sunY, 150);
           sunGlow.addColorStop(0, th.sunColor);
           sunGlow.addColorStop(0.35, 'rgba(255, 255, 255, 0.14)');
@@ -2849,66 +3160,76 @@
           ctx.arc(sunX, sunY, 34, 0, Math.PI * 2);
           ctx.fill();
 
-          this._drawMountainLayer(cam.x * 0.12, 330, 110, 220, th.farMountain);
-          this._drawRuinsLayer(cam.x * 0.28, th.midRuins);
+          this._drawMountainLayer(cam.x * 0.12, horizonY - 230, 110, 220, th.farMountain, viewW, horizonY);
+          this._drawRuinsLayer(cam.x * 0.28, th.midRuins, viewW, horizonY);
 
           ctx.fillStyle = th.nearHaze;
-          ctx.fillRect(0, VIEW_H - 180, VIEW_W, 180);
+          ctx.fillRect(0, horizonY - 180, viewW, 180);
+
+          // Subterranean abyss fill below ground plane (for tall portrait screens)
+          if (viewH > horizonY) {
+            const abyss = ctx.createLinearGradient(0, horizonY, 0, viewH);
+            abyss.addColorStop(0, th.stoneDark);
+            abyss.addColorStop(0.35, '#090d14');
+            abyss.addColorStop(1, '#04060a');
+            ctx.fillStyle = abyss;
+            ctx.fillRect(0, horizonY, viewW, viewH - horizonY);
+          }
 
           // EMP Zone subtle electric scan tint
           if (level.modifier.id === 'EMP_ZONE') {
             ctx.fillStyle = `rgba(56, 189, 248, ${0.03 + 0.02 * Math.sin(time * 6)})`;
-            ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+            ctx.fillRect(0, 0, viewW, viewH);
           }
 
           ctx.fillStyle = th.moteColor;
           for (let i = 0; i < 24; i++) {
-            const mx = ((i * 157 - cam.x * 0.5 + time * 14) % VIEW_W + VIEW_W) % VIEW_W;
-            const my = ((i * 89 - time * (8 + (i % 4) * 3)) % VIEW_H + VIEW_H) % VIEW_H;
+            const mx = ((i * 157 - cam.x * 0.5 + time * 14) % viewW + viewW) % viewW;
+            const my = ((i * 89 - time * (8 + (i % 4) * 3)) % viewH + viewH) % viewH;
             ctx.beginPath();
             ctx.arc(mx, my, 1.5 + (i % 2), 0, Math.PI * 2);
             ctx.fill();
           }
         }
 
-        _drawMountainLayer(offset, baseY, amp, step, color) {
+        _drawMountainLayer(offset, baseY, amp, step, color, viewW, horizonY) {
           const ctx = this.ctx;
           ctx.fillStyle = color;
           ctx.beginPath();
-          ctx.moveTo(0, VIEW_H);
+          ctx.moveTo(0, horizonY);
           const startIdx = Math.floor(offset / step) - 1;
-          const count = Math.ceil(VIEW_W / step) + 3;
+          const count = Math.ceil(viewW / step) + 3;
           for (let i = 0; i <= count; i++) {
             const idx = startIdx + i;
             const x = idx * step - offset;
             const h = Math.abs(Math.sin(idx * 1.7 + 0.5)) * amp + Math.abs(Math.cos(idx * 0.9)) * (amp * 0.45);
             ctx.lineTo(x, baseY - h);
           }
-          ctx.lineTo(VIEW_W, VIEW_H);
+          ctx.lineTo(viewW, horizonY);
           ctx.closePath();
           ctx.fill();
         }
 
-        _drawRuinsLayer(offset, color) {
+        _drawRuinsLayer(offset, color, viewW, horizonY) {
           const ctx = this.ctx;
           ctx.fillStyle = color;
           const span = 180;
           const startIdx = Math.floor(offset / span) - 1;
-          const count = Math.ceil(VIEW_W / span) + 3;
+          const count = Math.ceil(viewW / span) + 3;
           for (let i = 0; i < count; i++) {
             const idx = startIdx + i;
             const x = idx * span - offset;
             const h = 120 + ((Math.abs(idx * 73) % 5) * 26);
-            ctx.fillRect(x, VIEW_H - h, 34, h);
-            if (Math.abs(idx) % 2 === 0) ctx.fillRect(x, VIEW_H - h, span - 30, 18);
+            ctx.fillRect(x, horizonY - h, 34, h);
+            if (Math.abs(idx) % 2 === 0) ctx.fillRect(x, horizonY - h, span - 30, 18);
           }
         }
 
-        drawTiles(cam, level) {
+        drawTiles(cam, level, viewW) {
           const ctx = this.ctx;
           const th = level.theme;
           const startCol = Math.max(0, Math.floor(cam.x / TILE) - 1);
-          const endCol = Math.min(level.cols - 1, Math.ceil((cam.x + VIEW_W) / TILE) + 1);
+          const endCol = Math.min(level.cols - 1, Math.ceil((cam.x + viewW) / TILE) + 1);
 
           for (let r = 0; r < level.rows; r++) {
             for (let c = startCol; c <= endCol; c++) {
@@ -2953,18 +3274,18 @@
           }
         }
 
-        drawHunterWarnings(cam, enemies, time) {
+        drawHunterWarnings(cam, enemies, time, viewW, viewH) {
           const ctx = this.ctx;
           for (const e of enemies) {
             if (!e.alive || !e.enraged) continue;
             const offLeft = e.x + e.w < cam.x;
-            const offRight = e.x > cam.x + VIEW_W;
+            const offRight = e.x > cam.x + viewW;
             if (!offLeft && !offRight) continue;
 
             const pulse = 0.65 + 0.35 * Math.sin(time * 12);
-            const y = Math.max(44, Math.min(VIEW_H - 44, e.y + e.h * 0.5 - cam.y));
-            const distM = Math.max(1, Math.round((offLeft ? cam.x - e.x : e.x - (cam.x + VIEW_W)) / 20));
-            const x = offLeft ? 20 : VIEW_W - 20;
+            const y = Math.max(44, Math.min(viewH - 44, e.y + e.h * 0.5 - cam.y));
+            const distM = Math.max(1, Math.round((offLeft ? cam.x - e.x : e.x - (cam.x + viewW)) / 20));
+            const x = offLeft ? 20 : viewW - 20;
 
             ctx.save();
             ctx.globalAlpha = pulse;
@@ -3000,8 +3321,17 @@
       // =========================================================================
       class Game {
         constructor() {
+          this.stageWrap = document.getElementById('stageWrap');
           this.canvas = document.getElementById('gameCanvas');
           this.ctx = this.canvas.getContext('2d');
+
+          this.viewW = 960;
+          this.viewH = WORLD_H;
+          this.renderScale = 1;
+          this.dpr = 1;
+          this.portraitDismissed = false;
+          this.isTouchDevice = window.matchMedia('(pointer: coarse)').matches || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
+          if (this.isTouchDevice) document.body.classList.add('touch-enabled');
 
           this.profile = ProfileStore.load();
           this.sound = new SoundEngine();
@@ -3027,16 +3357,81 @@
           this.projectiles = [];
           this.level = LevelGenerator.generate(this.stage, this.seed);
           this.player = new Player(this.level.spawn.x, this.level.spawn.y);
-          this.camera.reset(this.player, this.level);
+
+          this._resizeCanvas();
+          this.camera.reset(this.player, this.level, this.viewW, this.viewH);
 
           this._bindUI();
+          this._bindResponsive();
           this._syncProfileUI();
           this._syncHUD();
+          this._syncRotatePrompt();
 
-          this.chat.addSystem('Welcome to Embervale. Press T to chat or Start Run to begin.');
+          this.chat.addSystem('Welcome to Embervale. Tap Chat or press T to talk.');
 
           this.lastFrame = performance.now();
           requestAnimationFrame((now) => this._loop(now));
+        }
+
+        _resizeCanvas() {
+          const rect = this.stageWrap.getBoundingClientRect();
+          const cssW = Math.max(240, Math.round(rect.width || window.innerWidth));
+          const cssH = Math.max(180, Math.round(rect.height || window.innerHeight));
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+          if (this.canvas.width !== Math.round(cssW * dpr) || this.canvas.height !== Math.round(cssH * dpr)) {
+            this.canvas.width = Math.round(cssW * dpr);
+            this.canvas.height = Math.round(cssH * dpr);
+          }
+
+          const scale = Math.min(cssH / WORLD_H, cssW / MIN_VIEW_W);
+          this.dpr = dpr;
+          this.renderScale = scale;
+          this.viewW = cssW / scale;
+          this.viewH = cssH / scale;
+          if (this.camera) {
+            this.camera.y = this.viewH > WORLD_H
+              ? -Math.round((this.viewH - WORLD_H) * 0.45)
+              : Math.max(0, Math.min(WORLD_H - this.viewH, this.camera.y));
+          }
+        }
+
+        _bindResponsive() {
+          const onResize = () => {
+            this._resizeCanvas();
+            this._syncRotatePrompt();
+          };
+          window.addEventListener('resize', onResize);
+          window.addEventListener('orientationchange', () => {
+            setTimeout(onResize, 80);
+            setTimeout(onResize, 260);
+          });
+          if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', onResize);
+          }
+          if (typeof ResizeObserver !== 'undefined') {
+            new ResizeObserver(onResize).observe(this.stageWrap);
+          }
+          window.addEventListener('touchstart', () => {
+            if (!this.isTouchDevice) {
+              this.isTouchDevice = true;
+              document.body.classList.add('touch-enabled');
+              this._syncRotatePrompt();
+            }
+          }, { once: true, passive: true });
+        }
+
+        _syncRotatePrompt() {
+          const el = document.getElementById('overlayRotate');
+          if (!el) return;
+          const isPortrait = window.innerHeight > window.innerWidth;
+          const isMobileScreen = this.isTouchDevice || window.innerWidth <= 760;
+          if (!isPortrait) {
+            el.classList.remove('visible');
+            return;
+          }
+          const shouldShow = isMobileScreen && isPortrait && this.state === 'PLAYING' && !this.portraitDismissed;
+          el.classList.toggle('visible', shouldShow);
         }
 
         _bindUI() {
@@ -3070,10 +3465,15 @@
             goEscapes: document.getElementById('goEscapes')
           };
 
-          // Canvas click to shoot
-          this.canvas.addEventListener('pointerdown', () => {
+          document.getElementById('btnDismissRotate').addEventListener('click', () => {
+            this.portraitDismissed = true;
+            this._syncRotatePrompt();
+          });
+
+          // Mouse-only click to shoot (touch devices use the dedicated Fire button)
+          this.canvas.addEventListener('pointerdown', (e) => {
             this.sound.unlock();
-            if (this.state === 'PLAYING' && !this.chat.isOpen && this.player.upgrades.ammo > 0) {
+            if (e.pointerType === 'mouse' && this.state === 'PLAYING' && !this.chat.isOpen && this.player.upgrades.ammo > 0) {
               this.input.mouseShoot = true;
             }
           });
@@ -3233,6 +3633,7 @@
           } else if (nextState === 'START') {
             this._syncProfileUI();
           }
+          this._syncRotatePrompt();
         }
 
         _syncHUD() {
@@ -3280,7 +3681,7 @@
           this.level = LevelGenerator.generate(stageNum, this.seed);
           this.player.reset(this.level.spawn.x, this.level.spawn.y);
           this.particles.clear();
-          this.camera.reset(this.player, this.level);
+          this.camera.reset(this.player, this.level, this.viewW, this.viewH);
           this.transitionFlash = 0.35;
 
           if (stageNum > this.profile.stats.highestLevel) {
@@ -3453,7 +3854,7 @@
           if (fromPit) {
             this.player.reset(this.level.activeSpawn.x, this.level.activeSpawn.y);
             this.player.invulnTimer = 1.4;
-            this.camera.reset(this.player, this.level);
+            this.camera.reset(this.player, this.level, this.viewW, this.viewH);
             this.particles.burst(this.player.x + this.player.w * 0.5, this.player.y + this.player.h * 0.5, '#38bdf8', 14, 150, 120);
           } else {
             this.player.invulnTimer = 1.45;
@@ -3692,34 +4093,40 @@
           }
 
           this.particles.update(dt);
-          this.camera.update(dt, this.player, this.level);
+          this.camera.update(dt, this.player, this.level, this.viewW, this.viewH);
         }
 
         _render() {
-          const cam = this.camera.renderOffset;
-          this.renderer.drawBackground(cam, this.level, this.time);
-          this.renderer.drawTiles(cam, this.level);
+          const ctx = this.ctx;
+          ctx.save();
+          ctx.setTransform(this.dpr * this.renderScale, 0, 0, this.dpr * this.renderScale, 0, 0);
 
-          for (const plat of this.level.movingPlatforms) plat.draw(this.ctx, cam, this.level.theme);
-          for (const cp of this.level.checkpoints) cp.draw(this.ctx, cam, this.time);
-          if (this.level.portal) this.level.portal.draw(this.ctx, cam, this.time, this.level.theme.portalColor);
-          for (const item of this.level.collectibles) item.draw(this.ctx, cam, this.time);
+          const cam = this.camera.renderOffset;
+          this.renderer.drawBackground(cam, this.level, this.time, this.viewW, this.viewH);
+          this.renderer.drawTiles(cam, this.level, this.viewW);
+
+          for (const plat of this.level.movingPlatforms) plat.draw(ctx, cam, this.level.theme);
+          for (const cp of this.level.checkpoints) cp.draw(ctx, cam, this.time);
+          if (this.level.portal) this.level.portal.draw(ctx, cam, this.time, this.level.theme.portalColor);
+          for (const item of this.level.collectibles) item.draw(ctx, cam, this.time);
 
           const isArmored = this.level.modifier.id === 'ARMORED';
-          for (const enemy of this.level.enemies) enemy.draw(this.ctx, cam, isArmored);
-          for (const b of this.projectiles) b.draw(this.ctx, cam);
+          for (const enemy of this.level.enemies) enemy.draw(ctx, cam, isArmored);
+          for (const b of this.projectiles) b.draw(ctx, cam);
 
-          this.player.draw(this.ctx, cam, this.time, this.profile);
-          this.particles.draw(this.ctx, cam);
+          this.player.draw(ctx, cam, this.time, this.profile);
+          this.particles.draw(ctx, cam);
 
           if (this.state === 'PLAYING') {
-            this.renderer.drawHunterWarnings(cam, this.level.enemies, this.time);
+            this.renderer.drawHunterWarnings(cam, this.level.enemies, this.time, this.viewW, this.viewH);
           }
 
           if (this.transitionFlash > 0) {
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${(this.transitionFlash / 0.35) * 0.32})`;
-            this.ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+            ctx.fillStyle = `rgba(255, 255, 255, ${(this.transitionFlash / 0.35) * 0.32})`;
+            ctx.fillRect(0, 0, this.viewW, this.viewH);
           }
+
+          ctx.restore();
         }
 
         _loop(now) {
