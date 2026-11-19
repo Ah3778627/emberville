@@ -6,9 +6,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <title>Embervale Platformer</title>
-  <meta name="description" content="A procedural 2D HTML5 Canvas platformer with infinite generated stages, enrage-and-hunt enemy AI, jetpack & volatile firearms marketplace, profiles, and live chat." />
+  <meta name="description" content="A procedural 2D HTML5 Canvas platformer with infinite generated stages, enrage-and-hunt enemy AI, jetpack, and volatile firearms marketplace." />
   <meta property="og:title" content="Embervale Platformer" />
-  <meta property="og:description" content="A procedural 2D HTML5 Canvas platformer with infinite generated stages, enrage-and-hunt enemy AI, jetpack & volatile firearms marketplace, profiles, and live chat." />
+  <meta property="og:description" content="A procedural 2D HTML5 Canvas platformer with infinite generated stages, enrage-and-hunt enemy AI, jetpack, and volatile firearms marketplace." />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <style>
@@ -82,21 +82,30 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px 14px;
-      padding: 9px 14px;
+      gap: 8px 12px;
+      padding: 8px 12px;
       background: var(--panel);
       border-bottom: 1px solid var(--border);
       font-size: 13px;
       line-height: 1;
-      flex-wrap: wrap;
       flex-shrink: 0;
       z-index: 10;
+    }
+
+    .hud-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px 14px;
+      flex: 1 1 auto;
+      min-width: 0;
+      flex-wrap: wrap;
     }
 
     .hud-group {
       display: flex;
       align-items: center;
-      gap: 10px 12px;
+      gap: 8px 12px;
       flex-wrap: wrap;
     }
 
@@ -124,6 +133,7 @@
 
     .hud-modifier.mod-emp { color: #38bdf8; }
     .hud-modifier.mod-armored { color: #fb7185; }
+    .hud-modifier.mod-showdown { color: #f87171; }
     .hud-modifier.mod-standard { color: var(--muted); }
 
     .stat {
@@ -203,7 +213,40 @@
     .hud-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-gear {
+      appearance: none;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+    }
+
+    .btn-gear:hover {
+      background: rgba(255, 255, 255, 0.13);
+      border-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .btn-gear:active {
+      transform: scale(0.95);
+    }
+
+    .btn-gear svg {
+      width: 20px;
+      height: 20px;
+      display: block;
     }
 
     .btn-ghost {
@@ -236,17 +279,9 @@
       color: var(--accent-hover);
     }
 
-    .btn-icon-svg {
-      width: 15px;
-      height: 15px;
-      flex-shrink: 0;
-      display: block;
-    }
-
     .btn-ghost:focus-visible,
-    .btn-primary:focus-visible,
-    .input-field:focus-visible,
-    .chat-input:focus-visible {
+    .btn-gear:focus-visible,
+    .btn-primary:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 2px;
     }
@@ -271,179 +306,124 @@
       -webkit-touch-callout: none;
     }
 
-    /* Interactive Chat Overlay */
-    .chat-box {
+    /* Cinematic Level & Event Alert Banner (non-blocking, 2.5s) */
+    .stage-banner-host {
       position: absolute;
-      left: 12px;
-      bottom: 12px;
-      width: min(340px, calc(100% - 24px));
+      inset: 0;
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 22;
+      align-items: center;
+      justify-content: center;
+      padding: 0 max(16px, env(safe-area-inset-right)) 12vh max(16px, env(safe-area-inset-left));
       pointer-events: none;
-    }
-
-    .chat-box.open {
-      pointer-events: auto;
-      background: rgba(11, 14, 20, 0.86);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 9px;
-      padding: 8px;
-      backdrop-filter: blur(6px);
-    }
-
-    .chat-log {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 120px;
-      overflow-y: auto;
-      touch-action: pan-y;
-      scrollbar-width: none;
-    }
-
-    .chat-log::-webkit-scrollbar {
-      display: none;
-    }
-
-    .chat-msg {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      font-size: 12px;
-      line-height: 1.35;
-      padding: 3px 6px;
-      border-radius: 5px;
-      background: rgba(9, 13, 22, 0.56);
-      color: #e2e8f0;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-      transition: opacity 0.25s ease;
-    }
-
-    .chat-msg.faded {
-      opacity: 0;
-      pointer-events: none;
-      height: 0;
-      padding: 0;
-      margin: 0;
+      z-index: 25;
       overflow: hidden;
     }
 
-    .chat-box.open .chat-msg.faded {
-      opacity: 0.85;
-      height: auto;
-      padding: 3px 6px;
+    .stage-banner {
+      width: min(640px, 100%);
+      padding: 13px 28px;
+      text-align: center;
+      position: relative;
+      background: linear-gradient(90deg, rgba(9, 13, 22, 0) 0%, rgba(11, 15, 24, 0.84) 16%, rgba(11, 15, 24, 0.9) 50%, rgba(11, 15, 24, 0.84) 84%, rgba(9, 13, 22, 0) 100%);
+      opacity: 0;
+      transform: translateX(-34px) scale(0.985);
+      will-change: transform, opacity;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .chat-msg.system {
-      color: #fbbf24;
-      background: rgba(245, 158, 11, 0.12);
+    .stage-banner::before,
+    .stage-banner::after {
+      content: "";
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--banner-accent, rgba(245, 158, 11, 0.72)) 50%, transparent 100%);
     }
 
-    .chat-msg.alert {
-      color: #fca5a5;
-      background: rgba(239, 68, 68, 0.16);
+    .stage-banner::before { top: 0; }
+    .stage-banner::after { bottom: 0; }
+
+    .stage-banner.entering {
+      opacity: 1;
+      transform: translateX(0) scale(1);
     }
 
-    .chat-avatar {
-      width: 16px;
-      height: 16px;
-      border-radius: 4px;
-      flex-shrink: 0;
-      margin-top: 1px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    .stage-banner.exiting {
+      opacity: 0;
+      transform: translateX(28px) scale(0.99);
+      transition: transform 0.42s cubic-bezier(0.4, 0, 1, 1), opacity 0.42s ease-out;
     }
 
-    .chat-author {
+    .stage-banner.tone-standard { --banner-accent: rgba(245, 158, 11, 0.78); }
+    .stage-banner.tone-emp { --banner-accent: rgba(56, 189, 248, 0.85); }
+    .stage-banner.tone-armored { --banner-accent: rgba(251, 113, 133, 0.85); }
+    .stage-banner.tone-showdown { --banner-accent: rgba(239, 68, 68, 0.92); }
+    .stage-banner.tone-unlock { --banner-accent: rgba(16, 185, 129, 0.85); }
+
+    .stage-banner-kicker {
+      font-size: clamp(10px, 1.5vw, 11px);
       font-weight: 700;
-      margin-right: 4px;
-      white-space: nowrap;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 4px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
     }
 
-    .chat-input-row {
-      display: none;
-      gap: 6px;
-      align-items: center;
-    }
+    .stage-banner.tone-emp .stage-banner-kicker { color: #38bdf8; }
+    .stage-banner.tone-armored .stage-banner-kicker { color: #fb7185; }
+    .stage-banner.tone-showdown .stage-banner-kicker { color: #f87171; }
+    .stage-banner.tone-unlock .stage-banner-kicker { color: #34d399; }
 
-    .chat-box.open .chat-input-row {
-      display: flex;
-    }
-
-    .chat-input {
-      flex: 1;
-      min-width: 0;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 6px;
-      padding: 7px 9px;
-      color: var(--text);
-      font-size: 14px;
-      font-family: inherit;
-      touch-action: auto;
-      user-select: text;
-      -webkit-user-select: text;
-    }
-
-    .chat-hint {
-      font-size: 11px;
-      color: rgba(226, 232, 240, 0.55);
-      padding-left: 2px;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-    }
-
-    .chat-box.open .chat-hint {
-      display: none;
-    }
-
-    /* Overlaid Mobile Touch Controls (Bottom-Left D-Pad + Bottom-Right Actions) */
-    .touch-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 20;
-    }
-
-    .touch-pad-left {
-      position: absolute;
-      left: max(12px, env(safe-area-inset-left));
-      bottom: max(12px, env(safe-area-inset-bottom));
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      pointer-events: auto;
-      touch-action: none;
-    }
-
-    .touch-pad-right {
-      position: absolute;
-      right: max(12px, env(safe-area-inset-right));
-      bottom: max(12px, env(safe-area-inset-bottom));
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      pointer-events: auto;
-      touch-action: none;
-    }
-
-    .touch-btn {
-      appearance: none;
-      min-width: 56px;
-      min-height: 56px;
-      padding: 0 12px;
-      border-radius: 14px;
-      border: 1.5px solid rgba(255, 255, 255, 0.22);
-      background: rgba(15, 20, 29, 0.58);
-      backdrop-filter: blur(4px);
+    .stage-banner-title {
+      font-size: clamp(16px, 3.1vw, 23px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
       color: #f8fafc;
-      font-size: 14px;
+      line-height: 1.2;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+    }
+
+    .stage-banner-sub {
+      font-size: clamp(11px, 1.7vw, 13px);
+      color: #cbd5e1;
+      margin-top: 3px;
+      line-height: 1.35;
+      text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage-banner {
+        transform: none;
+        transition: opacity 0.2s ease;
+      }
+      .stage-banner.entering,
+      .stage-banner.exiting {
+        transform: none;
+      }
+    }
+
+    /* Contextual Mobile Touch Controls */
+    .touch-dpad {
+      display: none;
+      position: absolute;
+      left: max(14px, env(safe-area-inset-left));
+      bottom: max(14px, env(safe-area-inset-bottom));
+      z-index: 20;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .touch-dpad-btn,
+    .touch-fire-btn {
+      appearance: none;
+      min-width: 58px;
+      min-height: 58px;
+      padding: 0 14px;
+      border-radius: 16px;
+      backdrop-filter: blur(4px);
+      font-size: 16px;
       font-weight: 700;
-      display: inline-flex;
       align-items: center;
       justify-content: center;
       touch-action: none;
@@ -451,20 +431,124 @@
       -webkit-user-select: none;
       -webkit-touch-callout: none;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.42);
       transition: transform 0.08s ease, background-color 0.08s ease, border-color 0.08s ease;
     }
 
-    .touch-btn.touch-primary {
-      min-width: 64px;
-      min-height: 64px;
-      border-color: rgba(245, 158, 11, 0.45);
+    .touch-dpad-btn {
+      display: inline-flex;
+      border: 1.5px solid rgba(255, 255, 255, 0.24);
+      background: rgba(15, 20, 29, 0.68);
+      color: var(--text);
     }
 
-    .touch-btn.active {
-      background: rgba(245, 158, 11, 0.36);
+    .touch-dpad-btn.active {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.55);
+      transform: scale(0.94);
+    }
+
+    .touch-fire-btn {
+      display: none;
+      position: absolute;
+      right: max(14px, env(safe-area-inset-right));
+      bottom: max(14px, env(safe-area-inset-bottom));
+      z-index: 20;
+      min-width: 60px;
+      min-height: 60px;
+      border: 1.5px solid rgba(245, 158, 11, 0.55);
+      background: rgba(15, 20, 29, 0.68);
+      color: #fef3c7;
+      font-size: 13px;
+    }
+
+    .touch-fire-btn.active {
+      background: rgba(245, 158, 11, 0.42);
       border-color: var(--accent-hover);
       transform: scale(0.94);
+    }
+
+    /* Settings Gear Modal Menu */
+    .settings-modal {
+      max-width: 420px;
+      background: rgba(15, 20, 29, 0.88);
+      backdrop-filter: blur(12px);
+    }
+
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: clamp(12px, 2vh, 18px);
+      text-align: left;
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 9px;
+    }
+
+    .settings-row-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .settings-row-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .btn-toggle {
+      appearance: none;
+      min-width: 82px;
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .btn-toggle.on {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: var(--accent);
+      color: var(--accent-hover);
+    }
+
+    .settings-utility-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: clamp(12px, 2vh, 16px);
+    }
+
+    .settings-utility-grid .btn-ghost {
+      min-height: 42px;
+      width: 100%;
+    }
+
+    .btn-danger-ghost {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.28);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .btn-danger-ghost:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.45);
     }
 
     /* Portrait Orientation Prompt */
@@ -600,39 +684,6 @@
       white-space: nowrap;
     }
 
-    .profile-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 8px;
-      margin-bottom: clamp(10px, 2vh, 16px);
-      text-align: left;
-    }
-
-    .profile-id {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .profile-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .profile-meta {
-      font-size: 12px;
-      color: var(--muted);
-      font-variant-numeric: tabular-nums;
-      margin-top: 2px;
-    }
-
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -694,96 +745,6 @@
     .btn-primary:disabled {
       opacity: 0.45;
       cursor: not-allowed;
-    }
-
-    /* Profile Setup Form */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      gap: 14px;
-      align-items: start;
-      margin-bottom: clamp(10px, 2vh, 16px);
-    }
-
-    .avatar-preview-box {
-      background: rgba(7, 9, 14, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .field-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 5px;
-    }
-
-    .input-field {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 7px;
-      padding: 8px 11px;
-      color: var(--text);
-      font-size: 14px;
-      margin-bottom: 10px;
-      touch-action: auto;
-      user-select: text;
-      -webkit-user-select: text;
-    }
-
-    .swatch-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    .swatch {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      touch-action: manipulation;
-      transition: transform 0.12s ease, border-color 0.12s ease;
-    }
-
-    .swatch.selected {
-      border-color: #ffffff;
-      transform: scale(1.08);
-    }
-
-    .visor-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-    }
-
-    .visor-btn {
-      appearance: none;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: var(--muted);
-      border-radius: 6px;
-      padding: 7px 6px;
-      min-height: 36px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    .visor-btn.selected {
-      background: rgba(245, 158, 11, 0.18);
-      border-color: var(--accent);
-      color: var(--text);
     }
 
     /* Marketplace */
@@ -882,34 +843,20 @@
 
     /* Mobile / Touch Responsive Rules */
     @media (pointer: coarse), (hover: none) {
-      .touch-overlay {
-        display: block;
+      .touch-fire-btn.has-ammo {
+        display: inline-flex;
       }
-      .chat-hint {
-        display: none;
-      }
-      .chat-box {
-        top: 8px;
-        bottom: auto;
-        left: max(10px, env(safe-area-inset-left));
-        width: min(300px, calc(100% - 20px));
-      }
-      .chat-log {
-        max-height: 92px;
+      body.manual-move .touch-dpad {
+        display: flex;
       }
     }
 
-    body.touch-enabled .touch-overlay {
-      display: block;
+    body.touch-enabled .touch-fire-btn.has-ammo {
+      display: inline-flex;
     }
-    body.touch-enabled .chat-hint {
-      display: none;
-    }
-    body.touch-enabled .chat-box {
-      top: 8px;
-      bottom: auto;
-      left: max(10px, env(safe-area-inset-left));
-      width: min(300px, calc(100% - 20px));
+
+    body.touch-enabled.manual-move .touch-dpad {
+      display: flex;
     }
 
     @media (max-width: 920px), (max-height: 540px) {
@@ -929,13 +876,9 @@
       .hud-title, .hud-sep:first-of-type {
         display: none;
       }
-      .hud-actions .btn-ghost {
-        padding: 6px 8px;
-        min-height: 34px;
-        min-width: 34px;
-      }
-      .btn-label-mobile-hide {
-        display: none;
+      .btn-gear {
+        width: 44px;
+        height: 44px;
       }
     }
 
@@ -946,10 +889,6 @@
       }
       .controls-grid {
         display: none;
-      }
-      .profile-banner {
-        padding: 8px 10px;
-        margin-bottom: 10px;
       }
       .summary-grid {
         padding: 8px;
@@ -967,31 +906,18 @@
       .shop-card-desc {
         display: none;
       }
-      .form-grid {
-        grid-template-columns: 104px 1fr;
-        gap: 10px;
-        margin-bottom: 10px;
-      }
-      .avatar-preview-box {
-        padding: 8px;
-      }
-      .input-field {
-        margin-bottom: 8px;
-        padding: 6px 9px;
-      }
-      .swatch-row {
-        margin-bottom: 8px;
+      .stage-banner {
+        padding: 9px 18px;
       }
     }
 
     @media (max-width: 560px) {
-      .controls-grid {
+      .controls-grid, .shop-grid {
         grid-template-columns: 1fr;
+      }
+      .controls-grid {
         gap: 5px;
         padding: 8px 10px;
-      }
-      .form-grid, .shop-grid {
-        grid-template-columns: 1fr;
       }
       .summary-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1008,76 +934,69 @@
   <div class="shell">
     <div class="cabinet">
       <header class="hud" aria-label="Game Status">
-        <div class="hud-group">
-          <span class="hud-title">Embervale</span>
-          <span class="hud-sep" aria-hidden="true">/</span>
-          <span class="hud-level" id="hudLevel">Stage 1 · Sunlit Ruins</span>
-          <span class="hud-sep" aria-hidden="true">·</span>
-          <span class="hud-modifier mod-standard" id="hudModifier">Standard</span>
-        </div>
+        <div class="hud-main">
+          <div class="hud-group">
+            <span class="hud-title">Embervale</span>
+            <span class="hud-sep" aria-hidden="true">/</span>
+            <span class="hud-level" id="hudLevel">Stage 1 · Sunlit Ruins</span>
+            <span class="hud-sep" aria-hidden="true">·</span>
+            <span class="hud-modifier mod-standard" id="hudModifier">Standard</span>
+          </div>
 
-        <div class="hud-group">
-          <div class="stat">
-            <span class="stat-label">Lives</span>
-            <span class="hearts" id="hudHearts" aria-label="Lives remaining"></span>
-          </div>
-          <div class="fuel-wrap" id="hudFuelWrap">
-            <span class="stat-label">Fuel</span>
-            <div class="fuel-track"><div class="fuel-fill" id="hudFuelFill"></div></div>
-          </div>
-          <div class="ammo-wrap" id="hudAmmoWrap">
-            <span class="stat-label">Ammo</span>
-            <span class="stat-value" id="hudAmmo">0/6</span>
-          </div>
-          <div class="stat">
-            <span class="stat-label">Coins</span>
-            <span class="stat-value" id="hudCoins">0</span>
-          </div>
-          <div class="stat">
-            <span class="stat-label">Score</span>
-            <span class="stat-value" id="hudScore">0000</span>
+          <div class="hud-group">
+            <div class="stat">
+              <span class="stat-label">Lives</span>
+              <span class="hearts" id="hudHearts" aria-label="Lives remaining"></span>
+            </div>
+            <div class="fuel-wrap" id="hudFuelWrap">
+              <span class="stat-label">Fuel</span>
+              <div class="fuel-track"><div class="fuel-fill" id="hudFuelFill"></div></div>
+            </div>
+            <div class="ammo-wrap" id="hudAmmoWrap">
+              <span class="stat-label">Ammo</span>
+              <span class="stat-value" id="hudAmmo">0/6</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Coins</span>
+              <span class="stat-value" id="hudCoins">0</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Score</span>
+              <span class="stat-value" id="hudScore">0000</span>
+            </div>
           </div>
         </div>
 
         <div class="hud-actions">
-          <button type="button" class="btn-ghost" id="btnNewSeed" title="Generate a new random seed for this stage">
-            <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            <span class="btn-label-mobile-hide">New Seed</span>
+          <button type="button" class="btn-gear" id="btnSettings" title="Settings & Menu (P / Esc)" aria-label="Open Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
           </button>
-          <button type="button" class="btn-ghost" id="btnChatToggle" title="Toggle Chat (T)" aria-label="Toggle Chat">
-            <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            <span class="btn-label-mobile-hide">Chat</span>
-          </button>
-          <button type="button" class="btn-ghost" id="btnMute" title="Toggle Sound (M)">Sound On</button>
-          <button type="button" class="btn-ghost" id="btnRestart" title="Restart Run (R)">Restart</button>
         </div>
       </header>
 
       <div class="stage-wrap" id="stageWrap">
         <canvas id="gameCanvas" width="960" height="560"></canvas>
 
-        <!-- Interactive Chat Overlay -->
-        <div class="chat-box" id="chatBox">
-          <div class="chat-log" id="chatLog"></div>
-          <div class="chat-hint" id="chatHint">Press T to chat</div>
-          <form class="chat-input-row" id="chatForm">
-            <input type="text" class="chat-input" id="chatInput" maxlength="90" placeholder="Send a message (Esc to close)..." autocomplete="off" />
-            <button type="submit" class="btn-ghost">Send</button>
-          </form>
+        <!-- Cinematic Level & Unlock Alert Banner -->
+        <div class="stage-banner-host" aria-live="polite" aria-atomic="true">
+          <div class="stage-banner tone-standard" id="stageBanner">
+            <div class="stage-banner-kicker" id="stageBannerKicker">Stage 1 · Sunlit Ruins</div>
+            <div class="stage-banner-title" id="stageBannerTitle">Stage 1: Sunlit Ruins</div>
+            <div class="stage-banner-sub" id="stageBannerSub">Reach the exit portal. Bypassed enemies will enrage.</div>
+          </div>
         </div>
 
-        <!-- On-Screen Touch Controls (Overlaid inside Safe Area) -->
-        <div class="touch-overlay" id="touchOverlay" aria-label="Touch Controls">
-          <div class="touch-pad-left">
-            <button type="button" class="touch-btn" id="touchLeft" aria-label="Move Left">←</button>
-            <button type="button" class="touch-btn" id="touchRight" aria-label="Move Right">→</button>
-          </div>
-          <div class="touch-pad-right">
-            <button type="button" class="touch-btn" id="touchShoot" aria-label="Fire Weapon">Fire</button>
-            <button type="button" class="touch-btn" id="touchJet" aria-label="Jetpack Thrust">Jet</button>
-            <button type="button" class="touch-btn touch-primary" id="touchJump" aria-label="Jump">Jump</button>
-          </div>
+        <!-- Contextual Left/Right Touch Controls (Mobile only when Auto-Accelerate is Off) -->
+        <div class="touch-dpad" id="touchDpad" aria-label="Movement Controls">
+          <button type="button" class="touch-dpad-btn" id="touchLeft" aria-label="Move Left">&#9664;</button>
+          <button type="button" class="touch-dpad-btn" id="touchRight" aria-label="Move Right">&#9654;</button>
         </div>
+
+        <!-- Contextual Fire Button (Mobile only when Volatile Carbine has ammo) -->
+        <button type="button" class="touch-fire-btn" id="touchShoot" aria-label="Fire Weapon">Fire</button>
       </div>
     </div>
 
@@ -1107,81 +1026,15 @@
           Conquer infinite procedural ruins, outrun enraged hunters, unlock your jetpack, and scavenge volatile firepower.
         </p>
 
-        <div class="profile-banner">
-          <div class="profile-id">
-            <canvas id="startAvatarCanvas" width="40" height="40"></canvas>
-            <div>
-              <div class="profile-name" id="startProfileName">Runner_01</div>
-              <div class="profile-meta" id="startProfileStats">Best Stage 1 · 0 Kills · 0 Coins</div>
-            </div>
-          </div>
-          <button type="button" class="btn-ghost" id="btnOpenProfile">Profile</button>
-        </div>
-
         <div class="controls-grid">
-          <div class="control-row"><span>Move</span><span class="keycap">A / D · ← / →</span></div>
-          <div class="control-row"><span>Jump / Jetpack</span><span class="keycap">W · Space · Shift</span></div>
-          <div class="control-row"><span>Fire Weapon</span><span class="keycap">F · J · Click</span></div>
-          <div class="control-row"><span>Chat / Pause</span><span class="keycap">T · P / Esc</span></div>
+          <div class="control-row"><span>Move</span><span class="keycap">A/D · ←/→ · Touch</span></div>
+          <div class="control-row"><span>Jump / Jetpack</span><span class="keycap">Tap/Hold · Space</span></div>
+          <div class="control-row"><span>Fire Weapon</span><span class="keycap">Shift · F · Click</span></div>
+          <div class="control-row"><span>Settings / Reset</span><span class="keycap">⚙ · P/Esc · R</span></div>
         </div>
 
         <div class="modal-actions">
           <button type="button" class="btn-primary" id="btnStart">Start Run</button>
-          <button type="button" class="btn-ghost" id="btnStartSeed">New Seed</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Profile Setup & Career Stats Modal -->
-    <div class="overlay" id="overlayProfile">
-      <div class="modal wide">
-        <div class="modal-kicker">Runner Identity & Career</div>
-        <h2 class="modal-title">Player Profile</h2>
-        <p class="modal-desc">Customize your runner badge for gameplay and live chat. Stats persist locally across runs.</p>
-
-        <div class="form-grid">
-          <div class="avatar-preview-box">
-            <canvas id="profilePreviewCanvas" width="84" height="84"></canvas>
-            <span class="stat-label" id="profilePreviewTag">Runner_01</span>
-          </div>
-          <div>
-            <label class="field-label" for="inputUsername">Username</label>
-            <input type="text" class="input-field" id="inputUsername" maxlength="16" placeholder="Enter runner name" />
-
-            <span class="field-label">Cloak & Scarf Color</span>
-            <div class="swatch-row" id="swatchRow"></div>
-
-            <span class="field-label">Visor Style</span>
-            <div class="visor-row" id="visorRow">
-              <button type="button" class="visor-btn" data-visor="dual">Dual</button>
-              <button type="button" class="visor-btn" data-visor="cyclops">Cyclops</button>
-              <button type="button" class="visor-btn" data-visor="visor">Slit</button>
-              <button type="button" class="visor-btn" data-visor="crest">Crest</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="summary-grid">
-          <div>
-            <div class="summary-item-label">Highest Stage</div>
-            <div class="summary-item-val" id="profHighest">1</div>
-          </div>
-          <div>
-            <div class="summary-item-label">Total Kills</div>
-            <div class="summary-item-val" id="profKills">0</div>
-          </div>
-          <div>
-            <div class="summary-item-label">Total Coins</div>
-            <div class="summary-item-val" id="profCoins">0</div>
-          </div>
-          <div>
-            <div class="summary-item-label">Enraged Escapes</div>
-            <div class="summary-item-val" id="profEscapes">0</div>
-          </div>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="btn-primary" id="btnSaveProfile">Save & Return</button>
         </div>
       </div>
     </div>
@@ -1206,16 +1059,43 @@
       </div>
     </div>
 
-    <!-- Pause Screen -->
-    <div class="overlay" id="overlayPause">
-      <div class="modal">
-        <div class="modal-kicker" id="pauseLevelLabel">Stage 1</div>
-        <h2 class="modal-title">Paused</h2>
-        <p class="modal-desc">Catch your breath before the hunters close in.</p>
+    <!-- Settings Gear Overlay Menu (Consolidates Pause + Utility Controls) -->
+    <div class="overlay" id="overlaySettings">
+      <div class="modal settings-modal">
+        <div class="modal-kicker" id="settingsLevelLabel">Stage 1 · Seed #1042</div>
+        <h2 class="modal-title">Settings</h2>
+
+        <div class="settings-list">
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-title">Sound &amp; SFX</div>
+              <div class="settings-row-sub">Web Audio retro synthesizer</div>
+            </div>
+            <button type="button" class="btn-toggle on" id="btnSettingAudio">On</button>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-title">Screen Shake</div>
+              <div class="settings-row-sub">Impact &amp; recoil camera motion</div>
+            </div>
+            <button type="button" class="btn-toggle on" id="btnSettingShake">On</button>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-row-title">Auto-Accelerate</div>
+              <div class="settings-row-sub">Run forward automatically (A/D overrides)</div>
+            </div>
+            <button type="button" class="btn-toggle" id="btnSettingAutoRun">Off</button>
+          </div>
+        </div>
+
+        <div class="settings-utility-grid">
+          <button type="button" class="btn-ghost" id="btnSettingSeed">New Seed</button>
+          <button type="button" class="btn-ghost btn-danger-ghost" id="btnSettingReset">Reset Run</button>
+        </div>
+
         <div class="modal-actions">
-          <button type="button" class="btn-primary" id="btnResume">Resume</button>
-          <button type="button" class="btn-ghost" id="btnPauseNewSeed">New Seed</button>
-          <button type="button" class="btn-ghost" id="btnPauseRestart">Restart Run</button>
+          <button type="button" class="btn-primary" id="btnSettingResume">Resume</button>
         </div>
       </div>
     </div>
@@ -1245,8 +1125,7 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="btn-primary" id="btnGameOverRestart">Try Again (R)</button>
-          <button type="button" class="btn-ghost" id="btnGameOverProfile">Profile</button>
+          <button type="button" class="btn-primary" id="btnGameOverRestart">Restart Run (R)</button>
         </div>
       </div>
     </div>
@@ -1260,9 +1139,6 @@
       const MAP_ROWS = 14;
       const WORLD_H = MAP_ROWS * TILE;
       const MIN_VIEW_W = 640;
-      const STORAGE_KEY = 'embervale_profile_v1';
-
-      const AVATAR_COLORS = ['#f59e0b', '#38bdf8', '#10b981', '#fb7185', '#a78bfa', '#e2e8f0'];
 
       const BIOMES = [
         {
@@ -1298,7 +1174,8 @@
       const MODIFIERS = {
         STANDARD: { id: 'STANDARD', label: 'Standard', desc: 'All gear & weapons operate normally.', cls: 'mod-standard' },
         EMP_ZONE: { id: 'EMP_ZONE', label: 'EMP Zone', desc: 'Firearms jammed by interference. Rely on stomps & agility.', cls: 'mod-emp' },
-        ARMORED: { id: 'ARMORED', label: 'Armored Bastion', desc: 'Enemies wear bulletproof plating. Bullets ricochet harmlessly!', cls: 'mod-armored' }
+        ARMORED: { id: 'ARMORED', label: 'Armored Bastion', desc: 'Enemies wear bulletproof plating. Bullets ricochet harmlessly!', cls: 'mod-armored' },
+        SHOWDOWN: { id: 'SHOWDOWN', label: 'Showdown Arena', desc: 'High-alert sector with dense Stalker patrols & bonus sky gems.', cls: 'mod-showdown' }
       };
 
       // =========================================================================
@@ -1322,46 +1199,6 @@
         }
         pick(arr) {
           return arr[Math.floor(this.next() * arr.length)];
-        }
-      }
-
-      // =========================================================================
-      // PROFILE STORE (localStorage)
-      // =========================================================================
-      class ProfileStore {
-        static load() {
-          const fallback = {
-            username: 'Runner_01',
-            color: '#f59e0b',
-            visor: 'dual',
-            stats: { totalKills: 0, highestLevel: 1, totalCoins: 0, enragedEscapes: 0 }
-          };
-          try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return fallback;
-            const parsed = JSON.parse(raw);
-            return {
-              username: typeof parsed.username === 'string' && parsed.username.trim() ? parsed.username.slice(0, 16) : fallback.username,
-              color: AVATAR_COLORS.includes(parsed.color) ? parsed.color : fallback.color,
-              visor: ['dual', 'cyclops', 'visor', 'crest'].includes(parsed.visor) ? parsed.visor : fallback.visor,
-              stats: {
-                totalKills: Number(parsed.stats?.totalKills) || 0,
-                highestLevel: Math.max(1, Number(parsed.stats?.highestLevel) || 1),
-                totalCoins: Number(parsed.stats?.totalCoins) || 0,
-                enragedEscapes: Number(parsed.stats?.enragedEscapes) || 0
-              }
-            };
-          } catch {
-            return fallback;
-          }
-        }
-
-        static save(profile) {
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-          } catch {
-            // Ignore storage quota / privacy mode errors
-          }
         }
       }
 
@@ -1512,29 +1349,24 @@
       // INPUT MANAGER
       // =========================================================================
       class InputManager {
-        constructor(sound) {
+        constructor(sound, game) {
           this.sound = sound;
+          this.game = game;
           this.keys = new Set();
           this.prevKeys = new Set();
-          this.touch = { left: false, right: false, jump: false, jet: false, shoot: false };
-          this.prevTouch = { left: false, right: false, jump: false, jet: false, shoot: false };
+          this.touch = { left: false, right: false, jump: false, shoot: false };
+          this.prevTouch = { left: false, right: false, jump: false, shoot: false };
+          this.stagePointers = new Set();
           this.mouseShoot = false;
-          this.typingBlocked = false;
 
           this._bindKeyboard();
           this._bindTouch();
-        }
-
-        _isInputFocused() {
-          const el = document.activeElement;
-          return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA');
         }
 
         _bindKeyboard() {
           const prevent = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space']);
           window.addEventListener('keydown', (e) => {
             this.sound.unlock();
-            if (this._isInputFocused()) return;
             if (prevent.has(e.code)) e.preventDefault();
             this.keys.add(e.code);
           });
@@ -1553,76 +1385,112 @@
         }
 
         _clearTouch() {
-          Object.keys(this.touch).forEach((k) => { this.touch[k] = false; });
-          document.querySelectorAll('.touch-btn.active').forEach((b) => b.classList.remove('active'));
+          this.stagePointers.clear();
+          this.touch.left = false;
+          this.touch.right = false;
+          this.touch.jump = false;
+          this.touch.shoot = false;
+          document.getElementById('touchLeft')?.classList.remove('active');
+          document.getElementById('touchRight')?.classList.remove('active');
+          document.getElementById('touchShoot')?.classList.remove('active');
+        }
+
+        _bindTouchButton(el, key) {
+          if (!el) return;
+          const pointers = new Set();
+          const sync = () => {
+            const pressed = pointers.size > 0;
+            this.touch[key] = pressed;
+            el.classList.toggle('active', pressed);
+          };
+          el.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.sound.unlock();
+            document.body.classList.add('touch-enabled');
+            pointers.add(e.pointerId);
+            if (el.setPointerCapture) {
+              try { el.setPointerCapture(e.pointerId); } catch {}
+            }
+            sync();
+          }, { passive: false });
+
+          const release = (e) => {
+            e.preventDefault();
+            pointers.delete(e.pointerId);
+            sync();
+          };
+          el.addEventListener('pointerup', release, { passive: false });
+          el.addEventListener('pointercancel', release, { passive: false });
+          el.addEventListener('lostpointercapture', (e) => {
+            pointers.delete(e.pointerId);
+            sync();
+          });
+          el.addEventListener('contextmenu', (e) => e.preventDefault());
         }
 
         _bindTouch() {
-          const bindBtn = (id, key) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const activePointers = new Set();
-
-            const sync = () => {
-              const pressed = activePointers.size > 0;
-              this.touch[key] = pressed;
-              el.classList.toggle('active', pressed);
-            };
-
-            el.addEventListener('pointerdown', (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              this.sound.unlock();
-              document.body.classList.add('touch-enabled');
-              activePointers.add(e.pointerId);
-              if (el.setPointerCapture) {
-                try { el.setPointerCapture(e.pointerId); } catch {}
-              }
-              sync();
-            }, { passive: false });
-
-            const release = (e) => {
-              e.preventDefault();
-              activePointers.delete(e.pointerId);
-              sync();
-            };
-
-            el.addEventListener('pointerup', release, { passive: false });
-            el.addEventListener('pointercancel', release, { passive: false });
-            el.addEventListener('lostpointercapture', (e) => {
-              activePointers.delete(e.pointerId);
-              sync();
-            });
-            el.addEventListener('contextmenu', (e) => e.preventDefault());
+          // Tap anywhere on the stage/canvas to jump; keep holding to engage Jetpack
+          const stage = document.getElementById('stageWrap');
+          const syncStageJump = () => {
+            this.touch.jump = this.stagePointers.size > 0;
           };
 
-          bindBtn('touchLeft', 'left');
-          bindBtn('touchRight', 'right');
-          bindBtn('touchJump', 'jump');
-          bindBtn('touchJet', 'jet');
-          bindBtn('touchShoot', 'shoot');
+          if (stage) {
+            stage.addEventListener('pointerdown', (e) => {
+              this.sound.unlock();
+              if (e.target.closest('.touch-fire-btn, .touch-dpad-btn, button')) return;
+
+              if (e.pointerType === 'mouse') {
+                if (this.game.state === 'PLAYING' && this.game.player.upgrades.ammo > 0) {
+                  this.mouseShoot = true;
+                }
+                return;
+              }
+
+              document.body.classList.add('touch-enabled');
+              if (this.game.state !== 'PLAYING') return;
+
+              e.preventDefault();
+              this.stagePointers.add(e.pointerId);
+              if (stage.setPointerCapture) {
+                try { stage.setPointerCapture(e.pointerId); } catch {}
+              }
+              syncStageJump();
+            }, { passive: false });
+
+            const releaseStage = (e) => {
+              if (!this.stagePointers.has(e.pointerId)) return;
+              this.stagePointers.delete(e.pointerId);
+              syncStageJump();
+            };
+            stage.addEventListener('pointerup', releaseStage);
+            stage.addEventListener('pointercancel', releaseStage);
+            stage.addEventListener('lostpointercapture', releaseStage);
+            stage.addEventListener('contextmenu', (e) => e.preventDefault());
+          }
+
+          this._bindTouchButton(document.getElementById('touchLeft'), 'left');
+          this._bindTouchButton(document.getElementById('touchRight'), 'right');
+          this._bindTouchButton(document.getElementById('touchShoot'), 'shoot');
         }
 
         isDown(action) {
-          if (this.typingBlocked) return false;
           switch (action) {
             case 'left': return this.keys.has('ArrowLeft') || this.keys.has('KeyA') || this.touch.left;
             case 'right': return this.keys.has('ArrowRight') || this.keys.has('KeyD') || this.touch.right;
             case 'jump': return this.keys.has('ArrowUp') || this.keys.has('KeyW') || this.keys.has('Space') || this.touch.jump;
-            case 'jet': return this.keys.has('ShiftLeft') || this.keys.has('ShiftRight') || this.touch.jet;
-            case 'shoot': return this.keys.has('KeyF') || this.keys.has('KeyJ') || this.touch.shoot;
+            case 'shoot': return this.keys.has('ShiftLeft') || this.keys.has('ShiftRight') || this.keys.has('KeyF') || this.keys.has('KeyJ') || this.touch.shoot;
             default: return this.keys.has(action);
           }
         }
 
         wasDown(action) {
-          if (this.typingBlocked) return false;
           switch (action) {
             case 'left': return this.prevKeys.has('ArrowLeft') || this.prevKeys.has('KeyA') || this.prevTouch.left;
             case 'right': return this.prevKeys.has('ArrowRight') || this.prevKeys.has('KeyD') || this.prevTouch.right;
             case 'jump': return this.prevKeys.has('ArrowUp') || this.prevKeys.has('KeyW') || this.prevKeys.has('Space') || this.prevTouch.jump;
-            case 'jet': return this.prevKeys.has('ShiftLeft') || this.prevKeys.has('ShiftRight') || this.prevTouch.jet;
-            case 'shoot': return this.prevKeys.has('KeyF') || this.prevKeys.has('KeyJ') || this.prevTouch.shoot;
+            case 'shoot': return this.prevKeys.has('ShiftLeft') || this.prevKeys.has('ShiftRight') || this.prevKeys.has('KeyF') || this.prevKeys.has('KeyJ') || this.prevTouch.shoot;
             default: return this.prevKeys.has(action);
           }
         }
@@ -1644,147 +1512,67 @@
       }
 
       // =========================================================================
-      // CHAT SYSTEM (Interactive Overlay + Live Events + Ambient Bot Runners)
+      // ALERT BANNER (Cinematic Non-Blocking Stage & Event Notifications)
       // =========================================================================
-      class ChatSystem {
-        constructor(game) {
-          this.game = game;
-          this.box = document.getElementById('chatBox');
-          this.logEl = document.getElementById('chatLog');
-          this.form = document.getElementById('chatForm');
-          this.input = document.getElementById('chatInput');
-          this.isOpen = false;
-          this.messages = [];
-          this.bots = [
-            { name: 'Kestrel_9', color: '#38bdf8', visor: 'visor' },
-            { name: 'VoltRunner', color: '#10b981', visor: 'cyclops' },
-            { name: 'RuinWalker', color: '#a78bfa', visor: 'crest' }
-          ];
-          this.ambientTimer = 14;
-
-          this.form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const txt = this.input.value.trim();
-            if (txt) {
-              const p = this.game.profile;
-              this.addPlayerMessage(p.username, p.color, p.visor, txt);
-              this.input.value = '';
-              this._maybeBotReply(txt);
-            }
-            this.close();
-          });
+      class AlertBanner {
+        constructor() {
+          this.el = document.getElementById('stageBanner');
+          this.kickerEl = document.getElementById('stageBannerKicker');
+          this.titleEl = document.getElementById('stageBannerTitle');
+          this.subEl = document.getElementById('stageBannerSub');
+          this.queue = [];
+          this.active = false;
+          this.fadeTimer = null;
+          this.doneTimer = null;
         }
 
-        open() {
-          this.isOpen = true;
-          this.box.classList.add('open');
-          document.getElementById('btnChatToggle')?.classList.add('active');
-          this.game.input.typingBlocked = true;
-          this.game.input.keys.clear();
-          this.game.input._clearTouch();
-          setTimeout(() => this.input.focus(), 10);
+        show({ kicker = '', title = '', sub = '', tone = 'standard' }) {
+          if (!title) return;
+          this.queue.push({ kicker, title, sub, tone });
+          if (!this.active) this._next();
         }
 
-        close() {
-          this.isOpen = false;
-          this.box.classList.remove('open');
-          document.getElementById('btnChatToggle')?.classList.remove('active');
-          this.input.blur();
-          this.game.input.typingBlocked = false;
-        }
-
-        toggle() {
-          if (this.isOpen) this.close();
-          else this.open();
-        }
-
-        _avatarSvg(color, visor) {
-          let eye = '<rect x="3" y="6" width="3" height="3" fill="#fde68a"/><rect x="10" y="6" width="3" height="3" fill="#fde68a"/>';
-          if (visor === 'cyclops') eye = '<circle cx="8" cy="7.5" r="2.8" fill="#fde68a"/>';
-          else if (visor === 'visor') eye = '<rect x="3" y="6.5" width="10" height="2.5" fill="#38bdf8"/>';
-          else if (visor === 'crest') eye = '<polygon points="8,2 11,5 5,5" fill="#fff"/><rect x="4" y="7" width="8" height="2" fill="#fde68a"/>';
-          return `<svg width="14" height="14" viewBox="0 0 16 16">${`<rect x="1" y="1" width="14" height="14" rx="3" fill="${color}" opacity="0.28"/>`}${eye}</svg>`;
-        }
-
-        _push(msg) {
-          this.messages.push({ ...msg, createdAt: performance.now() });
-          if (this.messages.length > 28) this.messages.shift();
-          this._render();
-        }
-
-        addSystem(text, isAlert = false) {
-          this._push({ kind: isAlert ? 'alert' : 'system', author: '[System]', text });
-        }
-
-        addPlayerMessage(name, color, visor, text) {
-          this._push({ kind: 'user', author: name, color, visor, text });
-        }
-
-        addBotMessage(text, specificBot = null) {
-          const bot = specificBot || this.bots[Math.floor(Math.random() * this.bots.length)];
-          this._push({ kind: 'user', author: bot.name, color: bot.color, visor: bot.visor, text });
-        }
-
-        _maybeBotReply(text) {
-          const lower = text.toLowerCase();
-          setTimeout(() => {
-            if (lower.includes('gun') || lower.includes('ammo')) {
-              this.addBotMessage('Save your rounds for enraged stalkers—or check bonus ledges for crates.');
-            } else if (lower.includes('jet') || lower.includes('fuel')) {
-              this.addBotMessage('Hold Shift in mid-air to feather the jetpack over spike corridors.');
-            } else if (lower.includes('emp') || lower.includes('armor')) {
-              this.addBotMessage('Yeah, when EMP or Armored Bastion hits, head-stomping is king.');
-            } else if (Math.random() < 0.65) {
-              this.addBotMessage('Stay sharp out there—do not leave hunters behind you!');
-            }
-          }, 900);
-        }
-
-        update(dt, state, stage, modifier) {
-          if (state === 'PLAYING') {
-            this.ambientTimer -= dt;
-            if (this.ambientTimer <= 0) {
-              this.ambientTimer = 18 + Math.random() * 14;
-              const tips = [
-                'Passing enemies without stomping them triggers Enrage—watch the edge arrows!',
-                'Sky gems are worth 5 coins toward Marketplace upgrades.',
-                modifier.id === 'EMP_ZONE' ? 'EMP interference is strong here—guns are completely jammed.' :
-                modifier.id === 'ARMORED' ? 'Heavy plating on this sector! Bullets will ricochet off enemies.' :
-                `Stage ${stage} layouts scale up—save coins for Jetpack Tier 2.`,
-                'Checkpoints light up cyan and save your respawn point on this stage.'
-              ];
-              this.addBotMessage(tips[Math.floor(Math.random() * tips.length)]);
-            }
+        _next() {
+          if (!this.el || this.queue.length === 0) {
+            this.active = false;
+            return;
           }
+          this.active = true;
+          const item = this.queue.shift();
 
-          // Fade messages older than 9s when chat is closed
-          const now = performance.now();
-          let changed = false;
-          for (const m of this.messages) {
-            const shouldFade = !this.isOpen && (now - m.createdAt > 9000);
-            if (m.faded !== shouldFade) {
-              m.faded = shouldFade;
-              changed = true;
-            }
-          }
-          if (changed) this._render();
+          this.kickerEl.textContent = item.kicker;
+          this.kickerEl.style.display = item.kicker ? '' : 'none';
+          this.titleEl.textContent = item.title;
+          this.subEl.textContent = item.sub;
+          this.subEl.style.display = item.sub ? '' : 'none';
+
+          this.el.className = `stage-banner tone-${item.tone}`;
+          void this.el.offsetWidth;
+          this.el.classList.add('entering');
+
+          clearTimeout(this.fadeTimer);
+          clearTimeout(this.doneTimer);
+
+          // Total 2.5s lifecycle: slide-in + hold (~2.08s) + smooth fade-out (0.42s)
+          this.fadeTimer = setTimeout(() => {
+            this.el.classList.remove('entering');
+            this.el.classList.add('exiting');
+          }, 2080);
+
+          this.doneTimer = setTimeout(() => {
+            this.el.classList.remove('entering', 'exiting');
+            this._next();
+          }, 2500);
         }
 
-        _render() {
-          const now = performance.now();
-          const recent = this.messages.slice(-14);
-          this.logEl.innerHTML = recent.map((m) => {
-            const faded = !this.isOpen && (now - m.createdAt > 9000);
-            const cls = m.kind === 'system' ? 'system' : m.kind === 'alert' ? 'alert' : '';
-            const badge = m.kind === 'user'
-              ? `<span class="chat-avatar">${this._avatarSvg(m.color, m.visor)}</span>`
-              : '';
-            const authorColor = m.kind === 'user' ? `style="color:${m.color}"` : '';
-            const safeText = m.text.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-            const safeAuthor = m.author.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-            return `<div class="chat-msg ${cls}${faded ? ' faded' : ''}">${badge}<div><span class="chat-author" ${authorColor}>${safeAuthor}</span><span>${safeText}</span></div></div>`;
-          }).join('');
-          this.logEl.scrollTop = this.logEl.scrollHeight;
+        clear() {
+          clearTimeout(this.fadeTimer);
+          clearTimeout(this.doneTimer);
+          this.queue.length = 0;
+          this.active = false;
+          if (this.el) {
+            this.el.classList.remove('entering', 'exiting');
+          }
         }
       }
 
@@ -1929,6 +1717,7 @@
           this.y = 0;
           this.shakeTime = 0;
           this.shakeMag = 0;
+          this.shakeEnabled = true;
         }
 
         reset(player, level, viewW = 960, viewH = WORLD_H) {
@@ -1940,6 +1729,7 @@
         }
 
         shake(mag = 6, duration = 0.16) {
+          if (!this.shakeEnabled) return;
           this.shakeMag = Math.max(this.shakeMag, mag);
           this.shakeTime = Math.max(this.shakeTime, duration);
         }
@@ -2573,10 +2363,13 @@
           const rng = new RNG(seed + stage * 7919);
           const biome = BIOMES[(stage - 1 + rng.int(0, 1)) % BIOMES.length];
           let modifier = MODIFIERS.STANDARD;
-          if (stage >= 2) {
+          if (stage >= 4 && stage % 4 === 0) {
+            modifier = MODIFIERS.SHOWDOWN;
+          } else if (stage >= 2) {
             const roll = rng.next();
-            if (roll < 0.28) modifier = MODIFIERS.EMP_ZONE;
-            else if (roll < 0.54) modifier = MODIFIERS.ARMORED;
+            if (roll < 0.26) modifier = MODIFIERS.EMP_ZONE;
+            else if (roll < 0.5) modifier = MODIFIERS.ARMORED;
+            else if (stage >= 3 && roll < 0.65) modifier = MODIFIERS.SHOWDOWN;
           }
           return { biome, modifier };
         }
@@ -2678,12 +2471,13 @@
               checkpointPlaced = true;
             } else if (actualLen >= 6) {
               // Interior hazards & enemies (never on first or last tile of segment!)
-              const enemyChance = Math.min(0.82, 0.48 + (stage - 1) * 0.07);
+              const isShowdown = modifier.id === 'SHOWDOWN';
+              const enemyChance = isShowdown ? 0.92 : Math.min(0.82, 0.48 + (stage - 1) * 0.07);
               const enemyCol = segStart + Math.floor(actualLen * 0.5);
               let hasEnemy = false;
 
               if (rng.chance(enemyChance)) {
-                const fastChance = Math.min(0.65, Math.max(0, (stage - 2) * 0.16));
+                const fastChance = Math.min(0.75, Math.max(0, (stage - 2) * 0.16) + (isShowdown ? 0.28 : 0));
                 const kind = rng.chance(fastChance) ? 'sentinel' : 'crawler';
                 enemies.push(new Enemy(enemyCol * TILE, (curRow - 1) * TILE, kind, stage));
                 hasEnemy = true;
@@ -2717,7 +2511,7 @@
                 collectibles.push(new Collectible(midP * TILE, (platRow - 1) * TILE, 'gun'));
                 gunCratePlaced = true;
               } else {
-                collectibles.push(new Collectible(pStart * TILE, (platRow - 1) * TILE, 'coin'));
+                collectibles.push(new Collectible(pStart * TILE, (platRow - 1) * TILE, modifier.id === 'SHOWDOWN' ? 'gem' : 'coin'));
                 collectibles.push(new Collectible(midP * TILE, (platRow - 1) * TILE, 'gem'));
                 if (pEnd > midP) {
                   collectibles.push(new Collectible(pEnd * TILE, (platRow - 1) * TILE, 'coin'));
@@ -2770,7 +2564,7 @@
       }
 
       // =========================================================================
-      // PLAYER (Physics, Jetpack, Rare Gun, Upgrades, Custom Profile Avatar)
+      // PLAYER (Physics, Jetpack, Rare Gun, Upgrades)
       // =========================================================================
       class Player {
         constructor(x, y) {
@@ -2797,6 +2591,7 @@
           this.coyoteTimer = 0;
           this.jumpBufferTimer = 0;
           this.airJumpArmed = false;
+          this.jumpHoldTimer = 0;
           this.invulnTimer = 0;
           this.shootCooldown = 0;
           this.jetpacking = false;
@@ -2814,7 +2609,7 @@
           this.fuel = this.maxFuel;
         }
 
-        update(dt, input, level, particles, sound, cam, time, onShoot) {
+        update(dt, input, level, particles, sound, cam, time, onShoot, autoRun = false) {
           this.prevBottom = this.y + this.h;
           this.maxFuel = 1.0 + Math.max(0, this.upgrades.jetpackTier - 1) * 0.55;
 
@@ -2828,7 +2623,8 @@
           if (this.shootCooldown > 0) this.shootCooldown = Math.max(0, this.shootCooldown - dt);
 
           const speedMult = 1 + this.upgrades.bootsTier * 0.16;
-          const moveDir = (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
+          const manualDir = (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
+          const moveDir = manualDir !== 0 ? manualDir : (autoRun ? 1 : 0);
           const maxSpeed = 290 * speedMult;
           const accel = (this.grounded ? 2350 : 1650) * speedMult;
           const friction = this.grounded ? 2500 : 520;
@@ -2848,10 +2644,16 @@
           if (this.grounded) {
             this.coyoteTimer = 0.11;
             this.airJumpArmed = false;
+            this.jumpHoldTimer = 0;
             const rechargeRate = 0.85 + this.upgrades.jetpackTier * 0.3;
             this.fuel = Math.min(this.maxFuel, this.fuel + rechargeRate * dt);
           } else {
             this.coyoteTimer = Math.max(0, this.coyoteTimer - dt);
+            if (input.isDown('jump')) {
+              this.jumpHoldTimer += dt;
+            } else {
+              this.jumpHoldTimer = 0;
+            }
           }
 
           if (input.justPressed('jump')) {
@@ -2870,6 +2672,7 @@
             this.coyoteTimer = 0;
             this.jumpBufferTimer = 0;
             this.airJumpArmed = false;
+            this.jumpHoldTimer = 0;
             this.scaleX = 0.76;
             this.scaleY = 1.28;
             particles.dust(this.x + this.w * 0.5, this.y + this.h, this.facing);
@@ -2881,9 +2684,10 @@
             if (!this.grounded) this.airJumpArmed = true;
           }
 
-          // Jetpack Thrust (Shift anytime in air OR hold Jump after mid-air re-press)
+          // Jetpack Thrust: activates seamlessly when continuing to hold Jump/Tap past launch burst OR on mid-air re-press & hold
+          const continuousHoldJet = this.jumpHoldTimer >= 0.22 && this.vy >= -200;
           const wantJet = this.upgrades.jetpackTier > 0 && !this.grounded && this.fuel > 0 &&
-            (input.isDown('jet') || (this.airJumpArmed && input.isDown('jump')));
+            input.isDown('jump') && (this.airJumpArmed || continuousHoldJet);
 
           if (wantJet) {
             this.jetpacking = true;
@@ -2902,7 +2706,7 @@
             this.vy = Math.min(760, this.vy + baseG * gMult * dt);
           }
 
-          // Volatile Gun Firing
+          // Volatile Gun Firing (Shift / F / J / Desktop Click / Touch Fire button)
           if (input.justPressed('shoot') && this.shootCooldown <= 0 && this.upgrades.ammo > 0) {
             this.shootCooldown = 0.24;
             onShoot();
@@ -2994,7 +2798,7 @@
           return this.x < rx + rw && this.x + this.w > rx && this.y < ry + rh && this.y + this.h > ry;
         }
 
-        draw(ctx, cam, time, profile) {
+        draw(ctx, cam, time) {
           if (this.invulnTimer > 0 && Math.floor(this.invulnTimer * 16) % 2 === 0) return;
           const footX = this.x + this.w * 0.5 - cam.x;
           const footY = this.y + this.h - cam.y;
@@ -3007,8 +2811,8 @@
             runAnim: this.runAnim,
             scarfWave: this.scarfWave,
             time,
-            color: profile.color,
-            visor: profile.visor,
+            color: '#f59e0b',
+            visor: 'dual',
             hasJetpack: this.upgrades.jetpackTier > 0,
             hasGun: this.upgrades.ammo > 0,
             hasBoots: this.upgrades.bootsTier > 0
@@ -3176,9 +2980,12 @@
             ctx.fillRect(0, horizonY, viewW, viewH - horizonY);
           }
 
-          // EMP Zone subtle electric scan tint
+          // Sector atmospheric scan tint
           if (level.modifier.id === 'EMP_ZONE') {
             ctx.fillStyle = `rgba(56, 189, 248, ${0.03 + 0.02 * Math.sin(time * 6)})`;
+            ctx.fillRect(0, 0, viewW, viewH);
+          } else if (level.modifier.id === 'SHOWDOWN') {
+            ctx.fillStyle = `rgba(239, 68, 68, ${0.025 + 0.018 * Math.sin(time * 5)})`;
             ctx.fillRect(0, 0, viewW, viewH);
           }
 
@@ -3333,16 +3140,16 @@
           this.isTouchDevice = window.matchMedia('(pointer: coarse)').matches || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
           if (this.isTouchDevice) document.body.classList.add('touch-enabled');
 
-          this.profile = ProfileStore.load();
+          this.autoRun = false;
           this.sound = new SoundEngine();
-          this.input = new InputManager(this.sound);
+          this.input = new InputManager(this.sound, this);
           this.particles = new ParticleSystem();
           this.camera = new Camera();
           this.renderer = new Renderer(this.ctx);
-          this.chat = new ChatSystem(this);
+          this.banner = new AlertBanner();
 
           this.state = 'START';
-          this.previousStateBeforeProfile = 'START';
+          this.previousStateBeforeSettings = 'PLAYING';
           this.stage = 1;
           this.seed = Math.floor(1000 + Math.random() * 8999);
           this.score = 0;
@@ -3353,6 +3160,8 @@
           this.runEscapes = 0;
           this.time = 0;
           this.transitionFlash = 0;
+          this.pendingUnlocks = [];
+          this.announcedMechanics = { enrage: false, modifiers: false };
 
           this.projectiles = [];
           this.level = LevelGenerator.generate(this.stage, this.seed);
@@ -3363,11 +3172,10 @@
 
           this._bindUI();
           this._bindResponsive();
-          this._syncProfileUI();
+          this._syncStartUI();
           this._syncHUD();
+          this._syncSettingsUI();
           this._syncRotatePrompt();
-
-          this.chat.addSystem('Welcome to Embervale. Tap Chat or press T to talk.');
 
           this.lastFrame = performance.now();
           requestAnimationFrame((now) => this._loop(now));
@@ -3437,9 +3245,8 @@
         _bindUI() {
           this.overlays = {
             START: document.getElementById('overlayStart'),
-            PROFILE: document.getElementById('overlayProfile'),
             SHOP: document.getElementById('overlayShop'),
-            PAUSED: document.getElementById('overlayPause'),
+            SETTINGS: document.getElementById('overlaySettings'),
             GAME_OVER: document.getElementById('overlayGameOver')
           };
 
@@ -3451,13 +3258,17 @@
             fuelFill: document.getElementById('hudFuelFill'),
             ammoWrap: document.getElementById('hudAmmoWrap'),
             ammo: document.getElementById('hudAmmo'),
+            touchShoot: document.getElementById('touchShoot'),
             coins: document.getElementById('hudCoins'),
             score: document.getElementById('hudScore'),
-            btnMute: document.getElementById('btnMute'),
             startSeedLabel: document.getElementById('startSeedLabel'),
-            startProfileName: document.getElementById('startProfileName'),
-            startProfileStats: document.getElementById('startProfileStats'),
-            pauseLevelLabel: document.getElementById('pauseLevelLabel'),
+            settingsLevelLabel: document.getElementById('settingsLevelLabel'),
+            btnSettingAudio: document.getElementById('btnSettingAudio'),
+            btnSettingShake: document.getElementById('btnSettingShake'),
+            btnSettingAutoRun: document.getElementById('btnSettingAutoRun'),
+            btnSettingSeed: document.getElementById('btnSettingSeed'),
+            btnSettingReset: document.getElementById('btnSettingReset'),
+            btnSettingResume: document.getElementById('btnSettingResume'),
             gameOverLevelLabel: document.getElementById('gameOverLevelLabel'),
             goScore: document.getElementById('goScore'),
             goStage: document.getElementById('goStage'),
@@ -3470,92 +3281,62 @@
             this._syncRotatePrompt();
           });
 
-          // Mouse-only click to shoot (touch devices use the dedicated Fire button)
-          this.canvas.addEventListener('pointerdown', (e) => {
+          const startAction = () => { this.sound.unlock(); this.startNewRun(); };
+          document.getElementById('btnStart').addEventListener('click', startAction);
+          document.getElementById('btnGameOverRestart').addEventListener('click', startAction);
+
+          // Settings Gear Menu Controls
+          document.getElementById('btnSettings').addEventListener('click', () => {
             this.sound.unlock();
-            if (e.pointerType === 'mouse' && this.state === 'PLAYING' && !this.chat.isOpen && this.player.upgrades.ammo > 0) {
-              this.input.mouseShoot = true;
+            if (this.state === 'SETTINGS') {
+              this._setState(this.previousStateBeforeSettings || 'PLAYING');
+            } else {
+              this.previousStateBeforeSettings = this.state;
+              this._setState('SETTINGS');
             }
           });
 
-          const startAction = () => { this.sound.unlock(); this.startNewRun(); };
-          document.getElementById('btnStart').addEventListener('click', startAction);
-          document.getElementById('btnRestart').addEventListener('click', startAction);
-          document.getElementById('btnPauseRestart').addEventListener('click', startAction);
-          document.getElementById('btnGameOverRestart').addEventListener('click', startAction);
+          this.ui.btnSettingResume.addEventListener('click', () => {
+            this.sound.unlock();
+            if (this.state === 'SETTINGS') {
+              this._setState(this.previousStateBeforeSettings || 'PLAYING');
+            }
+          });
 
-          const regenSeed = () => {
+          this.ui.btnSettingAudio.addEventListener('click', () => {
+            this.sound.unlock();
+            this.sound.toggleMute();
+            this._syncSettingsUI();
+          });
+
+          this.ui.btnSettingShake.addEventListener('click', () => {
+            this.camera.shakeEnabled = !this.camera.shakeEnabled;
+            this._syncSettingsUI();
+          });
+
+          this.ui.btnSettingAutoRun.addEventListener('click', () => {
+            this.autoRun = !this.autoRun;
+            this._syncSettingsUI();
+          });
+
+          this.ui.btnSettingSeed.addEventListener('click', () => {
             this.sound.unlock();
             this.seed = Math.floor(1000 + Math.random() * 8999);
-            if (this.state === 'START') {
+            const returnTo = this.previousStateBeforeSettings || 'PLAYING';
+            if (returnTo === 'START') {
               this.loadStage(this.stage);
-              this._syncProfileUI();
+              this._syncStartUI();
+              this._setState('START');
             } else {
               this.loadStage(this.stage);
               this._setState('PLAYING');
+              this._announceStageStart();
             }
-            this.chat.addSystem(`Generated Stage ${this.stage} with Seed #${this.seed}.`);
-          };
-          document.getElementById('btnNewSeed').addEventListener('click', regenSeed);
-          document.getElementById('btnStartSeed').addEventListener('click', regenSeed);
-          document.getElementById('btnPauseNewSeed').addEventListener('click', regenSeed);
+          });
 
-          document.getElementById('btnResume').addEventListener('click', () => {
+          this.ui.btnSettingReset.addEventListener('click', () => {
             this.sound.unlock();
-            if (this.state === 'PAUSED') this._setState('PLAYING');
-          });
-
-          document.getElementById('btnChatToggle').addEventListener('click', () => {
-            this.chat.toggle();
-          });
-
-          this.ui.btnMute.addEventListener('click', () => {
-            this.sound.unlock();
-            const muted = this.sound.toggleMute();
-            this.ui.btnMute.textContent = muted ? 'Muted' : 'Sound On';
-          });
-
-          // Profile Modal Wiring
-          const openProf = () => {
-            this.previousStateBeforeProfile = this.state === 'GAME_OVER' ? 'START' : this.state;
-            this._populateProfileForm();
-            this._setState('PROFILE');
-          };
-          document.getElementById('btnOpenProfile').addEventListener('click', openProf);
-          document.getElementById('btnGameOverProfile').addEventListener('click', openProf);
-
-          const swatchRow = document.getElementById('swatchRow');
-          AVATAR_COLORS.forEach((col) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'swatch';
-            btn.style.backgroundColor = col;
-            btn.dataset.color = col;
-            btn.addEventListener('click', () => {
-              this.profile.color = col;
-              this._refreshProfilePreview();
-            });
-            swatchRow.appendChild(btn);
-          });
-
-          document.querySelectorAll('.visor-btn').forEach((btn) => {
-            btn.addEventListener('click', () => {
-              this.profile.visor = btn.dataset.visor;
-              this._refreshProfilePreview();
-            });
-          });
-
-          document.getElementById('inputUsername').addEventListener('input', (e) => {
-            const val = e.target.value.trim();
-            document.getElementById('profilePreviewTag').textContent = val || 'Runner_01';
-          });
-
-          document.getElementById('btnSaveProfile').addEventListener('click', () => {
-            const rawName = document.getElementById('inputUsername').value.trim();
-            this.profile.username = rawName ? rawName.slice(0, 16) : 'Runner_01';
-            ProfileStore.save(this.profile);
-            this._syncProfileUI();
-            this._setState(this.previousStateBeforeProfile || 'START');
+            this.startNewRun();
           });
 
           // Next Stage from Shop
@@ -3563,67 +3344,46 @@
             this.sound.unlock();
             this.loadStage(this.stage + 1);
             this._setState('PLAYING');
+            this._announceStageStart();
           });
         }
 
-        _populateProfileForm() {
-          document.getElementById('inputUsername').value = this.profile.username;
-          document.getElementById('profHighest').textContent = this.profile.stats.highestLevel;
-          document.getElementById('profKills').textContent = this.profile.stats.totalKills;
-          document.getElementById('profCoins').textContent = this.profile.stats.totalCoins;
-          document.getElementById('profEscapes').textContent = this.profile.stats.enragedEscapes;
-          this._refreshProfilePreview();
-        }
-
-        _refreshProfilePreview() {
-          document.querySelectorAll('.swatch').forEach((el) => {
-            el.classList.toggle('selected', el.dataset.color === this.profile.color);
-          });
-          document.querySelectorAll('.visor-btn').forEach((el) => {
-            el.classList.toggle('selected', el.dataset.visor === this.profile.visor);
-          });
-          document.getElementById('profilePreviewTag').textContent = document.getElementById('inputUsername').value.trim() || this.profile.username;
-
-          const pCanvas = document.getElementById('profilePreviewCanvas');
-          const pCtx = pCanvas.getContext('2d');
-          pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-          pCtx.save();
-          pCtx.translate(42, 68);
-          pCtx.scale(1.6, 1.6);
-          Player.renderCharacter(pCtx, 0, 0, {
-            facing: 1, scaleX: 1, scaleY: 1, vx: 60, grounded: true,
-            runAnim: 0, scarfWave: 0.8, time: 0.2,
-            color: this.profile.color, visor: this.profile.visor,
-            hasJetpack: true, hasGun: false, hasBoots: false
-          });
-          pCtx.restore();
-        }
-
-        _syncProfileUI() {
+        _syncStartUI() {
           this.ui.startSeedLabel.textContent = `Infinite Procedural Platformer · Seed #${this.seed}`;
-          this.ui.startProfileName.textContent = this.profile.username;
-          const st = this.profile.stats;
-          this.ui.startProfileStats.textContent = `Best Stage ${st.highestLevel} · ${st.totalKills} Kills · ${st.totalCoins} Coins`;
+        }
 
-          const sCanvas = document.getElementById('startAvatarCanvas');
-          const sCtx = sCanvas.getContext('2d');
-          sCtx.clearRect(0, 0, sCanvas.width, sCanvas.height);
-          Player.renderCharacter(sCtx, 20, 38, {
-            facing: 1, scaleX: 1, scaleY: 1, vx: 30, grounded: true,
-            runAnim: 0, scarfWave: 0.5, time: 0.2,
-            color: this.profile.color, visor: this.profile.visor,
-            hasJetpack: false, hasGun: false, hasBoots: false
-          });
+        _syncSettingsUI() {
+          const audioOn = !this.sound.muted;
+          this.ui.btnSettingAudio.textContent = audioOn ? 'On' : 'Muted';
+          this.ui.btnSettingAudio.classList.toggle('on', audioOn);
+
+          const shakeOn = this.camera.shakeEnabled;
+          this.ui.btnSettingShake.textContent = shakeOn ? 'On' : 'Off';
+          this.ui.btnSettingShake.classList.toggle('on', shakeOn);
+
+          const autoOn = this.autoRun;
+          this.ui.btnSettingAutoRun.textContent = autoOn ? 'On' : 'Off';
+          this.ui.btnSettingAutoRun.classList.toggle('on', autoOn);
+          document.body.classList.toggle('manual-move', !autoOn);
         }
 
         _setState(nextState) {
           this.state = nextState;
+          this.input._clearTouch();
+          if (nextState !== 'PLAYING') {
+            this.banner.clear();
+          }
           Object.entries(this.overlays).forEach(([key, el]) => {
             el.classList.toggle('visible', key === nextState);
           });
 
-          if (nextState === 'PAUSED') {
-            this.ui.pauseLevelLabel.textContent = `Stage ${this.stage} · ${this.level.name} · Seed #${this.seed}`;
+          if (nextState === 'SETTINGS') {
+            this.ui.settingsLevelLabel.textContent = `Stage ${this.stage} · ${this.level.name} · Seed #${this.seed}`;
+            const fromStart = this.previousStateBeforeSettings === 'START';
+            this.ui.btnSettingResume.textContent = fromStart ? 'Close' : 'Resume';
+            this.ui.btnSettingReset.style.display = fromStart ? 'none' : '';
+            this.ui.btnSettingSeed.style.gridColumn = fromStart ? '1 / -1' : '';
+            this._syncSettingsUI();
           } else if (nextState === 'GAME_OVER') {
             this.ui.gameOverLevelLabel.textContent = `Fell on Stage ${this.stage} (${this.level.name})`;
             this.ui.goScore.textContent = this.score;
@@ -3631,7 +3391,7 @@
             this.ui.goKills.textContent = this.runKills;
             this.ui.goEscapes.textContent = this.runEscapes;
           } else if (nextState === 'START') {
-            this._syncProfileUI();
+            this._syncStartUI();
           }
           this._syncRotatePrompt();
         }
@@ -3654,6 +3414,7 @@
           if (u.ammo > 0) {
             this.ui.ammo.textContent = `${u.ammo}/${u.maxAmmo}`;
           }
+          this.ui.touchShoot?.classList.toggle('has-ammo', u.ammo > 0);
 
           let heartsHtml = '';
           for (let i = 0; i < this.maxLives; i++) {
@@ -3663,6 +3424,48 @@
           this.ui.hearts.innerHTML = heartsHtml;
         }
 
+        _announceStageStart() {
+          this.banner.clear();
+          const mod = this.level.modifier;
+          if (mod.id === 'EMP_ZONE') {
+            this.banner.show({
+              kicker: `Stage ${this.stage} · ${this.level.name}`,
+              title: `Stage ${this.stage}: EMP Zone — Firearms Jammed!`,
+              sub: 'Electronic interference disables guns. Rely on head-stomps & agility.',
+              tone: 'emp'
+            });
+          } else if (mod.id === 'ARMORED') {
+            this.banner.show({
+              kicker: `Stage ${this.stage} · ${this.level.name}`,
+              title: `Stage ${this.stage}: Armored Bastion — Bullets Ricochet!`,
+              sub: 'Enemies wear bulletproof plating. Stomp from above.',
+              tone: 'armored'
+            });
+          } else if (mod.id === 'SHOWDOWN') {
+            this.banner.show({
+              kicker: `Stage ${this.stage} · ${this.level.name}`,
+              title: `Stage ${this.stage}: Showdown Arena`,
+              sub: 'High-alert Obsidian Stalker sector with extra sky gems.',
+              tone: 'showdown'
+            });
+          } else {
+            this.banner.show({
+              kicker: `Stage ${this.stage} · Seed #${this.seed}`,
+              title: `Stage ${this.stage}: ${this.level.name}`,
+              sub: this.stage === 1 ? 'Stomp patrols or leap cleanly — bypassed enemies enrage!' : 'All gear operational. Reach the exit portal.',
+              tone: 'standard'
+            });
+          }
+
+          if (mod.id !== 'STANDARD' && !this.announcedMechanics.modifiers) {
+            this.announcedMechanics.modifiers = true;
+          }
+
+          while (this.pendingUnlocks.length > 0) {
+            this.banner.show(this.pendingUnlocks.shift());
+          }
+        }
+
         startNewRun() {
           this.score = 0;
           this.coins = 0;
@@ -3670,9 +3473,12 @@
           this.lives = 3;
           this.runKills = 0;
           this.runEscapes = 0;
+          this.pendingUnlocks = [];
+          this.announcedMechanics = { enrage: false, modifiers: false };
           this.player.upgrades = { jetpackTier: 0, magnetTier: 0, bootsTier: 0, ammo: 0, maxAmmo: 6 };
           this.loadStage(1);
           this._setState('PLAYING');
+          this._announceStageStart();
         }
 
         loadStage(stageNum) {
@@ -3683,17 +3489,7 @@
           this.particles.clear();
           this.camera.reset(this.player, this.level, this.viewW, this.viewH);
           this.transitionFlash = 0.35;
-
-          if (stageNum > this.profile.stats.highestLevel) {
-            this.profile.stats.highestLevel = stageNum;
-            ProfileStore.save(this.profile);
-          }
-
           this._syncHUD();
-
-          if (this.level.modifier.id !== 'STANDARD') {
-            this.chat.addSystem(`Stage ${stageNum}: ${this.level.modifier.label} — ${this.level.modifier.desc}`, true);
-          }
         }
 
         _openShop() {
@@ -3722,10 +3518,21 @@
               id: 'jetpack',
               title: u.jetpackTier === 0 ? 'Jetpack Module' : `Jetpack Mk.${u.jetpackTier + 1}`,
               tier: u.jetpackTier >= 3 ? 'MAX' : `Tier ${u.jetpackTier}/3`,
-              desc: u.jetpackTier === 0 ? 'Hold Shift or mid-air Jump to thrust using a recharging fuel gauge.' : 'Increases fuel capacity & recharge rate.',
+              desc: u.jetpackTier === 0 ? 'Hold your tap or Space after jumping to thrust using a recharging fuel gauge.' : 'Increases fuel capacity & recharge rate.',
               cost: jetCost,
               maxed: u.jetpackTier >= 3,
-              buy: () => { u.jetpackTier++; this.player.syncUpgrades(); }
+              buy: () => {
+                if (u.jetpackTier === 0) {
+                  this.pendingUnlocks.push({
+                    kicker: 'Feature Unlocked',
+                    title: 'Jetpack Module Enabled!',
+                    sub: 'Hold your tap or Space in mid-air to thrust.',
+                    tone: 'unlock'
+                  });
+                }
+                u.jetpackTier++;
+                this.player.syncUpgrades();
+              }
             },
             {
               id: 'maxhp',
@@ -3752,7 +3559,17 @@
               desc: 'Pulls nearby coins and sky gems directly toward you.',
               cost: magCost,
               maxed: u.magnetTier >= 2,
-              buy: () => { u.magnetTier++; }
+              buy: () => {
+                if (u.magnetTier === 0) {
+                  this.pendingUnlocks.push({
+                    kicker: 'Item Unlocked',
+                    title: 'Coin Magnet Active!',
+                    sub: 'Coins and sky gems pull toward you automatically.',
+                    tone: 'unlock'
+                  });
+                }
+                u.magnetTier++;
+              }
             },
             {
               id: 'boots',
@@ -3761,7 +3578,17 @@
               desc: 'Boosts horizontal sprint speed and acceleration.',
               cost: bootCost,
               maxed: u.bootsTier >= 2,
-              buy: () => { u.bootsTier++; }
+              buy: () => {
+                if (u.bootsTier === 0) {
+                  this.pendingUnlocks.push({
+                    kicker: 'Item Unlocked',
+                    title: 'Speed Boots Equipped!',
+                    sub: 'Sprint velocity and air acceleration boosted.',
+                    tone: 'unlock'
+                  });
+                }
+                u.bootsTier++;
+              }
             }
           ];
 
@@ -3776,7 +3603,12 @@
               maxed: u.ammo >= u.maxAmmo,
               buy: () => {
                 u.ammo = u.maxAmmo;
-                this.chat.addSystem(`${this.profile.username} bought the Volatile Carbine (6 rounds)!`);
+                this.pendingUnlocks.push({
+                  kicker: 'Weapon Armed',
+                  title: 'Volatile Carbine Ready (6 Rounds)!',
+                  sub: 'Press Shift, F, Click, or Fire button to shoot.',
+                  tone: 'unlock'
+                });
               }
             });
           }
@@ -3846,7 +3678,6 @@
 
           if (this.lives <= 0) {
             this.sound.gameOver();
-            ProfileStore.save(this.profile);
             this._setState('GAME_OVER');
             return;
           }
@@ -3866,28 +3697,12 @@
         }
 
         _handleGlobalShortcuts() {
-          if (this.chat.isOpen) {
-            if (this.input.keys.has('Escape')) {
-              this.input.keys.delete('Escape');
-              this.chat.close();
-            }
-            return false;
-          }
-
-          if (this.input._isInputFocused()) return false;
-
-          if (this.input.justPressed('KeyT') && (this.state === 'PLAYING' || this.state === 'PAUSED')) {
-            this.input.keys.delete('KeyT');
-            this.chat.open();
-            return true;
-          }
-
           if (this.input.justPressed('KeyM')) {
-            const muted = this.sound.toggleMute();
-            this.ui.btnMute.textContent = muted ? 'Muted' : 'Sound On';
+            this.sound.toggleMute();
+            this._syncSettingsUI();
           }
 
-          if (this.input.justPressed('KeyR') && this.state !== 'PROFILE') {
+          if (this.input.justPressed('KeyR') && (this.state === 'GAME_OVER' || this.state === 'PLAYING' || this.state === 'SETTINGS')) {
             this.sound.unlock();
             this.startNewRun();
             return true;
@@ -3901,10 +3716,11 @@
 
           if (this.input.justPressed('KeyP') || this.input.justPressed('Escape')) {
             if (this.state === 'PLAYING') {
-              this._setState('PAUSED');
+              this.previousStateBeforeSettings = 'PLAYING';
+              this._setState('SETTINGS');
               return true;
-            } else if (this.state === 'PAUSED') {
-              this._setState('PLAYING');
+            } else if (this.state === 'SETTINGS') {
+              this._setState(this.previousStateBeforeSettings || 'PLAYING');
               return true;
             }
           }
@@ -3922,7 +3738,7 @@
           }
 
           const prevFuel = this.player.fuel;
-          this.player.update(dt, this.input, this.level, this.particles, this.sound, this.camera, this.time, () => this._fireWeapon());
+          this.player.update(dt, this.input, this.level, this.particles, this.sound, this.camera, this.time, () => this._fireWeapon(), this.autoRun);
           if (this.player.upgrades.jetpackTier > 0 && Math.abs(this.player.fuel - prevFuel) > 0.002) {
             const pct = Math.max(0, Math.min(100, (this.player.fuel / this.player.maxFuel) * 100));
             this.ui.fuelFill.style.width = `${pct}%`;
@@ -3980,14 +3796,18 @@
                 this.sound.purchase();
                 this.particles.burst(item.x, item.y, '#f59e0b', 18, 190, 220);
                 this.particles.popup(item.x, item.y - 14, 'Carbine (6 Rounds)!', '#fbbf24');
-                this.chat.addSystem(`${this.profile.username} scavenged a Volatile Carbine!`);
+                this.banner.show({
+                  kicker: 'Item Unlocked',
+                  title: 'Volatile Carbine Scavenged (6 Rounds)!',
+                  sub: 'High recoil rounds. Press Shift, F, Click, or Fire.',
+                  tone: 'unlock'
+                });
               } else {
                 const isGem = item.kind === 'gem';
                 const coinGain = isGem ? 5 : 1;
                 const pts = isGem ? 50 : 10;
                 this.coins += coinGain;
                 this.score += pts;
-                this.profile.stats.totalCoins += coinGain;
                 this.sound.coin(isGem);
                 this.particles.burst(item.x, item.y, isGem ? '#38bdf8' : '#fbbf24', isGem ? 16 : 10, 165, 220);
                 this.particles.popup(item.x, item.y - 12, isGem ? '+5 Coins' : '+10', isGem ? '#7dd3fc' : '#fde047');
@@ -4026,7 +3846,6 @@
                   const pts = enemy.enraged ? 200 : 120;
                   this.score += pts;
                   this.runKills += 1;
-                  this.profile.stats.totalKills += 1;
                   this.sound.stomp();
                   this.camera.shake(4, 0.12);
                   this.particles.burst(enemy.x + enemy.w * 0.5, enemy.y + enemy.h * 0.5, '#f59e0b', 16, 200);
@@ -4045,7 +3864,15 @@
               this.camera.shake(4, 0.15);
               this.particles.burst(enragedEnemy.x + enragedEnemy.w * 0.5, enragedEnemy.y, '#ef4444', 14, 150);
               this.particles.popup(enragedEnemy.x + enragedEnemy.w * 0.5, enragedEnemy.y - 12, 'ENRAGED!', '#fca5a5');
-              this.chat.addSystem(`${this.profile.username} enraged a ${enragedEnemy.label}!`, true);
+              if (!this.announcedMechanics.enrage) {
+                this.announcedMechanics.enrage = true;
+                this.banner.show({
+                  kicker: 'New Mechanic',
+                  title: 'Enraged Hunters Enabled!',
+                  sub: 'Bypassed enemies gain speed and pursue you across gaps.',
+                  tone: 'showdown'
+                });
+              }
             });
 
             if (!enemy.alive) continue;
@@ -4061,7 +3888,6 @@
                 const pts = enemy.enraged ? 200 : 100;
                 this.score += pts;
                 this.runKills += 1;
-                this.profile.stats.totalKills += 1;
                 this.sound.stomp();
                 this.camera.shake(4, 0.12);
                 this.particles.burst(enemy.x + enemy.w * 0.5, enemy.y + enemy.h * 0.5, '#fbbf24', 14, 180);
@@ -4080,12 +3906,9 @@
             const activeEnraged = this.level.enemies.filter((e) => e.alive && e.enraged).length;
             if (activeEnraged > 0) {
               this.runEscapes += activeEnraged;
-              this.profile.stats.enragedEscapes += activeEnraged;
               this.score += activeEnraged * 150;
-              this.chat.addSystem(`${this.profile.username} escaped ${activeEnraged} enraged hunter${activeEnraged > 1 ? 's' : ''}!`);
             }
             this.score += 200;
-            ProfileStore.save(this.profile);
             this.sound.levelClear();
             this._syncHUD();
             this._openShop();
@@ -4114,7 +3937,7 @@
           for (const enemy of this.level.enemies) enemy.draw(ctx, cam, isArmored);
           for (const b of this.projectiles) b.draw(ctx, cam);
 
-          this.player.draw(ctx, cam, this.time, this.profile);
+          this.player.draw(ctx, cam, this.time);
           this.particles.draw(ctx, cam);
 
           if (this.state === 'PLAYING') {
@@ -4142,7 +3965,6 @@
             this.camera.x = Math.sin(this.time * 0.25) * 40 + 40;
           }
 
-          this.chat.update(dt, this.state, this.stage, this.level.modifier);
           this._render();
           this.input.endFrame();
           requestAnimationFrame((t) => this._loop(t));
