@@ -408,21 +408,31 @@
       display: none;
       position: absolute;
       left: max(14px, env(safe-area-inset-left));
-      bottom: max(14px, env(safe-area-inset-bottom));
+      bottom: max(16px, env(safe-area-inset-bottom));
       z-index: 20;
       gap: 10px;
       align-items: center;
     }
 
+    .touch-actions {
+      display: none;
+      position: absolute;
+      right: max(14px, env(safe-area-inset-right));
+      bottom: max(16px, env(safe-area-inset-bottom));
+      z-index: 20;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
     .touch-dpad-btn,
-    .touch-fire-btn {
+    .touch-fire-btn,
+    .touch-jump-btn {
       appearance: none;
       min-width: 58px;
       min-height: 58px;
       padding: 0 14px;
       border-radius: 16px;
       backdrop-filter: blur(4px);
-      font-size: 16px;
       font-weight: 700;
       align-items: center;
       justify-content: center;
@@ -437,8 +447,9 @@
 
     .touch-dpad-btn {
       display: inline-flex;
+      font-size: 16px;
       border: 1.5px solid rgba(255, 255, 255, 0.24);
-      background: rgba(15, 20, 29, 0.68);
+      background: rgba(15, 20, 29, 0.6);
       color: var(--text);
     }
 
@@ -450,14 +461,10 @@
 
     .touch-fire-btn {
       display: none;
-      position: absolute;
-      right: max(14px, env(safe-area-inset-right));
-      bottom: max(14px, env(safe-area-inset-bottom));
-      z-index: 20;
       min-width: 60px;
       min-height: 60px;
       border: 1.5px solid rgba(245, 158, 11, 0.55);
-      background: rgba(15, 20, 29, 0.68);
+      background: rgba(15, 20, 29, 0.62);
       color: #fef3c7;
       font-size: 13px;
     }
@@ -466,6 +473,51 @@
       background: rgba(245, 158, 11, 0.42);
       border-color: var(--accent-hover);
       transform: scale(0.94);
+    }
+
+    .touch-jump-btn {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: clamp(74px, 15vw, 90px);
+      min-height: clamp(62px, 12vh, 74px);
+      padding: 8px 14px;
+      border: 1.5px solid rgba(56, 189, 248, 0.48);
+      background: rgba(15, 20, 29, 0.58);
+      color: #f8fafc;
+      line-height: 1.05;
+    }
+
+    .touch-jump-main {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .touch-jump-sub {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: rgba(148, 163, 184, 0.85);
+    }
+
+    .touch-jump-btn.has-jetpack {
+      border-color: rgba(245, 158, 11, 0.6);
+    }
+
+    .touch-jump-btn.has-jetpack .touch-jump-sub {
+      color: #fbbf24;
+    }
+
+    .touch-jump-btn.active {
+      background: rgba(56, 189, 248, 0.34);
+      border-color: #7dd3fc;
+      transform: scale(0.94);
+    }
+
+    .touch-jump-btn.has-jetpack.active {
+      background: rgba(245, 158, 11, 0.36);
+      border-color: var(--accent-hover);
     }
 
     /* Settings Gear Modal Menu */
@@ -843,19 +895,26 @@
 
     /* Mobile / Touch Responsive Rules */
     @media (pointer: coarse), (hover: none) {
-      .touch-fire-btn.has-ammo {
+      body.is-playing .touch-actions {
+        display: flex;
+      }
+      body.is-playing .touch-fire-btn.has-ammo {
         display: inline-flex;
       }
-      body.manual-move .touch-dpad {
+      body.is-playing.manual-move .touch-dpad {
         display: flex;
       }
     }
 
-    body.touch-enabled .touch-fire-btn.has-ammo {
+    body.touch-enabled.is-playing .touch-actions {
+      display: flex;
+    }
+
+    body.touch-enabled.is-playing .touch-fire-btn.has-ammo {
       display: inline-flex;
     }
 
-    body.touch-enabled.manual-move .touch-dpad {
+    body.touch-enabled.is-playing.manual-move .touch-dpad {
       display: flex;
     }
 
@@ -995,8 +1054,14 @@
           <button type="button" class="touch-dpad-btn" id="touchRight" aria-label="Move Right">&#9654;</button>
         </div>
 
-        <!-- Contextual Fire Button (Mobile only when Volatile Carbine has ammo) -->
-        <button type="button" class="touch-fire-btn" id="touchShoot" aria-label="Fire Weapon">Fire</button>
+        <!-- Bottom-Right Mobile Action Cluster (Fire + Jump / Jetpack) -->
+        <div class="touch-actions" id="touchActions" aria-label="Action Controls">
+          <button type="button" class="touch-fire-btn" id="touchShoot" aria-label="Fire Weapon">Fire</button>
+          <button type="button" class="touch-jump-btn" id="touchJump" aria-label="Jump or Jetpack">
+            <span class="touch-jump-main">JUMP</span>
+            <span class="touch-jump-sub" id="touchJumpSub">JETPACK</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1028,7 +1093,7 @@
 
         <div class="controls-grid">
           <div class="control-row"><span>Move</span><span class="keycap">A/D · ←/→ · Touch</span></div>
-          <div class="control-row"><span>Jump / Jetpack</span><span class="keycap">Tap/Hold · Space</span></div>
+          <div class="control-row"><span>Jump / Jetpack</span><span class="keycap">Tap · JUMP · Space</span></div>
           <div class="control-row"><span>Fire Weapon</span><span class="keycap">Shift · F · Click</span></div>
           <div class="control-row"><span>Settings / Reset</span><span class="keycap">⚙ · P/Esc · R</span></div>
         </div>
@@ -1354,9 +1419,11 @@
           this.game = game;
           this.keys = new Set();
           this.prevKeys = new Set();
-          this.touch = { left: false, right: false, jump: false, shoot: false };
-          this.prevTouch = { left: false, right: false, jump: false, shoot: false };
+          this.touch = { left: false, right: false, stageJump: false, buttonJump: false, shoot: false };
+          this.prevTouch = { left: false, right: false, stageJump: false, buttonJump: false, shoot: false };
           this.stagePointers = new Set();
+          this.stageTouches = new Set();
+          this.touchButtonResetters = [];
           this.mouseShoot = false;
 
           this._bindKeyboard();
@@ -1386,23 +1453,50 @@
 
         _clearTouch() {
           this.stagePointers.clear();
+          this.stageTouches.clear();
           this.touch.left = false;
           this.touch.right = false;
-          this.touch.jump = false;
+          this.touch.stageJump = false;
+          this.touch.buttonJump = false;
           this.touch.shoot = false;
-          document.getElementById('touchLeft')?.classList.remove('active');
-          document.getElementById('touchRight')?.classList.remove('active');
-          document.getElementById('touchShoot')?.classList.remove('active');
+          for (const reset of this.touchButtonResetters) reset();
         }
 
         _bindTouchButton(el, key) {
           if (!el) return;
           const pointers = new Set();
+          const touches = new Set();
           const sync = () => {
-            const pressed = pointers.size > 0;
+            const pressed = pointers.size > 0 || touches.size > 0;
             this.touch[key] = pressed;
             el.classList.toggle('active', pressed);
           };
+
+          this.touchButtonResetters.push(() => {
+            pointers.clear();
+            touches.clear();
+            this.touch[key] = false;
+            el.classList.remove('active');
+          });
+
+          el.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.sound.unlock();
+            document.body.classList.add('touch-enabled');
+            for (const t of e.changedTouches) touches.add(t.identifier);
+            sync();
+          }, { passive: false });
+
+          const releaseTouch = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            for (const t of e.changedTouches) touches.delete(t.identifier);
+            sync();
+          };
+          el.addEventListener('touchend', releaseTouch, { passive: false });
+          el.addEventListener('touchcancel', releaseTouch, { passive: false });
+
           el.addEventListener('pointerdown', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -1415,13 +1509,14 @@
             sync();
           }, { passive: false });
 
-          const release = (e) => {
+          const releasePointer = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             pointers.delete(e.pointerId);
             sync();
           };
-          el.addEventListener('pointerup', release, { passive: false });
-          el.addEventListener('pointercancel', release, { passive: false });
+          el.addEventListener('pointerup', releasePointer, { passive: false });
+          el.addEventListener('pointercancel', releasePointer, { passive: false });
           el.addEventListener('lostpointercapture', (e) => {
             pointers.delete(e.pointerId);
             sync();
@@ -1433,13 +1528,18 @@
           // Tap anywhere on the stage/canvas to jump; keep holding to engage Jetpack
           const stage = document.getElementById('stageWrap');
           const syncStageJump = () => {
-            this.touch.jump = this.stagePointers.size > 0;
+            this.touch.stageJump = this.stagePointers.size > 0 || this.stageTouches.size > 0;
+          };
+
+          const isStageControlOrModal = (target) => {
+            if (!target || typeof target.closest !== 'function') return false;
+            return Boolean(target.closest('.touch-fire-btn, .touch-dpad-btn, .touch-jump-btn, .touch-actions, .touch-dpad, .hud, .overlay, .rotate-overlay, button'));
           };
 
           if (stage) {
             stage.addEventListener('pointerdown', (e) => {
               this.sound.unlock();
-              if (e.target.closest('.touch-fire-btn, .touch-dpad-btn, button')) return;
+              if (isStageControlOrModal(e.target)) return;
 
               if (e.pointerType === 'mouse') {
                 if (this.game.state === 'PLAYING' && this.game.player.upgrades.ammo > 0) {
@@ -1459,19 +1559,40 @@
               syncStageJump();
             }, { passive: false });
 
-            const releaseStage = (e) => {
+            const releaseStagePointer = (e) => {
               if (!this.stagePointers.has(e.pointerId)) return;
               this.stagePointers.delete(e.pointerId);
               syncStageJump();
             };
-            stage.addEventListener('pointerup', releaseStage);
-            stage.addEventListener('pointercancel', releaseStage);
-            stage.addEventListener('lostpointercapture', releaseStage);
+            stage.addEventListener('pointerup', releaseStagePointer);
+            stage.addEventListener('pointercancel', releaseStagePointer);
+            stage.addEventListener('lostpointercapture', releaseStagePointer);
+
+            stage.addEventListener('touchstart', (e) => {
+              this.sound.unlock();
+              if (isStageControlOrModal(e.target)) return;
+              document.body.classList.add('touch-enabled');
+              if (this.game.state !== 'PLAYING') return;
+              e.preventDefault();
+              for (const t of e.changedTouches) this.stageTouches.add(t.identifier);
+              syncStageJump();
+            }, { passive: false });
+
+            const releaseStageTouch = (e) => {
+              let changed = false;
+              for (const t of e.changedTouches) {
+                if (this.stageTouches.delete(t.identifier)) changed = true;
+              }
+              if (changed) syncStageJump();
+            };
+            stage.addEventListener('touchend', releaseStageTouch, { passive: false });
+            stage.addEventListener('touchcancel', releaseStageTouch, { passive: false });
             stage.addEventListener('contextmenu', (e) => e.preventDefault());
           }
 
           this._bindTouchButton(document.getElementById('touchLeft'), 'left');
           this._bindTouchButton(document.getElementById('touchRight'), 'right');
+          this._bindTouchButton(document.getElementById('touchJump'), 'buttonJump');
           this._bindTouchButton(document.getElementById('touchShoot'), 'shoot');
         }
 
@@ -1479,7 +1600,7 @@
           switch (action) {
             case 'left': return this.keys.has('ArrowLeft') || this.keys.has('KeyA') || this.touch.left;
             case 'right': return this.keys.has('ArrowRight') || this.keys.has('KeyD') || this.touch.right;
-            case 'jump': return this.keys.has('ArrowUp') || this.keys.has('KeyW') || this.keys.has('Space') || this.touch.jump;
+            case 'jump': return this.keys.has('ArrowUp') || this.keys.has('KeyW') || this.keys.has('Space') || this.touch.stageJump || this.touch.buttonJump;
             case 'shoot': return this.keys.has('ShiftLeft') || this.keys.has('ShiftRight') || this.keys.has('KeyF') || this.keys.has('KeyJ') || this.touch.shoot;
             default: return this.keys.has(action);
           }
@@ -1489,7 +1610,7 @@
           switch (action) {
             case 'left': return this.prevKeys.has('ArrowLeft') || this.prevKeys.has('KeyA') || this.prevTouch.left;
             case 'right': return this.prevKeys.has('ArrowRight') || this.prevKeys.has('KeyD') || this.prevTouch.right;
-            case 'jump': return this.prevKeys.has('ArrowUp') || this.prevKeys.has('KeyW') || this.prevKeys.has('Space') || this.prevTouch.jump;
+            case 'jump': return this.prevKeys.has('ArrowUp') || this.prevKeys.has('KeyW') || this.prevKeys.has('Space') || this.prevTouch.stageJump || this.prevTouch.buttonJump;
             case 'shoot': return this.prevKeys.has('ShiftLeft') || this.prevKeys.has('ShiftRight') || this.prevKeys.has('KeyF') || this.prevKeys.has('KeyJ') || this.prevTouch.shoot;
             default: return this.prevKeys.has(action);
           }
@@ -3258,6 +3379,7 @@
             fuelFill: document.getElementById('hudFuelFill'),
             ammoWrap: document.getElementById('hudAmmoWrap'),
             ammo: document.getElementById('hudAmmo'),
+            touchJump: document.getElementById('touchJump'),
             touchShoot: document.getElementById('touchShoot'),
             coins: document.getElementById('hudCoins'),
             score: document.getElementById('hudScore'),
@@ -3286,7 +3408,11 @@
           document.getElementById('btnGameOverRestart').addEventListener('click', startAction);
 
           // Settings Gear Menu Controls
-          document.getElementById('btnSettings').addEventListener('click', () => {
+          const btnSettings = document.getElementById('btnSettings');
+          btnSettings.addEventListener('touchstart', (e) => e.stopPropagation(), { passive: true });
+          btnSettings.addEventListener('pointerdown', (e) => e.stopPropagation());
+          btnSettings.addEventListener('click', (e) => {
+            e.stopPropagation();
             this.sound.unlock();
             if (this.state === 'SETTINGS') {
               this._setState(this.previousStateBeforeSettings || 'PLAYING');
@@ -3369,6 +3495,7 @@
 
         _setState(nextState) {
           this.state = nextState;
+          document.body.classList.toggle('is-playing', nextState === 'PLAYING');
           this.input._clearTouch();
           if (nextState !== 'PLAYING') {
             this.banner.clear();
@@ -3414,6 +3541,7 @@
           if (u.ammo > 0) {
             this.ui.ammo.textContent = `${u.ammo}/${u.maxAmmo}`;
           }
+          this.ui.touchJump?.classList.toggle('has-jetpack', u.jetpackTier > 0);
           this.ui.touchShoot?.classList.toggle('has-ammo', u.ammo > 0);
 
           let heartsHtml = '';
