@@ -1093,7 +1093,7 @@
 
         <div class="controls-grid">
           <div class="control-row"><span>Move</span><span class="keycap">A/D · ←/→ · Touch</span></div>
-          <div class="control-row"><span>Jump / Jetpack</span><span class="keycap">Tap · JUMP · Space</span></div>
+          <div class="control-row"><span>Jump (×2) / Jetpack</span><span class="keycap">Tap · JUMP · Space</span></div>
           <div class="control-row"><span>Fire Weapon</span><span class="keycap">Shift · F · Click</span></div>
           <div class="control-row"><span>Settings / Reset</span><span class="keycap">⚙ · P/Esc · R</span></div>
         </div>
@@ -1338,6 +1338,11 @@
         jump() {
           this._tone({ type: 'square', startFreq: 210, endFreq: 520, duration: 0.13, gain: 0.07 });
           this._tone({ type: 'triangle', startFreq: 180, endFreq: 420, duration: 0.12, gain: 0.08 });
+        }
+
+        doubleJump() {
+          this._tone({ type: 'triangle', startFreq: 340, endFreq: 760, duration: 0.14, gain: 0.09 });
+          this._tone({ type: 'sine', startFreq: 520, endFreq: 980, duration: 0.11, gain: 0.07, delay: 0.02 });
         }
 
         jetpack(time) {
@@ -1703,11 +1708,13 @@
       class ParticleSystem {
         constructor() {
           this.particles = [];
+          this.rings = [];
           this.texts = [];
         }
 
         clear() {
           this.particles.length = 0;
+          this.rings.length = 0;
           this.texts.length = 0;
         }
 
@@ -1775,6 +1782,36 @@
           }
         }
 
+        doubleJumpRing(x, y) {
+          this.rings.push({
+            x,
+            y: y - 1,
+            life: 0,
+            maxLife: 0.28,
+            startRx: 6,
+            endRx: 24,
+            startRy: 2,
+            endRy: 7,
+            color: '#bae6fd'
+          });
+          const colors = ['#f8fafc', '#bae6fd', '#38bdf8'];
+          for (let i = 0; i < 8; i++) {
+            const side = i % 2 === 0 ? 1 : -1;
+            const spread = (i / 8) * 0.9 + 0.25;
+            this.particles.push({
+              x: x + side * (2 + Math.random() * 5),
+              y: y - 2,
+              vx: side * (55 + spread * 90),
+              vy: 12 + Math.random() * 45,
+              life: 0,
+              maxLife: 0.22 + Math.random() * 0.14,
+              color: colors[i % colors.length],
+              size: 3 + Math.random() * 2,
+              gravity: 40
+            });
+          }
+        }
+
         popup(x, y, text, color = '#fbbf24') {
           this.texts.push({ x, y, text, color, life: 0, maxLife: 0.85 });
         }
@@ -1792,6 +1829,14 @@
             p.y += p.vy * dt;
           }
 
+          for (let i = this.rings.length - 1; i >= 0; i--) {
+            const r = this.rings[i];
+            r.life += dt;
+            if (r.life >= r.maxLife) {
+              this.rings.splice(i, 1);
+            }
+          }
+
           for (let i = this.texts.length - 1; i >= 0; i--) {
             const t = this.texts[i];
             t.life += dt;
@@ -1804,6 +1849,21 @@
         }
 
         draw(ctx, cam) {
+          for (const r of this.rings) {
+            const t = Math.min(1, r.life / r.maxLife);
+            const ease = 1 - Math.pow(1 - t, 2);
+            const rx = Math.max(1, r.startRx + (r.endRx - r.startRx) * ease);
+            const ry = Math.max(1, r.startRy + (r.endRy - r.startRy) * ease);
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, 0.9 * (1 - t));
+            ctx.strokeStyle = r.color;
+            ctx.lineWidth = Math.max(1, 2.5 * (1 - t * 0.6));
+            ctx.beginPath();
+            ctx.ellipse(r.x - cam.x, r.y - cam.y, rx, ry, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+
           for (const p of this.particles) {
             const alpha = Math.max(0, 1 - p.life / p.maxLife);
             ctx.save();
@@ -2711,6 +2771,7 @@
           this.standingPlatform = null;
           this.coyoteTimer = 0;
           this.jumpBufferTimer = 0;
+          this.doubleJumpsLeft = 1;
           this.airJumpArmed = false;
           this.jumpHoldTimer = 0;
           this.invulnTimer = 0;
@@ -2764,6 +2825,7 @@
 
           if (this.grounded) {
             this.coyoteTimer = 0.11;
+            this.doubleJumpsLeft = 1;
             this.airJumpArmed = false;
             this.jumpHoldTimer = 0;
             const rechargeRate = 0.85 + this.upgrades.jetpackTier * 0.3;
@@ -2777,21 +2839,39 @@
             }
           }
 
+          let didDoubleJump = false;
           if (input.justPressed('jump')) {
-            this.jumpBufferTimer = 0.12;
             if (!this.grounded && this.coyoteTimer <= 0) {
-              this.airJumpArmed = true;
+              if (this.doubleJumpsLeft > 0) {
+                // Mid-air Double Jump (~2x total height when chained near jump peak)
+                this.doubleJumpsLeft -= 1;
+                this.vy = -585;
+                this.jumpBufferTimer = 0;
+                this.airJumpArmed = false;
+                this.jumpHoldTimer = 0;
+                this.scaleX = 0.78;
+                this.scaleY = 1.25;
+                particles.doubleJumpRing(this.x + this.w * 0.5, this.y + this.h);
+                sound.doubleJump();
+                didDoubleJump = true;
+              } else {
+                this.jumpBufferTimer = 0.12;
+                this.airJumpArmed = true;
+              }
+            } else {
+              this.jumpBufferTimer = 0.12;
             }
           } else {
             this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - dt);
           }
 
-          if (this.jumpBufferTimer > 0 && this.coyoteTimer > 0) {
+          if (!didDoubleJump && this.jumpBufferTimer > 0 && this.coyoteTimer > 0) {
             this.vy = -585;
             this.grounded = false;
             this.standingPlatform = null;
             this.coyoteTimer = 0;
             this.jumpBufferTimer = 0;
+            this.doubleJumpsLeft = 1;
             this.airJumpArmed = false;
             this.jumpHoldTimer = 0;
             this.scaleX = 0.76;
@@ -2802,13 +2882,14 @@
 
           if (input.justReleased('jump')) {
             if (this.vy < -120) this.vy *= 0.48;
-            if (!this.grounded) this.airJumpArmed = true;
+            if (!this.grounded && this.doubleJumpsLeft === 0) this.airJumpArmed = true;
           }
 
-          // Jetpack Thrust: activates seamlessly when continuing to hold Jump/Tap past launch burst OR on mid-air re-press & hold
-          const continuousHoldJet = this.jumpHoldTimer >= 0.22 && this.vy >= -200;
+          // Jetpack Thrust: engages smoothly once a held jump/double-jump peaks (vy >= -180 & held >= 0.22s)
+          // or immediately on a subsequent mid-air press after the double jump is spent—never on the initial tap.
+          const continuousHoldJet = this.jumpHoldTimer >= 0.22 && this.vy >= -180;
           const wantJet = this.upgrades.jetpackTier > 0 && !this.grounded && this.fuel > 0 &&
-            input.isDown('jump') && (this.airJumpArmed || continuousHoldJet);
+            !didDoubleJump && input.isDown('jump') && (this.airJumpArmed || continuousHoldJet);
 
           if (wantJet) {
             this.jetpacking = true;
