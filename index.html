@@ -200,6 +200,76 @@
       transition: width 0.05s linear;
     }
 
+    .fuel-wrap.jammed .fuel-track {
+      display: none;
+    }
+
+    .jet-status {
+      display: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .fuel-wrap.jammed .jet-status {
+      display: inline-block;
+      color: #fecaca;
+      background: rgba(239, 68, 68, 0.25);
+      border: 1px solid rgba(239, 68, 68, 0.7);
+      animation: pulseWarn 0.9s ease-in-out infinite;
+    }
+
+    .fuel-wrap.emp-flicker:not(.jammed) .jet-status {
+      display: inline-block;
+      color: #bae6fd;
+      background: rgba(56, 189, 248, 0.22);
+      border: 1px solid rgba(56, 189, 248, 0.65);
+    }
+
+    @keyframes pulseWarn {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+
+    .hud-fever {
+      display: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 5px;
+      color: #fef08a;
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.35), rgba(239, 68, 68, 0.35));
+      border: 1px solid rgba(251, 191, 36, 0.8);
+      white-space: nowrap;
+      animation: pulseWarn 0.45s ease-in-out infinite;
+    }
+
+    .hud-fever.active {
+      display: inline-block;
+    }
+
+    .hud-bounty {
+      display: none;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      color: #f5d0fe;
+      background: rgba(168, 85, 247, 0.22);
+      border: 1px solid rgba(192, 132, 252, 0.55);
+      white-space: nowrap;
+    }
+
+    .hud-bounty.active {
+      display: inline-block;
+    }
+
     .ammo-wrap {
       display: none;
       align-items: center;
@@ -518,6 +588,22 @@
     .touch-jump-btn.has-jetpack.active {
       background: rgba(245, 158, 11, 0.36);
       border-color: var(--accent-hover);
+    }
+
+    .touch-jump-btn.jammed {
+      border-color: rgba(239, 68, 68, 0.72);
+    }
+
+    .touch-jump-btn.jammed .touch-jump-sub {
+      color: #fca5a5;
+    }
+
+    .touch-jump-btn.emp-flicker:not(.jammed) {
+      border-color: rgba(167, 139, 250, 0.78);
+    }
+
+    .touch-jump-btn.emp-flicker:not(.jammed) .touch-jump-sub {
+      color: #c4b5fd;
     }
 
     /* Settings Gear Modal Menu */
@@ -893,6 +979,177 @@
       padding: 6px 14px;
     }
 
+    /* Cursed Relics / Bounty Modifiers */
+    .relic-section {
+      margin: 10px 0 12px;
+      padding: 9px 10px;
+      background: rgba(88, 28, 135, 0.14);
+      border: 1px solid rgba(192, 132, 252, 0.28);
+      border-radius: 8px;
+      text-align: left;
+    }
+
+    .relic-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #e9d5ff;
+      margin-bottom: 7px;
+    }
+
+    .relic-sub {
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .relic-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .relic-chip {
+      appearance: none;
+      text-align: left;
+      padding: 7px 8px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 20, 29, 0.72);
+      color: var(--text);
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .relic-chip:hover {
+      border-color: rgba(192, 132, 252, 0.5);
+    }
+
+    .relic-chip.active {
+      background: rgba(147, 51, 234, 0.28);
+      border-color: #c084fc;
+      box-shadow: 0 0 0 1px rgba(192, 132, 252, 0.35);
+    }
+
+    .relic-chip-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .relic-chip-desc {
+      font-size: 10px;
+      color: #cbd5e1;
+      line-height: 1.25;
+      display: block;
+    }
+
+    .relic-chip-reward {
+      font-size: 10px;
+      font-weight: 700;
+      color: #fbbf24;
+      display: block;
+      margin-top: 3px;
+    }
+
+    /* Compact Leaderboard (Firebase RTDB + localStorage fallback) */
+    .lb-box {
+      margin: 10px 0 12px;
+      padding: 9px 11px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 8px;
+      text-align: left;
+    }
+
+    .lb-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .lb-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .lb-source {
+      font-size: 10px;
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--cyan);
+    }
+
+    .lb-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+
+    .lb-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 6px;
+      padding: 6px 9px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .lb-input:focus {
+      border-color: var(--accent);
+    }
+
+    .lb-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .lb-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      padding: 4px 6px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.025);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .lb-row.highlight {
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .lb-empty {
+      font-size: 11px;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+
+    @media (max-width: 560px) {
+      .relic-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* Mobile / Touch Responsive Rules */
     @media (pointer: coarse), (hover: none) {
       body.is-playing .touch-actions {
@@ -1003,6 +1260,8 @@
           </div>
 
           <div class="hud-group">
+            <span class="hud-bounty" id="hudBounty"></span>
+            <span class="hud-fever" id="hudFever">FEVER ×3</span>
             <div class="stat">
               <span class="stat-label">Lives</span>
               <span class="hearts" id="hudHearts" aria-label="Lives remaining"></span>
@@ -1010,6 +1269,7 @@
             <div class="fuel-wrap" id="hudFuelWrap">
               <span class="stat-label">Fuel</span>
               <div class="fuel-track"><div class="fuel-fill" id="hudFuelFill"></div></div>
+              <span class="jet-status" id="hudJetStatus">JETPACK JAMMED</span>
             </div>
             <div class="ammo-wrap" id="hudAmmoWrap">
               <span class="stat-label">Ammo</span>
@@ -1098,7 +1358,24 @@
           <div class="control-row"><span>Settings / Reset</span><span class="keycap">⚙ · P/Esc · R</span></div>
         </div>
 
+        <div class="relic-section">
+          <div class="relic-head">
+            <span>Cursed Bounty (Optional Stage 1 Pact)</span>
+            <span class="relic-sub" id="startBountyStatus">Standard Rules</span>
+          </div>
+          <div class="relic-grid" id="startBountyGrid"></div>
+        </div>
+
+        <div class="lb-box" id="startLbBox" style="display:none;">
+          <div class="lb-head">
+            <span class="lb-title">Top Runners</span>
+            <span class="lb-source" id="startLbSource">Local Cache</span>
+          </div>
+          <div class="lb-list" id="startLbList"></div>
+        </div>
+
         <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="btnToggleStartLb">Leaderboard</button>
           <button type="button" class="btn-primary" id="btnStart">Start Run</button>
         </div>
       </div>
@@ -1117,6 +1394,14 @@
 
         <div class="shop-next-info" id="shopNextInfo">Next: Stage 2 · Mossy Aqueduct · Standard</div>
         <div class="shop-grid" id="shopGrid"></div>
+
+        <div class="relic-section">
+          <div class="relic-head">
+            <span>Next-Stage Cursed Relic / Bounty</span>
+            <span class="relic-sub" id="shopBountyStatus">None Armed</span>
+          </div>
+          <div class="relic-grid" id="shopBountyGrid"></div>
+        </div>
 
         <div class="modal-actions">
           <button type="button" class="btn-primary" id="btnNextStage">Enter Next Stage</button>
@@ -1189,6 +1474,19 @@
             <div class="summary-item-val" id="goEscapes">0</div>
           </div>
         </div>
+
+        <div class="lb-box">
+          <div class="lb-head">
+            <span class="lb-title">Leaderboard</span>
+            <span class="lb-source" id="goLbSource">Local Cache</span>
+          </div>
+          <div class="lb-name-row">
+            <input type="text" class="lb-input" id="runnerNameInput" maxlength="16" placeholder="Runner Callsign" aria-label="Runner Callsign" />
+            <button type="button" class="btn-ghost" id="btnSaveScore">Submit</button>
+          </div>
+          <div class="lb-list" id="goLbList"></div>
+        </div>
+
         <div class="modal-actions">
           <button type="button" class="btn-primary" id="btnGameOverRestart">Restart Run (R)</button>
         </div>
@@ -1236,12 +1534,131 @@
         }
       ];
 
+      const LAVA_DOME_BIOME = {
+        name: 'Lava Dome',
+        isLavaDome: true,
+        skyTop: '#160708', skyMid: '#3a0e10', skyBot: '#991b1b', sunColor: '#fb923c',
+        farMountain: '#240b0e', midRuins: '#351014', nearHaze: 'rgba(249, 115, 22, 0.11)',
+        stoneBase: '#292024', stoneDark: '#171114', stoneCap: '#ea580c', stoneCapHighlight: '#fdba74',
+        slabColor: '#432e33', portalColor: '#fbbf24', moteColor: 'rgba(253, 186, 116, 0.72)'
+      };
+
       const MODIFIERS = {
         STANDARD: { id: 'STANDARD', label: 'Standard', desc: 'All gear & weapons operate normally.', cls: 'mod-standard' },
         EMP_ZONE: { id: 'EMP_ZONE', label: 'EMP Zone', desc: 'Firearms jammed by interference. Rely on stomps & agility.', cls: 'mod-emp' },
         ARMORED: { id: 'ARMORED', label: 'Armored Bastion', desc: 'Enemies wear bulletproof plating. Bullets ricochet harmlessly!', cls: 'mod-armored' },
         SHOWDOWN: { id: 'SHOWDOWN', label: 'Showdown Arena', desc: 'High-alert sector with dense Stalker patrols & bonus sky gems.', cls: 'mod-showdown' }
       };
+
+      const BOUNTIES = {
+        NONE: { id: 'NONE', label: 'No Pact', desc: 'Standard stage payout', reward: '1× Coins', coinMult: 1, scoreMult: 1 },
+        NO_DOUBLE_JUMP: { id: 'NO_DOUBLE_JUMP', label: 'Lead Boots', desc: 'No Double Jump', reward: '+200% Coins', coinMult: 3, scoreMult: 1.25 },
+        START_ENRAGED: { id: 'START_ENRAGED', label: 'Bloodhound', desc: 'Enemies start enraged', reward: 'Free Carbine +75% Pts', coinMult: 1.5, scoreMult: 1.75 },
+        DOUBLE_HAZARDS: { id: 'DOUBLE_HAZARDS', label: 'Hellfire', desc: 'Double spikes & extra Mercs', reward: '+150% Coins & 2× Pts', coinMult: 2.5, scoreMult: 2 }
+      };
+
+      // Optional Firebase Realtime Database endpoint (e.g. "https://your-project-default-rtdb.firebaseio.com")
+      // Automatically uses Firebase RTDB REST API when configured and falls back cleanly to localStorage.
+      const FIREBASE_RTDB_URL = (typeof window.EMBERVALE_FIREBASE_URL === 'string' ? window.EMBERVALE_FIREBASE_URL : '').replace(/\/+$/, '');
+      const LB_STORAGE_KEY = 'embervale_leaderboard_v1';
+      const LB_NAME_KEY = 'embervale_runner_name_v1';
+
+      class LeaderboardService {
+        constructor() {
+          this.source = FIREBASE_RTDB_URL ? 'Firebase RTDB' : 'Local Cache';
+          this.entries = this._readLocal();
+        }
+
+        _readLocal() {
+          try {
+            const raw = localStorage.getItem(LB_STORAGE_KEY);
+            const parsed = raw ? JSON.parse(raw) : [];
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        }
+
+        _writeLocal(list) {
+          try {
+            localStorage.setItem(LB_STORAGE_KEY, JSON.stringify(list.slice(0, 15)));
+          } catch {}
+        }
+
+        getSavedName() {
+          try {
+            return localStorage.getItem(LB_NAME_KEY) || 'Runner';
+          } catch {
+            return 'Runner';
+          }
+        }
+
+        saveName(name) {
+          try {
+            localStorage.setItem(LB_NAME_KEY, (name || 'Runner').slice(0, 16));
+          } catch {}
+        }
+
+        async fetchTop(limit = 8) {
+          if (FIREBASE_RTDB_URL && typeof fetch === 'function') {
+            try {
+              const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+              const timer = ctrl ? setTimeout(() => ctrl.abort(), 3200) : null;
+              const res = await fetch(`${FIREBASE_RTDB_URL}/leaderboard.json`, ctrl ? { signal: ctrl.signal } : undefined);
+              if (timer) clearTimeout(timer);
+              if (res.ok) {
+                const data = await res.json();
+                const remote = data ? Object.values(data).filter((e) => e && typeof e.score === 'number') : [];
+                remote.sort((a, b) => b.score - a.score || b.stage - a.stage);
+                this.entries = remote.slice(0, limit);
+                this.source = 'Firebase RTDB';
+                this._writeLocal(this.entries);
+                return { entries: this.entries, source: this.source };
+              }
+            } catch {}
+          }
+          this.source = 'Local Cache';
+          this.entries = this._readLocal().sort((a, b) => b.score - a.score || b.stage - a.stage).slice(0, limit);
+          return { entries: this.entries, source: this.source };
+        }
+
+        async submitScore(name, score, stage) {
+          const cleanName = String(name || 'Runner').trim().slice(0, 16) || 'Runner';
+          this.saveName(cleanName);
+          const entry = {
+            name: cleanName,
+            score: Math.max(0, Math.round(score)),
+            stage: Math.max(1, Math.round(stage)),
+            ts: Date.now()
+          };
+
+          const local = this._readLocal();
+          local.push(entry);
+          local.sort((a, b) => b.score - a.score || b.stage - a.stage);
+          this._writeLocal(local.slice(0, 15));
+
+          if (FIREBASE_RTDB_URL && typeof fetch === 'function') {
+            try {
+              const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+              const timer = ctrl ? setTimeout(() => ctrl.abort(), 3200) : null;
+              const res = await fetch(`${FIREBASE_RTDB_URL}/leaderboard.json`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(entry),
+                ...(ctrl ? { signal: ctrl.signal } : {})
+              });
+              if (timer) clearTimeout(timer);
+              if (res.ok) {
+                return await this.fetchTop(8);
+              }
+            } catch {}
+          }
+
+          this.source = 'Local Cache';
+          this.entries = local.slice(0, 8);
+          return { entries: this.entries, source: this.source };
+        }
+      }
 
       // =========================================================================
       // SEEDED PRNG
@@ -1413,6 +1830,91 @@
             this._tone({ type: 'sawtooth', startFreq: n, endFreq: n * 0.96, duration: 0.22, gain: 0.08, delay: idx * 0.14 });
           });
         }
+
+        fireballWhoosh() {
+          this._noiseBurst(0.14, 980, 0.13);
+          this._tone({ type: 'sawtooth', startFreq: 360, endFreq: 120, duration: 0.14, gain: 0.08 });
+        }
+
+        jetpackJam() {
+          this._noiseBurst(0.18, 2200, 0.17);
+          this._tone({ type: 'square', startFreq: 420, endFreq: 70, duration: 0.22, gain: 0.12 });
+          this._tone({ type: 'sawtooth', startFreq: 210, endFreq: 55, duration: 0.26, gain: 0.11, delay: 0.06 });
+        }
+
+        lavaSizzle() {
+          this._noiseBurst(0.24, 3400, 0.18);
+          this._tone({ type: 'sawtooth', startFreq: 150, endFreq: 65, duration: 0.2, gain: 0.1 });
+        }
+
+        flyBuzz() {
+          this._tone({ type: 'sawtooth', startFreq: 260, endFreq: 340, duration: 0.07, gain: 0.06 });
+          this._tone({ type: 'sawtooth', startFreq: 340, endFreq: 250, duration: 0.08, gain: 0.05, delay: 0.06 });
+        }
+
+        voidHum() {
+          this._tone({ type: 'sine', startFreq: 64, endFreq: 48, duration: 0.35, gain: 0.11 });
+          this._tone({ type: 'triangle', startFreq: 96, endFreq: 72, duration: 0.3, gain: 0.06, delay: 0.03 });
+        }
+
+        empPulse() {
+          this._noiseBurst(0.14, 3800, 0.15);
+          this._tone({ type: 'sine', startFreq: 1120, endFreq: 190, duration: 0.22, gain: 0.11 });
+        }
+
+        crumble() {
+          this._noiseBurst(0.11, 560, 0.12);
+          this._tone({ type: 'triangle', startFreq: 140, endFreq: 65, duration: 0.11, gain: 0.09 });
+        }
+
+        repair() {
+          this._tone({ type: 'triangle', startFreq: 440, endFreq: 660, duration: 0.08, gain: 0.11, delay: 0 });
+          this._tone({ type: 'triangle', startFreq: 660, endFreq: 988, duration: 0.1, gain: 0.11, delay: 0.07 });
+          this._tone({ type: 'sine', startFreq: 988, endFreq: 1318, duration: 0.16, gain: 0.12, delay: 0.14 });
+        }
+
+        mimicTrigger() {
+          this._noiseBurst(0.12, 2600, 0.14);
+          this._tone({ type: 'sawtooth', startFreq: 260, endFreq: 680, duration: 0.12, gain: 0.1 });
+          this._tone({ type: 'square', startFreq: 520, endFreq: 160, duration: 0.16, gain: 0.09, delay: 0.08 });
+        }
+
+        slimeSplit() {
+          this._tone({ type: 'sine', startFreq: 310, endFreq: 620, duration: 0.09, gain: 0.11 });
+          this._tone({ type: 'triangle', startFreq: 480, endFreq: 220, duration: 0.12, gain: 0.09, delay: 0.04 });
+        }
+
+        droneWarp(time) {
+          if (this.muted || !this.ctx || time - (this.lastDroneSound || 0) < 0.28) return;
+          this.lastDroneSound = time;
+          this._tone({ type: 'sine', startFreq: 180, endFreq: 115, duration: 0.14, gain: 0.05 });
+        }
+
+        wraithPhase() {
+          this._tone({ type: 'sine', startFreq: 820, endFreq: 1240, duration: 0.16, gain: 0.07 });
+        }
+
+        wraithAmbush() {
+          this._noiseBurst(0.14, 1900, 0.12);
+          this._tone({ type: 'sawtooth', startFreq: 580, endFreq: 140, duration: 0.24, gain: 0.11 });
+        }
+
+        bouncePad() {
+          this._tone({ type: 'triangle', startFreq: 220, endFreq: 760, duration: 0.14, gain: 0.12 });
+          this._tone({ type: 'sine', startFreq: 440, endFreq: 980, duration: 0.11, gain: 0.08, delay: 0.03 });
+        }
+
+        feverIgnite() {
+          const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+          notes.forEach((n, idx) => {
+            this._tone({ type: 'triangle', startFreq: n, endFreq: n * 1.04, duration: 0.14, gain: 0.11, delay: idx * 0.045 });
+          });
+        }
+
+        blackoutFlicker() {
+          this._noiseBurst(0.12, 1600, 0.12);
+          this._tone({ type: 'sawtooth', startFreq: 140, endFreq: 55, duration: 0.2, gain: 0.09 });
+        }
       }
 
       // =========================================================================
@@ -1438,6 +1940,8 @@
         _bindKeyboard() {
           const prevent = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space']);
           window.addEventListener('keydown', (e) => {
+            const tag = e.target && e.target.tagName ? e.target.tagName.toUpperCase() : '';
+            if (tag === 'INPUT' || tag === 'TEXTAREA') return;
             this.sound.unlock();
             if (prevent.has(e.code)) e.preventDefault();
             this.keys.add(e.code);
@@ -1705,6 +2209,10 @@
       // =========================================================================
       // PARTICLE SYSTEM & FLOATING POPUPS
       // =========================================================================
+      const MAX_PARTICLES = 140;
+      const MAX_RINGS = 16;
+      const MAX_TEXTS = 20;
+
       class ParticleSystem {
         constructor() {
           this.particles = [];
@@ -1718,11 +2226,19 @@
           this.texts.length = 0;
         }
 
+        _pushParticle(p) {
+          if (this.particles.length >= MAX_PARTICLES) {
+            this.particles.shift();
+          }
+          this.particles.push(p);
+        }
+
         burst(x, y, color, count = 12, speed = 170, gravity = 460, size = 4) {
-          for (let i = 0; i < count; i++) {
-            const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+          const safeCount = Math.min(count, 20);
+          for (let i = 0; i < safeCount; i++) {
+            const angle = (Math.PI * 2 * i) / safeCount + (Math.random() - 0.5) * 0.5;
             const mag = speed * (0.4 + Math.random() * 0.75);
-            this.particles.push({
+            this._pushParticle({
               x, y,
               vx: Math.cos(angle) * mag,
               vy: Math.sin(angle) * mag - 45,
@@ -1736,7 +2252,7 @@
         }
 
         smoke(x, y, color = 'rgba(239, 68, 68, 0.5)') {
-          this.particles.push({
+          this._pushParticle({
             x: x + (Math.random() - 0.5) * 14,
             y: y + (Math.random() - 0.5) * 8,
             vx: (Math.random() - 0.5) * 28,
@@ -1752,7 +2268,7 @@
         jetFlame(x, y, facing) {
           const colors = ['#fef08a', '#f59e0b', '#ef4444'];
           for (let i = 0; i < 2; i++) {
-            this.particles.push({
+            this._pushParticle({
               x: x - facing * 6 + (Math.random() - 0.5) * 6,
               y: y - 8,
               vx: -facing * (25 + Math.random() * 35) + (Math.random() - 0.5) * 24,
@@ -1766,9 +2282,24 @@
           }
         }
 
+        feverFlame(x, y) {
+          const colors = ['#fef08a', '#fbbf24', '#f97316', '#ef4444'];
+          this._pushParticle({
+            x: x + (Math.random() - 0.5) * 16,
+            y: y + (Math.random() - 0.5) * 18,
+            vx: (Math.random() - 0.5) * 55,
+            vy: -40 - Math.random() * 65,
+            life: 0,
+            maxLife: 0.22 + Math.random() * 0.16,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: 4 + Math.random() * 3.5,
+            gravity: -40
+          });
+        }
+
         dust(x, y, dir = 0) {
           for (let i = 0; i < 6; i++) {
-            this.particles.push({
+            this._pushParticle({
               x: x + (Math.random() - 0.5) * 14,
               y: y - 2,
               vx: dir * -45 + (Math.random() - 0.5) * 70,
@@ -1782,7 +2313,8 @@
           }
         }
 
-        doubleJumpRing(x, y) {
+        doubleJumpRing(x, y, color = '#bae6fd') {
+          if (this.rings.length >= MAX_RINGS) this.rings.shift();
           this.rings.push({
             x,
             y: y - 1,
@@ -1792,13 +2324,13 @@
             endRx: 24,
             startRy: 2,
             endRy: 7,
-            color: '#bae6fd'
+            color
           });
-          const colors = ['#f8fafc', '#bae6fd', '#38bdf8'];
+          const colors = ['#f8fafc', color, '#38bdf8'];
           for (let i = 0; i < 8; i++) {
             const side = i % 2 === 0 ? 1 : -1;
             const spread = (i / 8) * 0.9 + 0.25;
-            this.particles.push({
+            this._pushParticle({
               x: x + side * (2 + Math.random() * 5),
               y: y - 2,
               vx: side * (55 + spread * 90),
@@ -1813,6 +2345,7 @@
         }
 
         popup(x, y, text, color = '#fbbf24') {
+          if (this.texts.length >= MAX_TEXTS) this.texts.shift();
           this.texts.push({ x, y, text, color, life: 0, maxLife: 0.85 });
         }
 
@@ -2064,19 +2597,407 @@
         }
       }
 
-      class Enemy {
-        constructor(x, y, kind = 'crawler', stage = 1) {
-          this.kind = kind;
-          this.label = kind === 'sentinel' ? 'Obsidian Stalker' : 'Stone Beetle';
-          this.w = 30;
-          this.h = kind === 'sentinel' ? 28 : 24;
-          this.x = x + (TILE - this.w) * 0.5;
-          this.y = y + (TILE - this.h);
-          const stageSpeedBoost = Math.min(35, (stage - 1) * 5);
-          this.baseSpeed = (kind === 'sentinel' ? 124 : 78) + stageSpeedBoost;
-          this.dir = -1;
+      class CrumblePlatform {
+        constructor(x, y, w = TILE * 2, h = 18) {
+          this.x = x;
+          this.y = y;
+          this.w = w;
+          this.h = h;
+          this.dx = 0;
+          this.dy = 0;
+          this.state = 'solid'; // 'solid' | 'shaking' | 'fallen'
+          this.timer = 0;
+        }
+
+        trigger() {
+          if (this.state === 'solid') {
+            this.state = 'shaking';
+            this.timer = 0.65;
+          }
+        }
+
+        update(dt, particles, sound) {
+          if (this.state === 'shaking') {
+            this.timer -= dt;
+            if (this.timer <= 0) {
+              this.state = 'fallen';
+              this.timer = 2.7;
+              sound.crumble();
+              particles.burst(this.x + this.w * 0.5, this.y + this.h * 0.5, '#ea580c', 10, 140, 480, 4);
+            }
+          } else if (this.state === 'fallen') {
+            this.timer -= dt;
+            if (this.timer <= 0) {
+              this.state = 'solid';
+              this.timer = 0;
+              particles.burst(this.x + this.w * 0.5, this.y + this.h * 0.5, '#fdba74', 6, 80, 120, 3);
+            }
+          }
+        }
+
+        isActive() {
+          return this.state !== 'fallen';
+        }
+
+        draw(ctx, cam, theme) {
+          if (this.state === 'fallen') {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(251, 146, 60, 0.24)';
+            ctx.setLineDash([4, 5]);
+            ctx.strokeRect(Math.round(this.x - cam.x) + 1, Math.round(this.y - cam.y) + 1, this.w - 2, this.h - 2);
+            ctx.restore();
+            return;
+          }
+          const jitterX = this.state === 'shaking' ? (Math.random() - 0.5) * 4 : 0;
+          const jitterY = this.state === 'shaking' ? (Math.random() - 0.5) * 2.5 : 0;
+          const px = Math.round(this.x - cam.x + jitterX);
+          const py = Math.round(this.y - cam.y + jitterY);
+          ctx.save();
+          ctx.fillStyle = theme.stoneDark;
+          ctx.fillRect(px, py, this.w, this.h);
+          ctx.fillStyle = this.state === 'shaking' ? '#9a3412' : theme.slabColor;
+          ctx.fillRect(px + 2, py + 2, this.w - 4, this.h - 5);
+          ctx.fillStyle = this.state === 'shaking' ? '#fb923c' : theme.stoneCap;
+          ctx.fillRect(px + 2, py + 1, this.w - 4, 4);
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(px + this.w * 0.35, py + 4);
+          ctx.lineTo(px + this.w * 0.45, py + 10);
+          ctx.lineTo(px + this.w * 0.38, py + this.h - 3);
+          ctx.moveTo(px + this.w * 0.68, py + 5);
+          ctx.lineTo(px + this.w * 0.62, py + this.h - 4);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      class EnemyFireball {
+        constructor(x, y, vx, vy) {
+          this.x = x;
+          this.y = y;
+          this.vx = vx;
+          this.vy = vy;
+          this.r = 6;
+          this.life = 2.6;
+          this.alive = true;
+          this.trailTimer = 0;
+        }
+
+        update(dt, level, particles) {
+          this.life -= dt;
+          if (this.life <= 0) {
+            this.alive = false;
+            return;
+          }
+          this.x += this.vx * dt;
+          this.y += this.vy * dt;
+          this.trailTimer -= dt;
+          if (this.trailTimer <= 0) {
+            this.trailTimer = 0.035;
+            particles._pushParticle({
+              x: this.x + (Math.random() - 0.5) * 4,
+              y: this.y + (Math.random() - 0.5) * 4,
+              vx: -this.vx * 0.1 + (Math.random() - 0.5) * 24,
+              vy: -20 - Math.random() * 20,
+              life: 0,
+              maxLife: 0.22,
+              color: Math.random() < 0.5 ? '#fb923c' : '#fef08a',
+              size: 4,
+              gravity: -30
+            });
+          }
+          const c = Math.floor(this.x / TILE);
+          const r = Math.floor(this.y / TILE);
+          if (this.x < -20 || this.x > level.width + 20 || this.y < -40 || this.y > level.height + 20 || level.isSolid(c, r)) {
+            this.alive = false;
+            particles.burst(this.x, this.y, '#f97316', 7, 130, 320, 3.5);
+          }
+        }
+
+        draw(ctx, cam, time) {
+          const px = this.x - cam.x;
+          const py = this.y - cam.y;
+          ctx.save();
+          const glow = ctx.createRadialGradient(px, py, 2, px, py, 16);
+          glow.addColorStop(0, 'rgba(254, 240, 138, 0.9)');
+          glow.addColorStop(0.45, 'rgba(249, 115, 22, 0.7)');
+          glow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(px, py, 16 + Math.sin(time * 24) * 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.arc(px, py, this.r - 1.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      class LavaDroplet {
+        constructor(x, delay = 0.85) {
+          this.x = x;
+          this.y = 14;
           this.vy = 0;
-          this.grounded = true;
+          this.r = 7;
+          this.warningTimer = delay;
+          this.maxWarning = delay;
+          this.alive = true;
+          this.trailTimer = 0;
+        }
+
+        update(dt, level, particles, sound) {
+          if (this.warningTimer > 0) {
+            this.warningTimer = Math.max(0, this.warningTimer - dt);
+            return;
+          }
+          this.vy = Math.min(540, this.vy + 760 * dt);
+          this.y += this.vy * dt;
+          this.trailTimer -= dt;
+          if (this.trailTimer <= 0) {
+            this.trailTimer = 0.045;
+            particles._pushParticle({
+              x: this.x + (Math.random() - 0.5) * 4,
+              y: this.y - 4,
+              vx: (Math.random() - 0.5) * 18,
+              vy: -30,
+              life: 0,
+              maxLife: 0.2,
+              color: '#fb923c',
+              size: 3.5,
+              gravity: -20
+            });
+          }
+          const c = Math.floor(this.x / TILE);
+          const r = Math.floor((this.y + this.r) / TILE);
+          if (level.isSolid(c, r) || this.y >= level.lavaY) {
+            this.alive = false;
+            sound.lavaSizzle();
+            particles.burst(this.x, Math.min(this.y, level.lavaY), '#fb923c', 10, 150, 420, 3.5);
+          }
+        }
+
+        draw(ctx, cam, time) {
+          const px = this.x - cam.x;
+          ctx.save();
+          if (this.warningTimer > 0) {
+            const p = 1 - this.warningTimer / this.maxWarning;
+            const dripLen = 6 + p * 14;
+            const ringR = 6 + Math.sin(time * 22) * 3 + p * 10;
+            ctx.strokeStyle = `rgba(251, 146, 60, ${0.4 + 0.55 * p})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(px, 10, ringR, 4, 0, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#fb923c';
+            ctx.beginPath();
+            ctx.moveTo(px - 5, 0);
+            ctx.quadraticCurveTo(px, dripLen + 6, px + 5, 0);
+            ctx.fill();
+            ctx.restore();
+            return;
+          }
+
+          const py = this.y - cam.y;
+          const glow = ctx.createRadialGradient(px, py, 2, px, py, 16);
+          glow.addColorStop(0, 'rgba(254, 240, 138, 0.95)');
+          glow.addColorStop(0.5, 'rgba(249, 115, 22, 0.75)');
+          glow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(px, py, 16, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.moveTo(px, py - 11);
+          ctx.quadraticCurveTo(px + 8, py + 2, px, py + 8);
+          ctx.quadraticCurveTo(px - 8, py + 2, px, py - 11);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      class VoidWall {
+        constructor(stage = 80) {
+          this.x = -260;
+          this.speed = 112 + Math.min(48, Math.max(0, stage - 80) * 1.6);
+          this.humCooldown = 0;
+        }
+
+        resetNear(spawnX) {
+          this.x = Math.min(this.x, spawnX - 360);
+        }
+
+        update(dt, player, sound) {
+          // Steady forward pressure; keep within menacing range if far behind
+          const dist = player.x - this.x;
+          const catchup = dist > 950 ? 60 : 0;
+          this.x += (this.speed + catchup) * dt;
+          if (dist < 280) {
+            this.humCooldown -= dt;
+            if (this.humCooldown <= 0) {
+              this.humCooldown = 0.85;
+              sound.voidHum();
+            }
+          }
+        }
+
+        draw(ctx, cam, viewH, time) {
+          const edgeX = this.x - cam.x;
+          if (edgeX < -40) return;
+          ctx.save();
+          const w = Math.max(0, edgeX + 40);
+          const grad = ctx.createLinearGradient(edgeX - 180, 0, edgeX + 18, 0);
+          grad.addColorStop(0, '#05020a');
+          grad.addColorStop(0.7, 'rgba(24, 9, 44, 0.96)');
+          grad.addColorStop(0.92, 'rgba(139, 92, 246, 0.72)');
+          grad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(Math.min(0, edgeX - w), 0, Math.max(0, edgeX + 18) - Math.min(0, edgeX - w), viewH);
+
+          // Jagged static frontier
+          ctx.strokeStyle = '#c084fc';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          for (let y = 0; y <= viewH; y += 22) {
+            const jx = edgeX + Math.sin(time * 24 + y * 0.14) * 9 + (Math.random() - 0.5) * 8;
+            if (y === 0) ctx.moveTo(jx, y);
+            else ctx.lineTo(jx, y);
+          }
+          ctx.stroke();
+
+          ctx.strokeStyle = '#f43f5e';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          for (let y = 0; y <= viewH; y += 26) {
+            const jx = edgeX - 6 + Math.cos(time * 19 + y * 0.2) * 11;
+            if (y === 0) ctx.moveTo(jx, y);
+            else ctx.lineTo(jx, y);
+          }
+          ctx.stroke();
+
+          // Static noise flecks
+          ctx.fillStyle = 'rgba(233, 213, 255, 0.65)';
+          for (let i = 0; i < 18; i++) {
+            const sy = ((i * 53 + time * 180) % viewH + viewH) % viewH;
+            const sx = edgeX - 8 - ((i * 37) % 90);
+            ctx.fillRect(sx, sy, 6 + (i % 8), 2);
+          }
+          ctx.restore();
+        }
+      }
+
+      class BouncePad {
+        constructor(x, y, kind = 'up') {
+          this.kind = kind; // 'up' | 'diag_right' | 'diag_left' | 'wall_left' | 'wall_right'
+          this.isWall = kind === 'wall_left' || kind === 'wall_right';
+          this.w = this.isWall ? 14 : 34;
+          this.h = this.isWall ? 76 : 12;
+          this.x = x;
+          this.y = y;
+          this.pulse = 0;
+        }
+
+        trigger() {
+          this.pulse = 0.28;
+        }
+
+        update(dt) {
+          if (this.pulse > 0) this.pulse = Math.max(0, this.pulse - dt);
+        }
+
+        draw(ctx, cam, time) {
+          const px = Math.round(this.x - cam.x);
+          const py = Math.round(this.y - cam.y);
+          const lift = this.pulse > 0 ? Math.sin((this.pulse / 0.28) * Math.PI) * 5 : 0;
+          ctx.save();
+          if (this.isWall) {
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(px, py, this.w, this.h);
+            ctx.fillStyle = this.pulse > 0 ? '#67e8f9' : '#06b6d4';
+            const glowX = this.kind === 'wall_right' ? px + this.w - 6 : px + 1;
+            ctx.fillRect(glowX, py + 4, 5, this.h - 8);
+            ctx.strokeStyle = '#a5f3fc';
+            ctx.lineWidth = 2;
+            const dir = this.kind === 'wall_right' ? 1 : -1;
+            for (let i = 0; i < 3; i++) {
+              const cy = py + 16 + i * 22 + ((time * 30) % 10) * -0.4;
+              ctx.beginPath();
+              ctx.moveTo(px + this.w * 0.5 - dir * 3, cy + 5);
+              ctx.lineTo(px + this.w * 0.5 + dir * 3, cy);
+              ctx.lineTo(px + this.w * 0.5 - dir * 3, cy - 5);
+              ctx.stroke();
+            }
+          } else {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(px, py + this.h - 4, this.w, 4);
+            ctx.fillStyle = this.kind === 'up' ? '#34d399' : '#38bdf8';
+            ctx.beginPath();
+            ctx.roundRect(px + 2, py - lift, this.w - 4, this.h - 4, 4);
+            ctx.fill();
+            ctx.fillStyle = '#ecfeff';
+            const cx = px + this.w * 0.5;
+            const cy = py - lift + 4;
+            ctx.beginPath();
+            if (this.kind === 'diag_right') {
+              ctx.moveTo(cx - 5, cy + 2); ctx.lineTo(cx + 6, cy - 4); ctx.lineTo(cx + 4, cy + 4);
+            } else if (this.kind === 'diag_left') {
+              ctx.moveTo(cx + 5, cy + 2); ctx.lineTo(cx - 6, cy - 4); ctx.lineTo(cx - 4, cy + 4);
+            } else {
+              ctx.moveTo(cx - 7, cy + 3); ctx.lineTo(cx, cy - 3); ctx.lineTo(cx + 7, cy + 3);
+            }
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        drawEmissive(ctx, cam) {
+          const px = Math.round(this.x - cam.x);
+          const py = Math.round(this.y - cam.y);
+          ctx.save();
+          ctx.fillStyle = this.isWall ? '#22d3ee' : (this.kind === 'up' ? '#34d399' : '#38bdf8');
+          ctx.globalAlpha = 0.85;
+          ctx.fillRect(px + 2, py + 2, this.w - 4, this.h - 4);
+          ctx.restore();
+        }
+      }
+
+      class Enemy {
+        constructor(x, y, kind = 'crawler', stage = 1, opts = {}) {
+          this.kind = kind; // 'crawler' | 'sentinel' | 'merc' | 'fly' | 'mimic' | 'drone' | 'slime' | 'mini_ember' | 'wraith'
+          this.label = kind === 'merc' ? 'Pyro Merc'
+            : kind === 'fly' ? 'Abyssal Fly'
+            : kind === 'mimic' ? 'Mimic Crate'
+            : kind === 'drone' ? 'Gravity Drone'
+            : kind === 'slime' ? 'Ember Core Slime'
+            : kind === 'mini_ember' ? 'Mini Ember'
+            : kind === 'wraith' ? 'Phase Wraith'
+            : kind === 'sentinel' ? 'Obsidian Stalker'
+            : 'Stone Beetle';
+          this.w = kind === 'mini_ember' ? 18 : (kind === 'fly' || kind === 'mimic' || kind === 'wraith') ? 28 : 30;
+          this.h = kind === 'merc' ? 32 : kind === 'wraith' ? 34 : kind === 'mini_ember' ? 16 : kind === 'sentinel' ? 28 : (kind === 'fly' || kind === 'mimic') ? 22 : 24;
+          this.x = kind === 'mini_ember' ? x : x + (TILE - this.w) * 0.5;
+          this.y = (kind === 'fly' || kind === 'drone' || kind === 'mini_ember') ? y : y + (TILE - this.h);
+          this.homeX = this.x;
+          this.homeY = this.y;
+          const stageSpeedBoost = Math.min(45, (stage - 1) * 4);
+          this.baseSpeed = (kind === 'sentinel' ? 124
+            : kind === 'fly' ? 125
+            : kind === 'mini_ember' ? 148
+            : kind === 'wraith' ? 105
+            : kind === 'mimic' ? 132
+            : kind === 'drone' ? 58
+            : kind === 'slime' ? 70
+            : kind === 'merc' ? 68
+            : 78) + stageSpeedBoost;
+          this.dir = opts.dir || -1;
+          this.vx = opts.vx || 0;
+          this.vy = opts.vy || 0;
+          this.grounded = (kind !== 'fly' && kind !== 'drone' && kind !== 'mini_ember');
           this.alive = true;
           this.squashTimer = 0;
           this.animTime = Math.random() * 10;
@@ -2084,26 +3005,227 @@
           // Enrage & Hunt AI state
           this.spottedPlayer = false;
           this.bypassTimer = 0;
-          this.enraged = false;
+          this.enraged = Boolean(opts.startEnraged) && (kind === 'crawler' || kind === 'sentinel' || kind === 'slime');
           this.smokeTimer = 0;
           this.steerCooldown = 0;
+
+          // Merc fireball telegraph state
+          this.fireCooldown = 1.1 + Math.random() * 1.1;
+          this.telegraphTimer = 0;
+          this.aimAngle = Math.PI;
+          this.buzzPlayed = false;
+
+          // Mimic state
+          this.mimicDisguise = opts.disguise || (Math.random() < 0.45 ? 'repair' : 'coins');
+          this.mimicState = 'disguised'; // 'disguised' | 'telegraph' | 'lunge'
+
+          // Gravity / Magnet Drone state
+          this.fieldMode = opts.fieldMode || (Math.random() < 0.5 ? 'pull_down' : 'reverse');
+          this.fieldRadius = 152;
+
+          // Slime / Mini-Ember hop & grace state
+          this.hopTimer = 0.4 + Math.random() * 0.6;
+          this.spawnGraceTimer = opts.spawnGrace || 0;
+
+          // Phase Wraith state (Stage 70+)
+          this.phased = kind === 'wraith';
+          this.phaseBounceCooldown = 0;
         }
 
-        update(dt, level, player, particles, onEnrage) {
+        update(dt, level, player, particles, onEnrage, onMercFire, sound) {
           if (!this.alive) {
             if (this.squashTimer > 0) this.squashTimer = Math.max(0, this.squashTimer - dt);
             return;
           }
 
           this.animTime += dt;
+          if (this.spawnGraceTimer > 0) this.spawnGraceTimer = Math.max(0, this.spawnGraceTimer - dt);
+          if (this.phaseBounceCooldown > 0) this.phaseBounceCooldown = Math.max(0, this.phaseBounceCooldown - dt);
           const ecx = this.x + this.w * 0.5;
+          const ecy = this.y + this.h * 0.5;
           const pcx = player.x + player.w * 0.5;
+          const pcy = player.y + player.h * 0.5;
           const dx = pcx - ecx;
-          const dy = player.y - this.y;
+          const dy = pcy - ecy;
           const dist = Math.hypot(dx, dy);
 
-          // Detection & Bypass -> Enrage trigger
-          if (!this.enraged) {
+          // Gravity / Magnet Drone (Stage 40+): hovers & projects pull_down / reverse field
+          if (this.kind === 'drone') {
+            this.x += this.dir * this.baseSpeed * dt;
+            if (this.x < this.homeX - 64) { this.x = this.homeX - 64; this.dir = 1; }
+            else if (this.x > this.homeX + 64) { this.x = this.homeX + 64; this.dir = -1; }
+            this.x = Math.max(12, Math.min(level.width - this.w - 12, this.x));
+            this.y = this.homeY + Math.sin(this.animTime * 2.6) * 14;
+            return;
+          }
+
+          // Phase Wraith (Stage 70+): phased head-on, materializes on bypass to ambush
+          if (this.kind === 'wraith') {
+            if (this.phased) {
+              if (player.x > this.x + this.w + 48) {
+                this.phased = false;
+                this.enraged = true;
+                this.dir = dx >= 0 ? 1 : -1;
+                if (sound) sound.wraithAmbush();
+                particles.burst(ecx, ecy, '#c084fc', 14, 180, 120, 3.5);
+                particles.popup(ecx, this.y - 10, 'WRAITH AMBUSH!', '#e879f9');
+              } else {
+                this.x += this.dir * (this.baseSpeed * 0.38) * dt;
+                if (Math.abs(this.x - this.homeX) > 48) this.dir *= -1;
+                this.y = this.homeY + Math.sin(this.animTime * 3.4) * 8;
+              }
+              return;
+            }
+            const chaseSpeed = this.baseSpeed * (level.stage >= 80 ? 1.75 : 1.5);
+            const inv = dist > 1 ? 1 / dist : 0;
+            this.x += dx * inv * chaseSpeed * dt;
+            this.y += dy * inv * chaseSpeed * 0.65 * dt + Math.sin(this.animTime * 11) * 24 * dt;
+            this.dir = dx >= 0 ? 1 : -1;
+            this.smokeTimer -= dt;
+            if (this.smokeTimer <= 0) {
+              this.smokeTimer = 0.09;
+              particles.smoke(ecx, ecy, 'rgba(192, 132, 252, 0.5)');
+            }
+            this.x = Math.max(0, Math.min(level.width - this.w, this.x));
+            this.y = Math.max(20, Math.min(level.height - 44, this.y));
+            return;
+          }
+
+          // Mimic Crate: disguised -> telegraph -> lunge!
+          if (this.kind === 'mimic') {
+            if (this.mimicState === 'disguised') {
+              if (dist < 104 && Math.abs(dy) < 76) {
+                this.mimicState = 'telegraph';
+                this.telegraphTimer = 0.42;
+                this.dir = dx >= 0 ? 1 : -1;
+                if (sound) sound.mimicTrigger();
+                particles.popup(ecx, this.y - 12, 'MIMIC!', '#f87171');
+                particles.burst(ecx, ecy, '#ef4444', 8, 120, 220, 3);
+              }
+              return;
+            }
+            if (this.mimicState === 'telegraph') {
+              this.telegraphTimer -= dt;
+              if (this.telegraphTimer <= 0) {
+                this.mimicState = 'lunge';
+                this.enraged = true;
+                this.vy = -340;
+                this.grounded = false;
+                this.dir = dx >= 0 ? 1 : -1;
+              }
+              return;
+            }
+            // Fall through into aggressive enraged-style chase when lunging!
+          }
+
+          // Mini-Ember (bounces across platforms)
+          if (this.kind === 'mini_ember') {
+            this.vy = Math.min(680, this.vy + 1350 * dt);
+            const nextX = this.x + this.dir * this.baseSpeed * dt;
+            const leadingX = this.dir > 0 ? nextX + this.w : nextX;
+            const leadCol = Math.floor(leadingX / TILE);
+            const rTop = Math.floor((this.y + 2) / TILE);
+            const rBot = Math.floor((this.y + this.h - 2) / TILE);
+            let hitWall = leadingX <= 0 || leadingX >= level.width;
+            if (!hitWall) {
+              for (let r = rTop; r <= rBot; r++) {
+                if (level.isSolid(leadCol, r)) { hitWall = true; break; }
+              }
+            }
+            if (hitWall) this.dir *= -1;
+            else this.x = nextX;
+
+            this.y += this.vy * dt;
+            const cLeft = Math.floor((this.x + 2) / TILE);
+            const cRight = Math.floor((this.x + this.w - 2) / TILE);
+            if (this.vy >= 0) {
+              const br = Math.floor((this.y + this.h) / TILE);
+              for (let c = cLeft; c <= cRight; c++) {
+                if (level.isSolid(c, br)) {
+                  this.y = br * TILE - this.h;
+                  this.vy = -305;
+                  particles.burst(ecx, this.y + this.h, '#fb923c', 3, 70, 200, 2.5);
+                  break;
+                }
+              }
+            }
+            if (this.y > level.height + 64) this.alive = false;
+            return;
+          }
+
+          // Airborne Fly Enemy (Stage 60+): hovers & locks onto player's X/Y mid-run
+          if (this.kind === 'fly') {
+            if (dist < 340) {
+              if (!this.spottedPlayer) {
+                this.spottedPlayer = true;
+                if (!this.buzzPlayed && sound) {
+                  this.buzzPlayed = true;
+                  sound.flyBuzz();
+                }
+              }
+            } else if (dist > 480) {
+              this.spottedPlayer = false;
+              this.buzzPlayed = false;
+            }
+
+            if (this.spottedPlayer) {
+              const chaseSpeed = this.baseSpeed * (level.stage >= 80 ? 1.24 : 1.06);
+              const inv = dist > 1 ? 1 / dist : 0;
+              this.x += dx * inv * chaseSpeed * dt;
+              this.y += dy * inv * chaseSpeed * dt + Math.sin(this.animTime * 9) * 28 * dt;
+              this.dir = dx >= 0 ? 1 : -1;
+            } else {
+              this.x += this.dir * (this.baseSpeed * 0.72) * dt;
+              this.y = this.homeY + Math.sin(this.animTime * 3.2) * 18;
+              if (this.x < 16 || this.x + this.w > level.width - 16 || (Math.floor(this.animTime / 2.2) % 2 === 1 && Math.abs(this.animTime % 2.2) < 0.04)) {
+                this.dir *= -1;
+              }
+            }
+            this.x = Math.max(0, Math.min(level.width - this.w, this.x));
+            this.y = Math.max(24, Math.min(level.height - 52, this.y));
+            return;
+          }
+
+          // Merc Enemy (Stage 20+): telegraphs laser sight & fires fireball toward player's trajectory
+          if (this.kind === 'merc') {
+            if (dist < 460 && Math.abs(dy) < 280) {
+              this.spottedPlayer = true;
+              this.dir = dx >= 0 ? 1 : -1;
+
+              if (this.telegraphTimer > 0) {
+                this.telegraphTimer -= dt;
+                // Track trajectory early in telegraph, lock briefly right before firing so shots are fair to dodge
+                if (this.telegraphTimer > 0.16) {
+                  const leadT = Math.min(0.42, dist / 420);
+                  const tx = pcx + player.vx * leadT * 0.45;
+                  const ty = pcy + player.vy * leadT * 0.25;
+                  this.aimAngle = Math.atan2(ty - (this.y + 13), tx - ecx);
+                }
+                if (this.telegraphTimer <= 0) {
+                  const speed = 355 + Math.min(90, Math.max(0, level.stage - 20) * 2);
+                  const muzzleX = ecx + Math.cos(this.aimAngle) * 16;
+                  const muzzleY = this.y + 13 + Math.sin(this.aimAngle) * 16;
+                  if (onMercFire) {
+                    onMercFire(muzzleX, muzzleY, Math.cos(this.aimAngle) * speed, Math.sin(this.aimAngle) * speed);
+                  }
+                  this.fireCooldown = Math.max(1.25, 2.25 - Math.max(0, level.stage - 20) * 0.015);
+                }
+                return;
+              }
+
+              this.fireCooldown -= dt;
+              if (this.fireCooldown <= 0) {
+                this.telegraphTimer = 0.62;
+                this.aimAngle = Math.atan2(pcy - (this.y + 13), pcx - ecx);
+                return;
+              }
+            } else {
+              this.telegraphTimer = 0;
+            }
+          }
+
+          // Detection & Bypass -> Enrage trigger (ground patrols & enraged hunters)
+          if (!this.enraged && this.kind !== 'merc' && this.kind !== 'mimic') {
             if (dist < 260 && Math.abs(dy) < 190) {
               this.spottedPlayer = true;
             }
@@ -2122,14 +3244,15 @@
             }
           }
 
-          const speed = this.enraged ? this.baseSpeed * 1.6 : this.baseSpeed;
+          const enrageMult = level.stage >= 80 ? 1.95 : 1.6;
+          const speed = this.enraged ? this.baseSpeed * enrageMult : this.baseSpeed;
 
           if (this.enraged) {
-            // Relentless hunting + continuous smoke particles
+            // Relentless hunting + continuous smoke particles (Phantom Stalker overcharge at Stage 80+)
             this.smokeTimer -= dt;
             if (this.smokeTimer <= 0) {
               this.smokeTimer = 0.08;
-              particles.smoke(ecx, this.y + 4);
+              particles.smoke(ecx, this.y + 4, level.stage >= 80 ? 'rgba(168, 85, 247, 0.55)' : 'rgba(239, 68, 68, 0.5)');
             }
 
             this.steerCooldown -= dt;
@@ -2252,7 +3375,7 @@
           }
         }
 
-        draw(ctx, cam, isArmored) {
+        draw(ctx, cam, isArmored, stage = 1) {
           if (!this.alive && this.squashTimer <= 0) return;
 
           const px = this.x - cam.x;
@@ -2266,12 +3389,272 @@
             ctx.translate(-(px + this.w * 0.5), -(py + this.h));
           }
 
-          // Enraged red glow aura
+          // Gravity / Magnet Drone rendering
+          if (this.kind === 'drone') {
+            const cx = px + this.w * 0.5;
+            const cy = py + this.h * 0.5;
+            const isReverse = this.fieldMode === 'reverse';
+            const col = isReverse ? 'rgba(56, 189, 248,' : 'rgba(249, 115, 22,';
+            if (this.alive) {
+              // Visible gravity/magnet field rings & directional arrows
+              for (let i = 0; i < 2; i++) {
+                const phase = ((this.animTime * 0.9 + i * 0.5) % 1);
+                const rad = 28 + phase * (this.fieldRadius - 28);
+                ctx.strokeStyle = `${col} ${(1 - phase) * 0.34})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(cx, cy, rad, 0, Math.PI * 2);
+                ctx.stroke();
+              }
+              ctx.strokeStyle = `${col} 0.42)`;
+              ctx.lineWidth = 2;
+              const arrowDir = isReverse ? -1 : 1;
+              for (let a = -1; a <= 1; a += 2) {
+                const ax = cx + a * 38;
+                const ay = cy + ((this.animTime * 48 * arrowDir) % 36);
+                ctx.beginPath();
+                ctx.moveTo(ax - 5, ay - arrowDir * 4);
+                ctx.lineTo(ax, ay + arrowDir * 4);
+                ctx.lineTo(ax + 5, ay - arrowDir * 4);
+                ctx.stroke();
+              }
+            }
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = isReverse ? '#38bdf8' : '#fb923c';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(px + 2, py + 4, this.w - 4, this.h - 8, 6);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = isReverse ? '#7dd3fc' : '#fde047';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5 + Math.sin(this.animTime * 12) * 1.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            return;
+          }
+
+          // Phase Wraith rendering
+          if (this.kind === 'wraith') {
+            const cx = px + this.w * 0.5;
+            const cy = py + this.h * 0.5;
+            if (this.alive) {
+              ctx.globalAlpha = this.phased ? 0.32 + Math.sin(this.animTime * 7) * 0.08 : 0.95;
+            }
+            ctx.fillStyle = this.phased ? '#6366f1' : '#9333ea';
+            ctx.beginPath();
+            ctx.moveTo(cx, py + 2);
+            ctx.quadraticCurveTo(px + this.w, py + 8, px + this.w - 2, py + this.h);
+            ctx.lineTo(cx + 5, py + this.h - 5);
+            ctx.lineTo(cx, py + this.h);
+            ctx.lineTo(cx - 5, py + this.h - 5);
+            ctx.lineTo(px + 2, py + this.h);
+            ctx.quadraticCurveTo(px, py + 8, cx, py + 2);
+            ctx.fill();
+            ctx.fillStyle = this.phased ? '#a5f3fc' : '#f43f5e';
+            const eyeShift = this.dir * 3;
+            ctx.fillRect(cx - 5 + eyeShift, py + 11, 3, 4);
+            ctx.fillRect(cx + 2 + eyeShift, py + 11, 3, 4);
+            ctx.restore();
+            return;
+          }
+
+          // Mimic Crate rendering
+          if (this.kind === 'mimic') {
+            const cx = px + this.w * 0.5;
+            const cy = py + this.h * 0.5;
+            if (this.mimicState === 'disguised') {
+              const isRepair = this.mimicDisguise === 'repair';
+              ctx.fillStyle = '#0f172a';
+              ctx.strokeStyle = isRepair ? '#34d399' : '#fbbf24';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.roundRect(px + 2, py + 2, this.w - 4, this.h - 4, 4);
+              ctx.fill();
+              ctx.stroke();
+              ctx.fillStyle = isRepair ? '#34d399' : '#fbbf24';
+              if (isRepair) {
+                ctx.fillRect(cx - 2, py + 5, 4, 12);
+                ctx.fillRect(cx - 6, cy - 2, 12, 4);
+              } else {
+                ctx.beginPath();
+                ctx.arc(cx - 4, cy, 4, 0, Math.PI * 2);
+                ctx.arc(cx + 4, cy, 4, 0, Math.PI * 2);
+                ctx.fill();
+              }
+              if (Math.sin(this.animTime * 4.5) > 0.92) {
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(cx - 3, py + 4, 6, 2);
+              }
+            } else {
+              const jitter = this.mimicState === 'telegraph' ? (Math.random() - 0.5) * 4 : 0;
+              ctx.strokeStyle = '#ef4444';
+              ctx.lineWidth = 2.5;
+              const leg = Math.sin(this.animTime * 22) * 4;
+              ctx.beginPath();
+              ctx.moveTo(px + 4, py + this.h - 3); ctx.lineTo(px - 2, py + this.h + leg * 0.4);
+              ctx.moveTo(px + this.w - 4, py + this.h - 3); ctx.lineTo(px + this.w + 2, py + this.h - leg * 0.4);
+              ctx.stroke();
+              ctx.fillStyle = '#7f1d1d';
+              ctx.strokeStyle = '#f87171';
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.roundRect(px + 2 + jitter, py + 2, this.w - 4, this.h - 5, 4);
+              ctx.fill();
+              ctx.stroke();
+              // Jagged jaw & glowing eyes
+              ctx.fillStyle = '#fef08a';
+              for (let t = 0; t < 3; t++) {
+                const tx = px + 6 + t * 6 + jitter;
+                ctx.fillRect(tx, py + 12, 3, 4);
+              }
+              ctx.fillStyle = '#fbbf24';
+              ctx.fillRect(cx - 6 + jitter, py + 6, 4, 3);
+              ctx.fillRect(cx + 2 + jitter, py + 6, 4, 3);
+            }
+            ctx.restore();
+            return;
+          }
+
+          // Splitter Slime & Mini-Ember rendering
+          if (this.kind === 'slime' || this.kind === 'mini_ember') {
+            const cx = px + this.w * 0.5;
+            const cy = py + this.h * 0.55;
+            const wobble = Math.sin(this.animTime * 10) * 1.6;
+            ctx.fillStyle = this.kind === 'mini_ember' ? '#f97316' : (this.enraged ? '#dc2626' : '#ea580c');
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, this.w * 0.48 + wobble, this.h * 0.44 - wobble * 0.6, 0, Math.PI, 0);
+            ctx.lineTo(px + this.w - 1, py + this.h);
+            ctx.lineTo(px + 1, py + this.h);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.arc(cx, cy + 2, this.kind === 'mini_ember' ? 3.5 : 5.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(cx + this.dir * 3 - 2, cy - 2, 2.5, 3);
+            ctx.restore();
+            return;
+          }
+
+          // Airborne Fly Enemy rendering
+          if (this.kind === 'fly') {
+            const cx = px + this.w * 0.5;
+            const cy = py + this.h * 0.5;
+            const flap = Math.sin(this.animTime * 42) * 7;
+
+            if (this.spottedPlayer && this.alive) {
+              const aura = ctx.createRadialGradient(cx, cy, 3, cx, cy, 22);
+              aura.addColorStop(0, 'rgba(244, 63, 94, 0.45)');
+              aura.addColorStop(1, 'rgba(244, 63, 94, 0)');
+              ctx.fillStyle = aura;
+              ctx.beginPath();
+              ctx.arc(cx, cy, 22, 0, Math.PI * 2);
+              ctx.fill();
+            }
+
+            // Buzzing translucent wings
+            ctx.fillStyle = 'rgba(224, 242, 254, 0.65)';
+            ctx.beginPath();
+            ctx.ellipse(cx - 5, cy - 8 - flap * 0.4, 9, 4.5, -0.35, 0, Math.PI * 2);
+            ctx.ellipse(cx + 5, cy - 8 + flap * 0.4, 9, 4.5, 0.35, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Armored carapace
+            ctx.fillStyle = isArmored ? '#94a3b8' : (this.spottedPlayer ? '#9f1239' : '#581c87');
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, 12, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Stinger
+            ctx.fillStyle = '#fde047';
+            ctx.beginPath();
+            ctx.moveTo(cx - this.dir * 10, cy);
+            ctx.lineTo(cx - this.dir * 17, cy + 3);
+            ctx.lineTo(cx - this.dir * 10, cy + 4);
+            ctx.fill();
+
+            // Compound eye
+            ctx.fillStyle = this.spottedPlayer ? '#fb7185' : '#38bdf8';
+            ctx.beginPath();
+            ctx.arc(cx + this.dir * 6, cy - 1, 3.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            return;
+          }
+
+          // Armed Pyro Merc Enemy rendering
+          if (this.kind === 'merc') {
+            const cx = px + this.w * 0.5;
+            const gunY = py + 13;
+
+            // Laser-sight telegraph before firing
+            if (this.alive && this.telegraphTimer > 0) {
+              const flash = this.telegraphTimer < 0.18 ? 0.95 : 0.55 + 0.35 * Math.sin(this.animTime * 36);
+              ctx.save();
+              ctx.strokeStyle = `rgba(249, 115, 22, ${flash})`;
+              ctx.lineWidth = this.telegraphTimer < 0.18 ? 2.5 : 1.5;
+              ctx.setLineDash([7, 5]);
+              ctx.beginPath();
+              ctx.moveTo(cx + Math.cos(this.aimAngle) * 14, gunY + Math.sin(this.aimAngle) * 14);
+              ctx.lineTo(cx + Math.cos(this.aimAngle) * 340, gunY + Math.sin(this.aimAngle) * 340);
+              ctx.stroke();
+              ctx.setLineDash([]);
+
+              // Muzzle charge glow
+              const mx = cx + Math.cos(this.aimAngle) * 16;
+              const my = gunY + Math.sin(this.aimAngle) * 16;
+              ctx.fillStyle = '#fef08a';
+              ctx.beginPath();
+              ctx.arc(mx, my, 4 + (1 - this.telegraphTimer) * 3, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+
+            // Legs
+            const stride = this.telegraphTimer > 0 ? 0 : Math.sin(this.animTime * 11) * 4;
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(px + 6 + stride * 0.4, py + this.h - 9, 5, 9);
+            ctx.fillRect(px + this.w - 11 - stride * 0.4, py + this.h - 9, 5, 9);
+
+            // Tactical armor torso
+            ctx.fillStyle = isArmored ? '#64748b' : '#334155';
+            ctx.beginPath();
+            ctx.roundRect(px + 4, py + 10, this.w - 8, 15, 4);
+            ctx.fill();
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(px + 5, py + 13, this.w - 10, 3);
+
+            // Helmet + Crimson Visor
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath();
+            ctx.roundRect(px + 5, py + 1, this.w - 10, 11, 5);
+            ctx.fill();
+            ctx.fillStyle = this.telegraphTimer > 0 ? '#fef08a' : '#f97316';
+            ctx.fillRect(this.dir > 0 ? px + 14 : px + 7, py + 4, 9, 3.5);
+
+            // Aimed Fire-Lance Launcher
+            ctx.save();
+            ctx.translate(cx, gunY);
+            ctx.rotate(this.aimAngle);
+            ctx.fillStyle = '#cbd5e1';
+            ctx.fillRect(0, -2.5, 17, 5);
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(12, -3.5, 5, 7);
+            ctx.restore();
+
+            ctx.restore();
+            return;
+          }
+
+          // Enraged red/phantom aura
           if (this.enraged && this.alive) {
+            const isPhantom = stage >= 80;
             const pulse = 24 + Math.sin(this.animTime * 14) * 5;
             const glow = ctx.createRadialGradient(px + this.w * 0.5, py + this.h * 0.5, 4, px + this.w * 0.5, py + this.h * 0.5, pulse);
-            glow.addColorStop(0, 'rgba(239, 68, 68, 0.55)');
-            glow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            glow.addColorStop(0, isPhantom ? 'rgba(168, 85, 247, 0.62)' : 'rgba(239, 68, 68, 0.55)');
+            glow.addColorStop(1, isPhantom ? 'rgba(168, 85, 247, 0)' : 'rgba(239, 68, 68, 0)');
             ctx.fillStyle = glow;
             ctx.beginPath();
             ctx.arc(px + this.w * 0.5, py + this.h * 0.5, pulse, 0, Math.PI * 2);
@@ -2279,8 +3662,8 @@
           }
 
           const isSentinel = this.kind === 'sentinel';
-          const shellColor = this.enraged ? '#b91c1c' : (isSentinel ? '#7f1d1d' : '#475569');
-          const shellHighlight = this.enraged ? '#f87171' : (isSentinel ? '#ef4444' : '#94a3b8');
+          const shellColor = this.enraged ? (stage >= 80 ? '#7e22ce' : '#b91c1c') : (isSentinel ? '#7f1d1d' : '#475569');
+          const shellHighlight = this.enraged ? (stage >= 80 ? '#c084fc' : '#f87171') : (isSentinel ? '#ef4444' : '#94a3b8');
           const eyeColor = this.enraged ? '#fef08a' : (isSentinel ? '#fde047' : '#38bdf8');
 
           const legSwing = Math.sin(this.animTime * (this.enraged ? 24 : isSentinel ? 18 : 12)) * 3.5;
@@ -2333,16 +3716,69 @@
 
           ctx.restore();
         }
+
+        drawEmissive(ctx, cam, time) {
+          if (!this.alive) return;
+          const px = this.x - cam.x;
+          const py = this.y - cam.y;
+          const cx = px + this.w * 0.5;
+          const cy = py + this.h * 0.5;
+          ctx.save();
+          if (this.kind === 'merc') {
+            ctx.fillStyle = this.telegraphTimer > 0 ? '#fef08a' : '#f97316';
+            ctx.fillRect(this.dir > 0 ? px + 14 : px + 7, py + 4, 9, 3.5);
+            if (this.telegraphTimer > 0) {
+              ctx.strokeStyle = 'rgba(249, 115, 22, 0.85)';
+              ctx.lineWidth = 2;
+              ctx.setLineDash([7, 5]);
+              ctx.beginPath();
+              ctx.moveTo(cx + Math.cos(this.aimAngle) * 14, py + 13 + Math.sin(this.aimAngle) * 14);
+              ctx.lineTo(cx + Math.cos(this.aimAngle) * 280, py + 13 + Math.sin(this.aimAngle) * 280);
+              ctx.stroke();
+            }
+          } else if (this.kind === 'fly') {
+            ctx.fillStyle = this.spottedPlayer ? '#fb7185' : '#38bdf8';
+            ctx.beginPath();
+            ctx.arc(cx + this.dir * 6, cy - 1, 4, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (this.kind === 'drone') {
+            const isReverse = this.fieldMode === 'reverse';
+            ctx.fillStyle = isReverse ? '#7dd3fc' : '#fb923c';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (this.kind === 'slime' || this.kind === 'mini_ember') {
+            ctx.fillStyle = '#fef08a';
+            ctx.beginPath();
+            ctx.arc(cx, cy + 2, this.kind === 'mini_ember' ? 3.5 : 5.5, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (this.kind === 'wraith') {
+            ctx.fillStyle = this.phased ? '#a5f3fc' : '#f43f5e';
+            ctx.fillRect(cx - 5 + this.dir * 3, py + 11, 3, 4);
+            ctx.fillRect(cx + 2 + this.dir * 3, py + 11, 3, 4);
+          } else if (this.kind === 'mimic' && this.mimicState !== 'disguised') {
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(cx - 6, py + 6, 4, 3);
+            ctx.fillRect(cx + 2, py + 6, 4, 3);
+          } else {
+            const eyeX = this.dir > 0 ? px + this.w - 10 : px + 5;
+            ctx.fillStyle = this.enraged ? '#fef08a' : (this.kind === 'sentinel' ? '#fde047' : '#38bdf8');
+            ctx.beginPath();
+            ctx.arc(eyeX + 2.5, py + 14, this.enraged ? 4 : 3.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
       }
 
       class Collectible {
         constructor(x, y, kind = 'coin') {
-          this.kind = kind; // 'coin' | 'gem' | 'gun'
+          this.kind = kind; // 'coin' | 'gem' | 'gun' | 'repair'
           this.x = x + TILE * 0.5;
           this.y = y + TILE * 0.5;
           this.vx = 0;
           this.vy = 0;
-          this.radius = kind === 'gem' ? 11 : kind === 'gun' ? 13 : 9;
+          this.radius = kind === 'gem' ? 11 : (kind === 'gun' || kind === 'repair') ? 13 : 9;
           this.collected = false;
           this.phase = x * 0.05;
         }
@@ -2354,6 +3790,31 @@
           const cy = this.y + bob - cam.y;
 
           ctx.save();
+
+          if (this.kind === 'repair') {
+            const glow = ctx.createRadialGradient(cx, cy, 4, cx, cy, 28);
+            glow.addColorStop(0, 'rgba(16, 185, 129, 0.52)');
+            glow.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#34d399';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - 12, cy - 9, 24, 18, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            // Wrench / repair cross icon
+            ctx.fillStyle = '#34d399';
+            ctx.fillRect(cx - 2, cy - 6, 4, 12);
+            ctx.fillRect(cx - 6, cy - 2, 12, 4);
+            ctx.restore();
+            return;
+          }
 
           if (this.kind === 'gun') {
             // Rare Volatile Carbine Crate Pickup
@@ -2542,7 +4003,12 @@
       class LevelGenerator {
         static getPreview(stage, seed) {
           const rng = new RNG(seed + stage * 7919);
-          const biome = BIOMES[(stage - 1 + rng.int(0, 1)) % BIOMES.length];
+          let biome;
+          if (stage >= 20 && (stage === 20 || rng.next() < 0.34)) {
+            biome = LAVA_DOME_BIOME;
+          } else {
+            biome = BIOMES[(stage - 1 + rng.int(0, 1)) % BIOMES.length];
+          }
           let modifier = MODIFIERS.STANDARD;
           if (stage >= 4 && stage % 4 === 0) {
             modifier = MODIFIERS.SHOWDOWN;
@@ -2555,27 +4021,34 @@
           return { biome, modifier };
         }
 
-        static generate(stage, seed) {
+        static generate(stage, seed, bountyId = 'NONE') {
           const rng = new RNG(seed + stage * 7919);
           const { biome, modifier } = LevelGenerator.getPreview(stage, seed);
+          const bounty = BOUNTIES[bountyId] || BOUNTIES.NONE;
+          const isLavaDome = Boolean(biome.isLavaDome);
+          const doubleHazards = bounty.id === 'DOUBLE_HAZARDS';
+          const startEnraged = bounty.id === 'START_ENRAGED';
 
           const cols = Math.min(118, 66 + (stage - 1) * 8);
           const grid = Array.from({ length: MAP_ROWS }, () => Array(cols).fill('.'));
           const movingPlatforms = [];
+          const crumblePlatforms = [];
+          const bouncePads = [];
           const collectibles = [];
           const enemies = [];
           const checkpoints = [];
 
           const fillGround = (cStart, cEnd, topRow) => {
+            const maxRow = isLavaDome ? Math.min(MAP_ROWS - 2, topRow + 2) : MAP_ROWS;
             for (let c = cStart; c <= cEnd && c < cols; c++) {
-              for (let r = topRow; r < MAP_ROWS; r++) {
+              for (let r = topRow; r < maxRow; r++) {
                 grid[r][c] = '#';
               }
             }
           };
 
           // Safe starting platform (cols 0..7)
-          let curRow = 12;
+          let curRow = isLavaDome ? 10 : 12;
           fillGround(0, 7, curRow);
           const spawn = { x: 2 * TILE + 7, y: (curRow - 1) * TILE + 6 };
           collectibles.push(new Collectible(5 * TILE, (curRow - 2) * TILE, 'coin'));
@@ -2584,52 +4057,81 @@
           let col = 8;
           let checkpointPlaced = false;
           let gunCratePlaced = false;
+          let repairCratePlaced = false;
 
           while (col < cols - 12) {
-            // Decide gap type (bridged chasm vs direct jumpable pit)
-            const chasmChance = Math.min(0.42, 0.18 + (stage - 1) * 0.04);
+            const chasmChance = isLavaDome ? 0.54 : Math.min(0.44, 0.2 + (stage - 1) * 0.04);
             const useChasm = rng.chance(chasmChance) && col < cols - 20;
 
             if (useChasm) {
               const gapCols = rng.int(6, Math.min(9, 6 + Math.floor(stage / 2)));
               const gapStart = col;
               const gapEnd = col + gapCols;
-              const nextRow = Math.max(9, Math.min(12, curRow + rng.int(-2, 2)));
+              const nextRow = Math.max(8, Math.min(isLavaDome ? 10 : 12, curRow + rng.int(-2, 2)));
 
-              const platW = 96;
-              const platStartY = (curRow - 0.5) * TILE;
-              const platEndY = (nextRow - 0.5) * TILE;
-              movingPlatforms.push(new MovingPlatform({
-                startX: (gapStart + 0.35) * TILE,
-                startY: platStartY,
-                endX: (gapEnd - 0.35) * TILE - platW,
-                endY: platEndY,
-                w: platW,
-                h: 18,
-                speed: 95 + Math.min(55, stage * 8)
-              }));
+              const bridgeChance = isLavaDome ? 0.58 : (stage >= 3 ? 0.44 : 0);
+              if (rng.chance(bridgeChance)) {
+                // Multi-plank Crumbling Bridge across chasm / molten lava
+                const plankCount = Math.min(4, Math.max(2, Math.floor(gapCols / 2)));
+                const plankW = Math.max(54, Math.floor(((gapCols - 0.6) * TILE) / plankCount) - 8);
+                for (let s = 0; s < plankCount; s++) {
+                  const frac = (s + 0.5) / plankCount;
+                  const sx = (gapStart + 0.3) * TILE + s * (plankW + 8);
+                  const sy = (curRow + (nextRow - curRow) * frac - 0.1) * TILE;
+                  crumblePlatforms.push(new CrumblePlatform(sx, sy, plankW, 18));
+                  if (s === 0 || s === plankCount - 1) {
+                    collectibles.push(new Collectible(sx + plankW * 0.3, sy - TILE, s === 0 && stage >= 2 ? 'gem' : 'coin'));
+                  }
+                }
+              } else {
+                const platW = 96;
+                const platStartY = (curRow - 0.5) * TILE;
+                const platEndY = (nextRow - 0.5) * TILE;
+                movingPlatforms.push(new MovingPlatform({
+                  startX: (gapStart + 0.35) * TILE,
+                  startY: platStartY,
+                  endX: (gapEnd - 0.35) * TILE - platW,
+                  endY: platEndY,
+                  w: platW,
+                  h: 18,
+                  speed: 95 + Math.min(60, stage * 3)
+                }));
 
-              // Arc of coins over the moving platform
-              const midC = Math.floor((gapStart + gapEnd) * 0.5);
-              const arcR = Math.min(curRow, nextRow) - 2;
-              collectibles.push(new Collectible((midC - 1) * TILE, arcR * TILE, 'coin'));
-              collectibles.push(new Collectible(midC * TILE, (arcR - 1) * TILE, stage >= 2 ? 'gem' : 'coin'));
-              collectibles.push(new Collectible((midC + 1) * TILE, arcR * TILE, 'coin'));
+                const midC = Math.floor((gapStart + gapEnd) * 0.5);
+                const arcR = Math.min(curRow, nextRow) - 2;
+                collectibles.push(new Collectible((midC - 1) * TILE, arcR * TILE, 'coin'));
+                collectibles.push(new Collectible(midC * TILE, (arcR - 1) * TILE, stage >= 2 ? 'gem' : 'coin'));
+                collectibles.push(new Collectible((midC + 1) * TILE, arcR * TILE, 'coin'));
+              }
+
+              // Gravity / Magnet Drone hovering above chasms on Stage 40+
+              if (stage >= 40 && rng.chance(doubleHazards ? 0.65 : 0.45)) {
+                const droneCol = Math.floor((gapStart + gapEnd) * 0.5);
+                const droneY = Math.max(2.6 * TILE, (Math.min(curRow, nextRow) - 3.6) * TILE);
+                enemies.push(new Enemy(droneCol * TILE, droneY, 'drone', stage, {
+                  fieldMode: rng.chance(0.5) ? 'pull_down' : 'reverse'
+                }));
+              }
+
+              // Airborne Fly enemy patrolling above chasms on Stage 60+
+              if (stage >= 60 && rng.chance(0.62)) {
+                const flyCol = Math.floor((gapStart + gapEnd) * 0.5);
+                const flyY = Math.max(2.5 * TILE, (Math.min(curRow, nextRow) - 4) * TILE);
+                enemies.push(new Enemy(flyCol * TILE, flyY, 'fly', stage));
+              }
 
               col = gapEnd;
               curRow = nextRow;
             } else {
-              // Direct jumpable gap constrained by exact jump physics
               const maxGap = stage === 1 ? 3 : 4;
               const gapCols = rng.int(2, maxGap);
 
-              // Climb constraint: 2 rows up only for <=2 gap, 1 row up for 3 gap, 0 up for 4 gap
               let minNextRow = curRow;
-              if (gapCols <= 2) minNextRow = Math.max(8, curRow - 2);
-              else if (gapCols === 3) minNextRow = Math.max(8, curRow - 1);
-              const nextRow = rng.int(minNextRow, 12);
+              if (gapCols <= 2) minNextRow = Math.max(7, curRow - 2);
+              else if (gapCols === 3) minNextRow = Math.max(7, curRow - 1);
+              const maxRowBound = isLavaDome ? 10 : 12;
+              const nextRow = rng.int(Math.min(minNextRow, maxRowBound), maxRowBound);
 
-              // Optional coins over pit
               if (rng.chance(0.55)) {
                 const midC = col + Math.floor(gapCols * 0.5);
                 collectibles.push(new Collectible(midC * TILE, (Math.min(curRow, nextRow) - 2) * TILE, 'coin'));
@@ -2646,39 +4148,60 @@
             fillGround(segStart, segEnd, curRow);
             const actualLen = segEnd - segStart + 1;
 
-            // Place midpoint checkpoint on safe interior tile
+            // Midpoint checkpoint or interior enemies/hazards
             if (!checkpointPlaced && segStart >= cols * 0.45 && actualLen >= 5) {
               checkpoints.push(new Checkpoint(segStart + 2, curRow - 1));
               checkpointPlaced = true;
             } else if (actualLen >= 6) {
-              // Interior hazards & enemies (never on first or last tile of segment!)
               const isShowdown = modifier.id === 'SHOWDOWN';
-              const enemyChance = isShowdown ? 0.92 : Math.min(0.82, 0.48 + (stage - 1) * 0.07);
+              const enemyChance = (isShowdown || doubleHazards) ? 0.94 : Math.min(0.86, 0.48 + (stage - 1) * 0.04);
               const enemyCol = segStart + Math.floor(actualLen * 0.5);
               let hasEnemy = false;
 
               if (rng.chance(enemyChance)) {
-                const fastChance = Math.min(0.75, Math.max(0, (stage - 2) * 0.16) + (isShowdown ? 0.28 : 0));
-                const kind = rng.chance(fastChance) ? 'sentinel' : 'crawler';
-                enemies.push(new Enemy(enemyCol * TILE, (curRow - 1) * TILE, kind, stage));
+                let kind = 'crawler';
+                if (stage >= 70 && rng.chance(0.28)) {
+                  kind = 'wraith';
+                } else if (stage >= 20 && rng.chance(isLavaDome ? 0.5 : (doubleHazards ? 0.48 : 0.34))) {
+                  kind = 'merc';
+                } else if (stage >= 2 && rng.chance(0.26)) {
+                  kind = 'slime';
+                } else {
+                  const fastChance = Math.min(0.75, Math.max(0, (stage - 2) * 0.16) + (isShowdown ? 0.28 : 0));
+                  kind = rng.chance(fastChance) ? 'sentinel' : 'crawler';
+                }
+                enemies.push(new Enemy(enemyCol * TILE, (curRow - 1) * TILE, kind, stage, { startEnraged }));
                 hasEnemy = true;
               }
 
+              // Extra Merc / Slime under Double Hazards bounty
+              if (doubleHazards && actualLen >= 8 && rng.chance(0.65)) {
+                const extraCol = segEnd - 2;
+                if (Math.abs(extraCol - enemyCol) >= 2) {
+                  enemies.push(new Enemy(extraCol * TILE, (curRow - 1) * TILE, stage >= 20 ? 'merc' : 'slime', stage, { startEnraged }));
+                }
+              }
+
+              // Extra mid-air Fly patrol over longer Stage 60+ segments
+              if (stage >= 60 && rng.chance(0.36)) {
+                enemies.push(new Enemy((segStart + 1) * TILE, Math.max(2 * TILE, (curRow - 4) * TILE), 'fly', stage));
+              }
+
               // Place spikes away from enemy & away from takeoff/landing edges
-              const spikeChance = Math.min(0.65, 0.25 + (stage - 1) * 0.08);
+              const spikeChance = doubleHazards ? 0.88 : Math.min(0.65, 0.25 + (stage - 1) * 0.06);
               if (rng.chance(spikeChance)) {
                 const sCol = hasEnemy ? segStart + 2 : enemyCol;
                 if (sCol > segStart && sCol < segEnd && (!hasEnemy || Math.abs(sCol - enemyCol) >= 2)) {
                   grid[curRow - 1][sCol] = '^';
-                  if (stage >= 2 && sCol + 1 < segEnd && (!hasEnemy || Math.abs(sCol + 1 - enemyCol) >= 2) && rng.chance(0.4)) {
+                  if ((stage >= 2 || doubleHazards) && sCol + 1 < segEnd && (!hasEnemy || Math.abs(sCol + 1 - enemyCol) >= 2) && rng.chance(doubleHazards ? 0.85 : 0.4)) {
                     grid[curRow - 1][sCol + 1] = '^';
                   }
                 }
               }
             }
 
-            // High-risk elevated bonus platform (always 2 tiles = 80px above segment floor)
-            if (actualLen >= 6 && curRow >= 9 && rng.chance(0.55)) {
+            // High-risk elevated bonus platform + BouncePad / Mimic Crate / Boost Wall
+            if (actualLen >= 6 && curRow >= 8 && rng.chance(0.58)) {
               const platRow = curRow - 2;
               const pStart = segStart + 1;
               const pEnd = Math.min(segEnd - 1, pStart + rng.int(2, 3));
@@ -2687,10 +4210,32 @@
               }
               const midP = Math.floor((pStart + pEnd) * 0.5);
 
-              // Rare hidden Volatile Gun Crate in high-risk bonus alcoves
-              if (!gunCratePlaced && rng.chance(0.24)) {
+              // Bounce / Ricochet pad before or on segment for vertical climb & speed routing
+              if (rng.chance(0.48) && grid[curRow - 1][segStart + 1] === '.' && pStart > segStart) {
+                const padKind = rng.chance(0.55) ? 'up' : 'diag_right';
+                bouncePads.push(new BouncePad((segStart + 0.1) * TILE + 3, curRow * TILE - 12, padKind));
+              }
+
+              // Optional vertical boost wall mounted at elevated end
+              if (stage >= 2 && platRow >= 6 && rng.chance(0.35)) {
+                grid[platRow - 1][pEnd] = '#';
+                grid[platRow - 2][pEnd] = '#';
+                bouncePads.push(new BouncePad(pEnd * TILE - 14, (platRow - 2) * TILE + 2, 'wall_right'));
+                collectibles.push(new Collectible((pEnd - 1) * TILE, (platRow - 3) * TILE, 'gem'));
+              }
+
+              // Rare Repair Kit, Gun Crate, or disguised Mimic Crate on Stage 3+
+              if (stage >= 20 && !repairCratePlaced && rng.chance(isLavaDome ? 0.45 : 0.28)) {
+                collectibles.push(new Collectible(midP * TILE, (platRow - 1) * TILE, 'repair'));
+                repairCratePlaced = true;
+              } else if (!gunCratePlaced && rng.chance(startEnraged ? 0.75 : 0.24)) {
                 collectibles.push(new Collectible(midP * TILE, (platRow - 1) * TILE, 'gun'));
                 gunCratePlaced = true;
+              } else if ((stage >= 3 || isLavaDome) && rng.chance(doubleHazards ? 0.42 : 0.25)) {
+                enemies.push(new Enemy(midP * TILE, (platRow - 1) * TILE, 'mimic', stage, {
+                  disguise: rng.chance(0.45) ? 'repair' : 'coins'
+                }));
+                collectibles.push(new Collectible(pStart * TILE, (platRow - 1) * TILE, 'gem'));
               } else {
                 collectibles.push(new Collectible(pStart * TILE, (platRow - 1) * TILE, modifier.id === 'SHOWDOWN' ? 'gem' : 'coin'));
                 collectibles.push(new Collectible(midP * TILE, (platRow - 1) * TILE, 'gem'));
@@ -2698,6 +4243,8 @@
                   collectibles.push(new Collectible(pEnd * TILE, (platRow - 1) * TILE, 'coin'));
                 }
               }
+            } else if (actualLen >= 5 && rng.chance(0.32) && grid[curRow - 1][segEnd - 1] === '.') {
+              bouncePads.push(new BouncePad((segEnd - 1) * TILE + 3, curRow * TILE - 12, 'diag_right'));
             } else if (actualLen >= 4 && rng.chance(0.5)) {
               collectibles.push(new Collectible((segStart + 1) * TILE, (curRow - 2) * TILE, 'coin'));
             }
@@ -2708,7 +4255,7 @@
           // Final Summit Portal Segment
           const endGap = Math.min(3, Math.max(2, cols - 7 - col));
           const portalStart = col + endGap;
-          const finalRow = Math.max(8, curRow - 1);
+          const finalRow = Math.max(7, Math.min(isLavaDome ? 10 : 12, curRow - 1));
           fillGround(portalStart, cols - 1, finalRow);
           const portalCol = Math.min(cols - 3, portalStart + 3);
           const portal = new Portal(portalCol, finalRow - 1);
@@ -2718,6 +4265,11 @@
             seed,
             name: biome.name,
             theme: biome,
+            isLavaDome,
+            lavaY: WORLD_H - 34,
+            voidCollapse: stage >= 80,
+            hasBlackout: stage >= 8,
+            bountyId: bounty.id,
             modifier,
             rows: MAP_ROWS,
             cols,
@@ -2727,6 +4279,8 @@
             spawn,
             activeSpawn: { ...spawn },
             movingPlatforms,
+            crumblePlatforms,
+            bouncePads,
             collectibles,
             enemies,
             checkpoints,
@@ -2758,6 +4312,10 @@
             ammo: 0,
             maxAmmo: 6
           };
+          this.jetpackJammed = false;
+          this.empFlickerTimer = 0;
+          this.jamSmokeTimer = 0;
+          this.noDoubleJumpCurse = false;
           this.reset(x, y);
         }
 
@@ -2777,6 +4335,10 @@
           this.invulnTimer = 0;
           this.shootCooldown = 0;
           this.jetpacking = false;
+          this.empFlickerTimer = 0;
+          this.airCombo = 0;
+          this.feverTimer = 0;
+          this.bounceLockTimer = 0;
           this.maxFuel = 1.0 + Math.max(0, this.upgrades.jetpackTier - 1) * 0.55;
           this.fuel = this.maxFuel;
           this.scaleX = 1;
@@ -2791,7 +4353,7 @@
           this.fuel = this.maxFuel;
         }
 
-        update(dt, input, level, particles, sound, cam, time, onShoot, autoRun = false) {
+        update(dt, input, level, particles, sound, cam, time, onShoot, autoRun = false, droneAccelY = 0) {
           this.prevBottom = this.y + this.h;
           this.maxFuel = 1.0 + Math.max(0, this.upgrades.jetpackTier - 1) * 0.55;
 
@@ -2803,20 +4365,37 @@
 
           if (this.invulnTimer > 0) this.invulnTimer = Math.max(0, this.invulnTimer - dt);
           if (this.shootCooldown > 0) this.shootCooldown = Math.max(0, this.shootCooldown - dt);
+          if (this.empFlickerTimer > 0) this.empFlickerTimer = Math.max(0, this.empFlickerTimer - dt);
+          if (this.feverTimer > 0) {
+            this.feverTimer = Math.max(0, this.feverTimer - dt);
+            if (Math.random() < 0.7) {
+              particles.feverFlame(this.x + this.w * 0.5, this.y + this.h * 0.5);
+            }
+          }
+          if (this.bounceLockTimer > 0) this.bounceLockTimer = Math.max(0, this.bounceLockTimer - dt);
+          if (this.jetpackJammed && this.upgrades.jetpackTier > 0) {
+            this.jamSmokeTimer -= dt;
+            if (this.jamSmokeTimer <= 0) {
+              this.jamSmokeTimer = 0.22;
+              particles.smoke(this.x + this.w * 0.5 - this.facing * 10, this.y + 14, 'rgba(51, 65, 85, 0.72)');
+            }
+          }
 
-          const speedMult = 1 + this.upgrades.bootsTier * 0.16;
+          const feverSpeedMult = this.feverTimer > 0 ? 1.18 : 1;
+          const speedMult = (1 + this.upgrades.bootsTier * 0.16) * feverSpeedMult;
           const manualDir = (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
-          const moveDir = manualDir !== 0 ? manualDir : (autoRun ? 1 : 0);
+          const effectiveAutoRun = autoRun && this.bounceLockTimer <= 0;
+          const moveDir = manualDir !== 0 ? manualDir : (effectiveAutoRun ? 1 : 0);
           const maxSpeed = 290 * speedMult;
           const accel = (this.grounded ? 2350 : 1650) * speedMult;
-          const friction = this.grounded ? 2500 : 520;
+          const friction = this.grounded ? 2500 : (this.bounceLockTimer > 0 ? 90 : 520);
 
           if (moveDir !== 0) {
             this.facing = moveDir;
             const reversing = this.vx !== 0 && Math.sign(this.vx) !== moveDir;
             const effectiveAccel = reversing && this.grounded ? accel * 1.65 : accel;
             this.vx += moveDir * effectiveAccel * dt;
-            if (Math.abs(this.vx) > maxSpeed) this.vx = moveDir * maxSpeed;
+            if (Math.abs(this.vx) > maxSpeed && this.bounceLockTimer <= 0) this.vx = moveDir * maxSpeed;
           } else {
             const decel = friction * dt;
             if (Math.abs(this.vx) <= decel) this.vx = 0;
@@ -2825,13 +4404,16 @@
 
           if (this.grounded) {
             this.coyoteTimer = 0.11;
-            this.doubleJumpsLeft = 1;
+            this.doubleJumpsLeft = this.noDoubleJumpCurse ? 0 : 1;
             this.airJumpArmed = false;
             this.jumpHoldTimer = 0;
-            const rechargeRate = 0.85 + this.upgrades.jetpackTier * 0.3;
+            const rechargeRate = (0.85 + this.upgrades.jetpackTier * 0.3) * (this.feverTimer > 0 ? 2.2 : 1);
             this.fuel = Math.min(this.maxFuel, this.fuel + rechargeRate * dt);
           } else {
             this.coyoteTimer = Math.max(0, this.coyoteTimer - dt);
+            if (this.feverTimer > 0) {
+              this.fuel = Math.min(this.maxFuel, this.fuel + (1.2 + this.upgrades.jetpackTier * 0.35) * dt);
+            }
             if (input.isDown('jump')) {
               this.jumpHoldTimer += dt;
             } else {
@@ -2842,8 +4424,7 @@
           let didDoubleJump = false;
           if (input.justPressed('jump')) {
             if (!this.grounded && this.coyoteTimer <= 0) {
-              if (this.doubleJumpsLeft > 0) {
-                // Mid-air Double Jump (~2x total height when chained near jump peak)
+              if (this.doubleJumpsLeft > 0 && !this.noDoubleJumpCurse) {
                 this.doubleJumpsLeft -= 1;
                 this.vy = -585;
                 this.jumpBufferTimer = 0;
@@ -2871,7 +4452,7 @@
             this.standingPlatform = null;
             this.coyoteTimer = 0;
             this.jumpBufferTimer = 0;
-            this.doubleJumpsLeft = 1;
+            this.doubleJumpsLeft = this.noDoubleJumpCurse ? 0 : 1;
             this.airJumpArmed = false;
             this.jumpHoldTimer = 0;
             this.scaleX = 0.76;
@@ -2885,11 +4466,10 @@
             if (!this.grounded && this.doubleJumpsLeft === 0) this.airJumpArmed = true;
           }
 
-          // Jetpack Thrust: engages smoothly once a held jump/double-jump peaks (vy >= -180 & held >= 0.22s)
-          // or immediately on a subsequent mid-air press after the double jump is spent—never on the initial tap.
+          // Jetpack Thrust
           const continuousHoldJet = this.jumpHoldTimer >= 0.22 && this.vy >= -180;
-          const wantJet = this.upgrades.jetpackTier > 0 && !this.grounded && this.fuel > 0 &&
-            !didDoubleJump && input.isDown('jump') && (this.airJumpArmed || continuousHoldJet);
+          const canJetThrust = this.upgrades.jetpackTier > 0 && !this.jetpackJammed && this.empFlickerTimer <= 0 && !this.grounded && this.fuel > 0;
+          const wantJet = canJetThrust && !didDoubleJump && input.isDown('jump') && (this.airJumpArmed || continuousHoldJet);
 
           if (wantJet) {
             this.jetpacking = true;
@@ -2901,6 +4481,9 @@
             sound.jetpack(time);
           } else {
             this.jetpacking = false;
+            if (this.upgrades.jetpackTier > 0 && !this.grounded && input.isDown('jump') && (this.jetpackJammed || this.empFlickerTimer > 0) && Math.random() < 0.22) {
+              particles.smoke(this.x + this.w * 0.5 - this.facing * 10, this.y + 16, this.empFlickerTimer > 0 ? 'rgba(56, 189, 248, 0.55)' : 'rgba(30, 41, 59, 0.85)');
+            }
             const baseG = 1520;
             let gMult = 1.0;
             if (Math.abs(this.vy) < 70 && input.isDown('jump') && !this.grounded) gMult = 0.68;
@@ -2908,7 +4491,12 @@
             this.vy = Math.min(760, this.vy + baseG * gMult * dt);
           }
 
-          // Volatile Gun Firing (Shift / F / J / Desktop Click / Touch Fire button)
+          // Apply Gravity / Magnet Drone field forces on airborne player
+          if (!this.grounded && droneAccelY !== 0) {
+            this.vy = Math.max(-520, Math.min(820, this.vy + droneAccelY * dt));
+          }
+
+          // Volatile Gun Firing
           if (input.justPressed('shoot') && this.shootCooldown <= 0 && this.upgrades.ammo > 0) {
             this.shootCooldown = 0.24;
             onShoot();
@@ -2925,6 +4513,10 @@
           this.grounded = false;
           this.standingPlatform = null;
           this._resolveY(level);
+
+          if (this.grounded) {
+            this.airCombo = 0;
+          }
 
           if (!wasGrounded && this.grounded && preLandVy > 130) {
             const intensity = Math.min(1, preLandVy / 650);
@@ -2994,6 +4586,22 @@
               }
             }
           }
+          if (level.crumblePlatforms) {
+            for (const cp of level.crumblePlatforms) {
+              if (!cp.isActive()) continue;
+              if (this.overlapsRect(cp.x, cp.y, cp.w, cp.h)) {
+                if (this.vy >= 0 && this.prevBottom <= cp.y + 14) {
+                  this.y = cp.y - this.h;
+                  this.vy = 0;
+                  this.grounded = true;
+                  cp.trigger();
+                } else if (this.vy < 0) {
+                  this.y = cp.y + cp.h;
+                  this.vy = 0;
+                }
+              }
+            }
+          }
         }
 
         overlapsRect(rx, ry, rw, rh) {
@@ -3004,6 +4612,19 @@
           if (this.invulnTimer > 0 && Math.floor(this.invulnTimer * 16) % 2 === 0) return;
           const footX = this.x + this.w * 0.5 - cam.x;
           const footY = this.y + this.h - cam.y;
+          if (this.feverTimer > 0) {
+            ctx.save();
+            const rad = 28 + Math.sin(time * 20) * 4;
+            const g = ctx.createRadialGradient(footX, footY - 17, 4, footX, footY - 17, rad);
+            g.addColorStop(0, 'rgba(254, 240, 138, 0.6)');
+            g.addColorStop(0.55, 'rgba(249, 115, 22, 0.35)');
+            g.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(footX, footY - 17, rad, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
           Player.renderCharacter(ctx, footX, footY, {
             facing: this.facing,
             scaleX: this.scaleX,
@@ -3013,25 +4634,52 @@
             runAnim: this.runAnim,
             scarfWave: this.scarfWave,
             time,
-            color: '#f59e0b',
+            color: this.feverTimer > 0 ? '#fef08a' : '#f59e0b',
             visor: 'dual',
             hasJetpack: this.upgrades.jetpackTier > 0,
+            jetpackJammed: this.jetpackJammed,
+            empFlicker: this.empFlickerTimer > 0,
             hasGun: this.upgrades.ammo > 0,
             hasBoots: this.upgrades.bootsTier > 0
           });
         }
 
+        drawEmissive(ctx, cam, time) {
+          const footX = this.x + this.w * 0.5 - cam.x;
+          const footY = this.y + this.h - cam.y;
+          ctx.save();
+          ctx.translate(footX, footY);
+          ctx.scale(this.scaleX, this.scaleY);
+          const faceX = this.facing > 0 ? -3 : -8;
+          const eyeShift = this.facing > 0 ? 1 : -1;
+          ctx.fillStyle = this.feverTimer > 0 ? '#fef08a' : '#fde68a';
+          ctx.fillRect(faceX + 2 + eyeShift, -28.5, 2.5, 4);
+          ctx.fillRect(faceX + 6.5 + eyeShift, -28.5, 2.5, 4);
+          if (this.upgrades.jetpackTier > 0) {
+            ctx.fillStyle = this.jetpackJammed ? '#ef4444' : this.empFlickerTimer > 0 ? '#38bdf8' : '#f59e0b';
+            ctx.fillRect(-this.facing * 12 - 2, -22, 5, 3);
+          }
+          if (this.feverTimer > 0) {
+            ctx.strokeStyle = `rgba(251, 191, 36, ${0.5 + 0.3 * Math.sin(time * 18)})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, -17, 22, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+
         static renderCharacter(ctx, footX, footY, opts) {
-          const { facing, scaleX, scaleY, vx, grounded, runAnim, scarfWave, time, color, visor, hasJetpack, hasGun, hasBoots } = opts;
+          const { facing, scaleX, scaleY, vx, grounded, runAnim, scarfWave, time, color, visor, hasJetpack, jetpackJammed, empFlicker, hasGun, hasBoots } = opts;
           ctx.save();
           ctx.translate(footX, footY);
           ctx.scale(scaleX, scaleY);
 
-          // Jetpack backpack
+          // Jetpack backpack (with jammed/EMP warning LED)
           if (hasJetpack) {
-            ctx.fillStyle = '#475569';
+            ctx.fillStyle = jetpackJammed ? '#1f2937' : '#475569';
             ctx.fillRect(-facing * 12 - 3, -24, 7, 14);
-            ctx.fillStyle = '#f59e0b';
+            ctx.fillStyle = jetpackJammed ? '#ef4444' : empFlicker ? '#38bdf8' : '#f59e0b';
             ctx.fillRect(-facing * 12 - 2, -22, 5, 3);
           }
 
@@ -3116,6 +4764,8 @@
       class Renderer {
         constructor(ctx) {
           this.ctx = ctx;
+          this.lightCanvas = (typeof document !== 'undefined' && document.createElement) ? document.createElement('canvas') : null;
+          this.lightCtx = this.lightCanvas ? this.lightCanvas.getContext('2d') : null;
           this.stars = Array.from({ length: 56 }, (_, i) => ({
             u: ((i * 197) % 1000) / 1000,
             y: ((i * 113) % 300),
@@ -3323,11 +4973,207 @@
             ctx.restore();
           }
         }
+
+        drawLava(cam, level, time, viewW, viewH) {
+          if (!level.isLavaDome) return;
+          const ctx = this.ctx;
+          const baseY = level.lavaY - cam.y;
+          if (baseY > viewH + 20) return;
+
+          ctx.save();
+          const heat = ctx.createLinearGradient(0, baseY - 46, 0, baseY + 4);
+          heat.addColorStop(0, 'rgba(249, 115, 22, 0)');
+          heat.addColorStop(1, 'rgba(239, 68, 68, 0.28)');
+          ctx.fillStyle = heat;
+          ctx.fillRect(0, baseY - 46, viewW, 50);
+
+          const magma = ctx.createLinearGradient(0, baseY, 0, viewH);
+          magma.addColorStop(0, '#fb923c');
+          magma.addColorStop(0.18, '#ea580c');
+          magma.addColorStop(0.55, '#b91c1c');
+          magma.addColorStop(1, '#450a0a');
+          ctx.fillStyle = magma;
+
+          ctx.beginPath();
+          ctx.moveTo(0, viewH);
+          for (let x = 0; x <= viewW + 18; x += 18) {
+            const wx = x + cam.x;
+            const wy = baseY + Math.sin(wx * 0.04 + time * 4.2) * 3.5 + Math.cos(wx * 0.09 - time * 2.8) * 2;
+            ctx.lineTo(x, wy);
+          }
+          ctx.lineTo(viewW, viewH);
+          ctx.closePath();
+          ctx.fill();
+
+          // Glowing crust crest
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          for (let x = 0; x <= viewW + 18; x += 18) {
+            const wx = x + cam.x;
+            const wy = baseY + Math.sin(wx * 0.04 + time * 4.2) * 3.5 + Math.cos(wx * 0.09 - time * 2.8) * 2;
+            if (x === 0) ctx.moveTo(x, wy);
+            else ctx.lineTo(x, wy);
+          }
+          ctx.stroke();
+
+          // Bubbling magma blisters
+          ctx.fillStyle = '#fde047';
+          for (let i = 0; i < 8; i++) {
+            const bx = ((i * 143 - cam.x * 0.8 + Math.sin(time + i) * 14) % viewW + viewW) % viewW;
+            const cycle = (time * 1.3 + i * 0.37) % 1;
+            const br = 2 + Math.sin(cycle * Math.PI) * 3.5;
+            ctx.globalAlpha = 0.75 * (1 - cycle * 0.5);
+            ctx.beginPath();
+            ctx.arc(bx, baseY + 6 + (i % 3) * 6 - cycle * 8, br, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        drawEndgameEffects(cam, level, game, time, viewW, viewH) {
+          const ctx = this.ctx;
+          if (game.voidWall && level.voidCollapse) {
+            game.voidWall.draw(ctx, cam, viewH, time);
+            const voidDist = game.player.x - game.voidWall.x;
+            if (voidDist > 0 && game.voidWall.x < cam.x) {
+              const distM = Math.max(1, Math.round(voidDist / 20));
+              if (distM <= 26) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(88, 28, 135, 0.85)';
+                ctx.strokeStyle = '#c084fc';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.roundRect(10, 12, 86, 22, 6);
+                ctx.fill();
+                ctx.stroke();
+                ctx.fillStyle = '#f3e8ff';
+                ctx.font = '700 11px ui-monospace, SFMono-Regular, Menlo, monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(`VOID ${distM}m`, 53, 27);
+                ctx.restore();
+              }
+            }
+          }
+
+          if (game.empWarnTimer > 0) {
+            ctx.save();
+            const pulse = 0.14 + 0.12 * Math.sin(time * 22);
+            ctx.strokeStyle = `rgba(167, 139, 250, ${pulse * 3})`;
+            ctx.lineWidth = 6;
+            ctx.strokeRect(3, 3, viewW - 6, viewH - 6);
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.86)';
+            ctx.font = '800 12px ui-monospace, SFMono-Regular, Menlo, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('EMP PULSE INCOMING — GROUND YOURSELF!', viewW * 0.5, 24);
+            ctx.restore();
+          }
+
+          if (game.empActiveFlash > 0) {
+            ctx.save();
+            ctx.fillStyle = `rgba(56, 189, 248, ${game.empActiveFlash * 0.24})`;
+            ctx.fillRect(0, 0, viewW, viewH);
+            ctx.restore();
+          }
+        }
+
+        drawBlackoutOverlay(cam, level, game, enemies, bouncePads, time, viewW, viewH) {
+          if (game.blackoutWarnTimer <= 0 && game.blackoutTimer <= 0) return;
+          const ctx = this.ctx;
+
+          if (game.blackoutWarnTimer > 0) {
+            ctx.save();
+            const flick = (Math.sin(time * 48) > 0.15 ? 0.36 : 0.1);
+            ctx.fillStyle = `rgba(4, 6, 14, ${flick})`;
+            ctx.fillRect(0, 0, viewW, viewH);
+            ctx.fillStyle = 'rgba(245, 158, 11, 0.92)';
+            ctx.font = '800 12px ui-monospace, SFMono-Regular, Menlo, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('POWER GRID FLICKERING — BLACKOUT IMMINENT!', viewW * 0.5, 42);
+            ctx.restore();
+            return;
+          }
+
+          const darkness = Math.min(0.92, game.blackoutTimer * 1.4, (4.5 - game.blackoutTimer) * 2.5 + 0.35);
+          if (this.lightCanvas && this.lightCtx) {
+            const lw = Math.max(120, Math.round(viewW * 0.5));
+            const lh = Math.max(90, Math.round(viewH * 0.5));
+            if (this.lightCanvas.width !== lw || this.lightCanvas.height !== lh) {
+              this.lightCanvas.width = lw;
+              this.lightCanvas.height = lh;
+            }
+            const lctx = this.lightCtx;
+            lctx.save();
+            lctx.globalCompositeOperation = 'source-over';
+            lctx.clearRect(0, 0, lw, lh);
+            lctx.fillStyle = `rgba(3, 5, 12, ${darkness})`;
+            lctx.fillRect(0, 0, lw, lh);
+
+            lctx.globalCompositeOperation = 'destination-out';
+            const punch = (wx, wy, radius) => {
+              const sx = (wx - cam.x) * 0.5;
+              const sy = (wy - cam.y) * 0.5;
+              const r = radius * 0.5;
+              if (sx < -r || sx > lw + r || sy < -r || sy > lh + r) return;
+              const g = lctx.createRadialGradient(sx, sy, r * 0.15, sx, sy, r);
+              g.addColorStop(0, 'rgba(0, 0, 0, 1)');
+              g.addColorStop(0.55, 'rgba(0, 0, 0, 0.6)');
+              g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+              lctx.fillStyle = g;
+              lctx.beginPath();
+              lctx.arc(sx, sy, r, 0, Math.PI * 2);
+              lctx.fill();
+            };
+
+            const p = game.player;
+            const pRad = p.feverTimer > 0 ? 195 : p.jetpacking ? 165 : 132;
+            punch(p.x + p.w * 0.5, p.y + p.h * 0.5, pRad);
+            if (level.portal) punch(level.portal.x, level.portal.y, 110);
+            for (const cp of level.checkpoints) {
+              if (cp.activated) punch(cp.x, cp.y - 18, 72);
+            }
+            for (const fb of game.enemyFireballs) punch(fb.x, fb.y, 64);
+            for (const d of game.lavaDroplets) punch(d.x, d.y, 58);
+            for (const item of level.collectibles) {
+              if (!item.collected && (item.kind === 'repair' || item.kind === 'gun')) {
+                punch(item.x, item.y, 52);
+              }
+            }
+            if (level.isLavaDome) {
+              const lavaScreenY = (level.lavaY - cam.y) * 0.5;
+              if (lavaScreenY < lh + 40) {
+                const lg = lctx.createLinearGradient(0, lavaScreenY - 40, 0, lavaScreenY + 25);
+                lg.addColorStop(0, 'rgba(0,0,0,0)');
+                lg.addColorStop(1, 'rgba(0,0,0,0.92)');
+                lctx.fillStyle = lg;
+                lctx.fillRect(0, lavaScreenY - 40, lw, lh - (lavaScreenY - 40));
+              }
+            }
+            lctx.restore();
+            ctx.drawImage(this.lightCanvas, 0, 0, viewW, viewH);
+          } else {
+            ctx.fillStyle = `rgba(3, 5, 12, ${darkness * 0.7})`;
+            ctx.fillRect(0, 0, viewW, viewH);
+          }
+
+          // Re-draw crisp emissives over the darkness so glowing eyes, hazards & player remain readable
+          if (level.portal) level.portal.draw(ctx, cam, time, level.theme.portalColor);
+          for (const pad of bouncePads) pad.drawEmissive(ctx, cam);
+          for (const e of enemies) e.drawEmissive(ctx, cam, time);
+          for (const b of game.projectiles) b.draw(ctx, cam);
+          for (const fb of game.enemyFireballs) fb.draw(ctx, cam, time);
+          for (const d of game.lavaDroplets) d.draw(ctx, cam, time);
+          game.player.drawEmissive(ctx, cam, time);
+        }
       }
 
       // =========================================================================
       // MAIN GAME CONTROLLER
       // =========================================================================
+      const MAX_PROJECTILES = 16;
+      const MAX_ENEMY_FIREBALLS = 18;
+      const MAX_LAVA_DROPLETS = 10;
+
       class Game {
         constructor() {
           this.stageWrap = document.getElementById('stageWrap');
@@ -3349,6 +5195,7 @@
           this.camera = new Camera();
           this.renderer = new Renderer(this.ctx);
           this.banner = new AlertBanner();
+          this.leaderboard = new LeaderboardService();
 
           this.state = 'START';
           this.previousStateBeforeSettings = 'PLAYING';
@@ -3363,10 +5210,27 @@
           this.time = 0;
           this.transitionFlash = 0;
           this.pendingUnlocks = [];
-          this.announcedMechanics = { enrage: false, modifiers: false };
+          this.announcedMechanics = { enrage: false, modifiers: false, mercs: false, lavaDome: false, flies: false, voidTier: false, blackout: false };
+
+          this.selectedStartBounty = 'NONE';
+          this.nextStageBounty = 'NONE';
+          this.activeBounty = BOUNTIES.NONE;
+          this.scoreSubmittedForRun = false;
 
           this.projectiles = [];
-          this.level = LevelGenerator.generate(this.stage, this.seed);
+          this.enemyFireballs = [];
+          this.lavaDroplets = [];
+          this.dropletSpawnTimer = 1.6;
+          this.voidWall = null;
+          this.empCycleTimer = 9.5;
+          this.empWarnTimer = 0;
+          this.empActiveFlash = 0;
+          this.blackoutCycleTimer = 11.5;
+          this.blackoutWarnTimer = 0;
+          this.blackoutTimer = 0;
+          this.deathReason = '';
+
+          this.level = LevelGenerator.generate(this.stage, this.seed, 'NONE');
           this.player = new Player(this.level.spawn.x, this.level.spawn.y);
 
           this._resizeCanvas();
@@ -3455,16 +5319,27 @@
           this.ui = {
             level: document.getElementById('hudLevel'),
             modifier: document.getElementById('hudModifier'),
+            bountyBadge: document.getElementById('hudBounty'),
+            feverBadge: document.getElementById('hudFever'),
             hearts: document.getElementById('hudHearts'),
             fuelWrap: document.getElementById('hudFuelWrap'),
             fuelFill: document.getElementById('hudFuelFill'),
+            jetStatus: document.getElementById('hudJetStatus'),
             ammoWrap: document.getElementById('hudAmmoWrap'),
             ammo: document.getElementById('hudAmmo'),
             touchJump: document.getElementById('touchJump'),
+            touchJumpSub: document.getElementById('touchJumpSub'),
             touchShoot: document.getElementById('touchShoot'),
             coins: document.getElementById('hudCoins'),
             score: document.getElementById('hudScore'),
             startSeedLabel: document.getElementById('startSeedLabel'),
+            startBountyStatus: document.getElementById('startBountyStatus'),
+            startBountyGrid: document.getElementById('startBountyGrid'),
+            startLbBox: document.getElementById('startLbBox'),
+            startLbSource: document.getElementById('startLbSource'),
+            startLbList: document.getElementById('startLbList'),
+            shopBountyStatus: document.getElementById('shopBountyStatus'),
+            shopBountyGrid: document.getElementById('shopBountyGrid'),
             settingsLevelLabel: document.getElementById('settingsLevelLabel'),
             btnSettingAudio: document.getElementById('btnSettingAudio'),
             btnSettingShake: document.getElementById('btnSettingShake'),
@@ -3476,7 +5351,11 @@
             goScore: document.getElementById('goScore'),
             goStage: document.getElementById('goStage'),
             goKills: document.getElementById('goKills'),
-            goEscapes: document.getElementById('goEscapes')
+            goEscapes: document.getElementById('goEscapes'),
+            goLbSource: document.getElementById('goLbSource'),
+            goLbList: document.getElementById('goLbList'),
+            runnerNameInput: document.getElementById('runnerNameInput'),
+            btnSaveScore: document.getElementById('btnSaveScore')
           };
 
           document.getElementById('btnDismissRotate').addEventListener('click', () => {
@@ -3487,6 +5366,30 @@
           const startAction = () => { this.sound.unlock(); this.startNewRun(); };
           document.getElementById('btnStart').addEventListener('click', startAction);
           document.getElementById('btnGameOverRestart').addEventListener('click', startAction);
+
+          document.getElementById('btnToggleStartLb').addEventListener('click', () => {
+            const box = this.ui.startLbBox;
+            const opening = box.style.display === 'none';
+            box.style.display = opening ? 'block' : 'none';
+            if (opening) this._refreshLeaderboard(this.ui.startLbList, this.ui.startLbSource);
+          });
+
+          if (this.ui.runnerNameInput) {
+            this.ui.runnerNameInput.value = this.leaderboard.getSavedName();
+          }
+
+          if (this.ui.btnSaveScore) {
+            this.ui.btnSaveScore.addEventListener('click', async () => {
+              if (this.scoreSubmittedForRun) return;
+              this.scoreSubmittedForRun = true;
+              this.ui.btnSaveScore.disabled = true;
+              this.ui.btnSaveScore.textContent = 'Saved';
+              const name = this.ui.runnerNameInput?.value || 'Runner';
+              const res = await this.leaderboard.submitScore(name, this.score, this.stage);
+              this._renderLeaderboardList(this.ui.goLbList, this.ui.goLbSource, res.entries, res.source, this.score);
+              this._renderLeaderboardList(this.ui.startLbList, this.ui.startLbSource, res.entries, res.source, this.score);
+            });
+          }
 
           // Settings Gear Menu Controls
           const btnSettings = document.getElementById('btnSettings');
@@ -3555,8 +5458,56 @@
           });
         }
 
+        _escapeHtml(str) {
+          return String(str).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+
+        _renderBountyGrid(gridEl, statusEl, selectedId, onPick) {
+          if (!gridEl || !statusEl) return;
+          const active = BOUNTIES[selectedId] || BOUNTIES.NONE;
+          statusEl.textContent = active.id === 'NONE' ? 'Standard Rules' : `${active.label}: ${active.reward}`;
+          gridEl.innerHTML = '';
+          Object.values(BOUNTIES).filter((b) => b.id !== 'NONE').forEach((b) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `relic-chip${selectedId === b.id ? ' active' : ''}`;
+            btn.innerHTML = `
+              <span class="relic-chip-title">${b.label}</span>
+              <span class="relic-chip-desc">${b.desc}</span>
+              <span class="relic-chip-reward">${b.reward}</span>
+            `;
+            btn.addEventListener('click', () => {
+              this.sound.unlock();
+              onPick(selectedId === b.id ? 'NONE' : b.id);
+            });
+            gridEl.appendChild(btn);
+          });
+        }
+
+        async _refreshLeaderboard(listEl, sourceEl) {
+          const res = await this.leaderboard.fetchTop(8);
+          this._renderLeaderboardList(listEl, sourceEl, res.entries, res.source);
+        }
+
+        _renderLeaderboardList(listEl, sourceEl, entries, source, highlightScore = null) {
+          if (!listEl) return;
+          if (sourceEl) sourceEl.textContent = source || 'Local Cache';
+          if (!entries || entries.length === 0) {
+            listEl.innerHTML = '<div class="lb-empty">No runs recorded yet. Set the pace!</div>';
+            return;
+          }
+          listEl.innerHTML = entries.map((e, idx) => {
+            const hl = highlightScore !== null && e.score === highlightScore ? ' highlight' : '';
+            return `<div class="lb-row${hl}"><span>#${idx + 1} ${this._escapeHtml(e.name)}</span><span>Stg ${e.stage} · ${String(e.score).padStart(4, '0')}</span></div>`;
+          }).join('');
+        }
+
         _syncStartUI() {
           this.ui.startSeedLabel.textContent = `Infinite Procedural Platformer · Seed #${this.seed}`;
+          this._renderBountyGrid(this.ui.startBountyGrid, this.ui.startBountyStatus, this.selectedStartBounty, (id) => {
+            this.selectedStartBounty = id;
+            this._syncStartUI();
+          });
         }
 
         _syncSettingsUI() {
@@ -3593,11 +5544,19 @@
             this.ui.btnSettingSeed.style.gridColumn = fromStart ? '1 / -1' : '';
             this._syncSettingsUI();
           } else if (nextState === 'GAME_OVER') {
-            this.ui.gameOverLevelLabel.textContent = `Fell on Stage ${this.stage} (${this.level.name})`;
+            this.ui.gameOverLevelLabel.textContent = this.deathReason
+              ? `${this.deathReason} · Stage ${this.stage}`
+              : `Fell on Stage ${this.stage} (${this.level.name})`;
             this.ui.goScore.textContent = this.score;
             this.ui.goStage.textContent = this.stage;
             this.ui.goKills.textContent = this.runKills;
             this.ui.goEscapes.textContent = this.runEscapes;
+            this.scoreSubmittedForRun = false;
+            if (this.ui.btnSaveScore) {
+              this.ui.btnSaveScore.disabled = false;
+              this.ui.btnSaveScore.textContent = 'Submit';
+            }
+            this._refreshLeaderboard(this.ui.goLbList, this.ui.goLbSource);
           } else if (nextState === 'START') {
             this._syncStartUI();
           }
@@ -3611,8 +5570,26 @@
           this.ui.coins.textContent = String(this.coins);
           this.ui.score.textContent = String(this.score).padStart(4, '0');
 
+          if (this.ui.bountyBadge) {
+            const hasBounty = this.activeBounty && this.activeBounty.id !== 'NONE';
+            this.ui.bountyBadge.classList.toggle('active', hasBounty);
+            if (hasBounty) this.ui.bountyBadge.textContent = this.activeBounty.label;
+          }
+          if (this.ui.feverBadge) {
+            const feverActive = this.player.feverTimer > 0;
+            this.ui.feverBadge.classList.toggle('active', feverActive);
+            if (feverActive) this.ui.feverBadge.textContent = `FEVER ${this.player.feverTimer.toFixed(1)}s`;
+          }
+
           const u = this.player.upgrades;
+          const jammed = this.player.jetpackJammed;
+          const empFlicker = this.player.empFlickerTimer > 0;
           this.ui.fuelWrap.classList.toggle('active', u.jetpackTier > 0);
+          this.ui.fuelWrap.classList.toggle('jammed', jammed && u.jetpackTier > 0);
+          this.ui.fuelWrap.classList.toggle('emp-flicker', empFlicker && u.jetpackTier > 0);
+          if (this.ui.jetStatus) {
+            this.ui.jetStatus.textContent = jammed ? 'JETPACK JAMMED' : empFlicker ? 'EMP FLICKER' : '';
+          }
           if (u.jetpackTier > 0) {
             const pct = Math.max(0, Math.min(100, (this.player.fuel / this.player.maxFuel) * 100));
             this.ui.fuelFill.style.width = `${pct}%`;
@@ -3622,7 +5599,12 @@
           if (u.ammo > 0) {
             this.ui.ammo.textContent = `${u.ammo}/${u.maxAmmo}`;
           }
-          this.ui.touchJump?.classList.toggle('has-jetpack', u.jetpackTier > 0);
+          this.ui.touchJump?.classList.toggle('has-jetpack', u.jetpackTier > 0 && !jammed);
+          this.ui.touchJump?.classList.toggle('jammed', u.jetpackTier > 0 && jammed);
+          this.ui.touchJump?.classList.toggle('emp-flicker', u.jetpackTier > 0 && empFlicker);
+          if (this.ui.touchJumpSub) {
+            this.ui.touchJumpSub.textContent = (u.jetpackTier > 0 && jammed) ? 'JAMMED' : (u.jetpackTier > 0 && empFlicker) ? 'EMP' : 'JETPACK';
+          }
           this.ui.touchShoot?.classList.toggle('has-ammo', u.ammo > 0);
 
           let heartsHtml = '';
@@ -3636,7 +5618,22 @@
         _announceStageStart() {
           this.banner.clear();
           const mod = this.level.modifier;
-          if (mod.id === 'EMP_ZONE') {
+          if (this.level.voidCollapse && !this.announcedMechanics.voidTier) {
+            this.announcedMechanics.voidTier = true;
+            this.banner.show({
+              kicker: `Stage ${this.stage} · Endgame Terror Tier`,
+              title: `Stage ${this.stage}: Void Collapse!`,
+              sub: 'Outrun the Creeping Void Wall. Ground yourself during EMP Pulses!',
+              tone: 'showdown'
+            });
+          } else if (this.level.isLavaDome) {
+            this.banner.show({
+              kicker: `Stage ${this.stage} · Lava Dome`,
+              title: `Stage ${this.stage}: Lava Dome — Molten Abyss!`,
+              sub: 'No solid floor. Watch for crumbling stones, falling droplets & Merc fireballs!',
+              tone: 'showdown'
+            });
+          } else if (mod.id === 'EMP_ZONE') {
             this.banner.show({
               kicker: `Stage ${this.stage} · ${this.level.name}`,
               title: `Stage ${this.stage}: EMP Zone — Firearms Jammed!`,
@@ -3661,8 +5658,47 @@
             this.banner.show({
               kicker: `Stage ${this.stage} · Seed #${this.seed}`,
               title: `Stage ${this.stage}: ${this.level.name}`,
-              sub: this.stage === 1 ? 'Stomp patrols or leap cleanly — bypassed enemies enrage!' : 'All gear operational. Reach the exit portal.',
+              sub: this.stage === 1 ? 'Stomp 3× mid-air for Fever Mode! Bypassed foes enrage.' : 'All gear operational. Reach the exit portal.',
               tone: 'standard'
+            });
+          }
+
+          if (this.activeBounty && this.activeBounty.id !== 'NONE') {
+            this.banner.show({
+              kicker: 'Cursed Bounty Active',
+              title: `${this.activeBounty.label} (${this.activeBounty.reward})`,
+              sub: this.activeBounty.desc,
+              tone: 'showdown'
+            });
+          }
+
+          if (this.level.hasBlackout && !this.announcedMechanics.blackout) {
+            this.announcedMechanics.blackout = true;
+            this.banner.show({
+              kicker: 'Stage 8+ Hazard',
+              title: 'Power Blackout Intervals!',
+              sub: 'Track glowing eyes, fireballs & bounce pads when the lights cut out.',
+              tone: 'emp'
+            });
+          }
+
+          if (this.stage >= 20 && !this.announcedMechanics.mercs) {
+            this.announcedMechanics.mercs = true;
+            this.banner.show({
+              kicker: 'Stage 20+ Threat',
+              title: 'Pyro Mercs Deployed!',
+              sub: 'Dodge their fireballs—mid-air hits jam your jetpack!',
+              tone: 'showdown'
+            });
+          }
+
+          if (this.stage >= 60 && !this.announcedMechanics.flies) {
+            this.announcedMechanics.flies = true;
+            this.banner.show({
+              kicker: 'Stage 60+ Threat',
+              title: 'Abyssal Flies Airborne!',
+              sub: 'Hovering swarmers lock on mid-run and pursue through the air.',
+              tone: 'showdown'
             });
           }
 
@@ -3682,8 +5718,11 @@
           this.lives = 3;
           this.runKills = 0;
           this.runEscapes = 0;
+          this.deathReason = '';
           this.pendingUnlocks = [];
-          this.announcedMechanics = { enrage: false, modifiers: false };
+          this.announcedMechanics = { enrage: false, modifiers: false, mercs: false, lavaDome: false, flies: false, voidTier: false, blackout: false };
+          this.nextStageBounty = this.selectedStartBounty || 'NONE';
+          this.player.jetpackJammed = false;
           this.player.upgrades = { jetpackTier: 0, magnetTier: 0, bootsTier: 0, ammo: 0, maxAmmo: 6 };
           this.loadStage(1);
           this._setState('PLAYING');
@@ -3693,8 +5732,26 @@
         loadStage(stageNum) {
           this.stage = stageNum;
           this.projectiles.length = 0;
-          this.level = LevelGenerator.generate(stageNum, this.seed);
+          this.enemyFireballs.length = 0;
+          this.lavaDroplets.length = 0;
+          this.dropletSpawnTimer = 1.6;
+          const bountyId = this.nextStageBounty || 'NONE';
+          this.nextStageBounty = 'NONE';
+          this.activeBounty = BOUNTIES[bountyId] || BOUNTIES.NONE;
+          this.level = LevelGenerator.generate(stageNum, this.seed, bountyId);
+          this.voidWall = stageNum >= 80 ? new VoidWall(stageNum) : null;
+          this.empCycleTimer = 9.5;
+          this.empWarnTimer = 0;
+          this.empActiveFlash = 0;
+          this.blackoutCycleTimer = Math.max(7.5, 13 - stageNum * 0.08);
+          this.blackoutWarnTimer = 0;
+          this.blackoutTimer = 0;
+          this.player.noDoubleJumpCurse = bountyId === 'NO_DOUBLE_JUMP';
           this.player.reset(this.level.spawn.x, this.level.spawn.y);
+          this.player.doubleJumpsLeft = this.player.noDoubleJumpCurse ? 0 : 1;
+          if (bountyId === 'START_ENRAGED') {
+            this.player.upgrades.ammo = this.player.upgrades.maxAmmo;
+          }
           this.particles.clear();
           this.camera.reset(this.player, this.level, this.viewW, this.viewH);
           this.transitionFlash = 0.35;
@@ -3708,7 +5765,6 @@
           document.getElementById('shopNextInfo').textContent = `Next: Stage ${nextStage} · ${preview.biome.name} · ${preview.modifier.label}`;
           document.getElementById('btnNextStage').textContent = `Enter Stage ${nextStage}`;
 
-          // Roll whether a rare volatile gun drop appears in this shop (~38% chance)
           this.shopHasRareGun = Math.random() < 0.38;
           this._renderShop();
           this._setState('SHOP');
@@ -3717,6 +5773,11 @@
         _renderShop() {
           const u = this.player.upgrades;
           document.getElementById('shopPurse').textContent = `${this.coins} Coins`;
+
+          this._renderBountyGrid(this.ui.shopBountyGrid, this.ui.shopBountyStatus, this.nextStageBounty, (id) => {
+            this.nextStageBounty = id;
+            this._renderShop();
+          });
 
           const jetCost = u.jetpackTier === 0 ? 22 : u.jetpackTier === 1 ? 34 : 48;
           const magCost = u.magnetTier === 0 ? 18 : 30;
@@ -3801,6 +5862,29 @@
             }
           ];
 
+          if (u.jetpackTier > 0 && this.player.jetpackJammed) {
+            items.unshift({
+              id: 'repair_jetpack',
+              title: 'Jetpack Repair (Urgent)',
+              tier: 'JAMMED',
+              desc: 'Clears fireball damage and restores full Jetpack thrust & fuel for the next stage.',
+              cost: 12,
+              rare: true,
+              maxed: false,
+              buy: () => {
+                this.player.jetpackJammed = false;
+                this.player.syncUpgrades();
+                this.sound.repair();
+                this.pendingUnlocks.push({
+                  kicker: 'System Restored',
+                  title: 'Jetpack Repaired!',
+                  sub: 'Thrusters restored to full capacity.',
+                  tone: 'unlock'
+                });
+              }
+            });
+          }
+
           if (this.shopHasRareGun) {
             items.push({
               id: 'gun',
@@ -3867,25 +5951,77 @@
           p.upgrades.ammo -= 1;
           this.sound.gunshot();
           this.camera.shake(4.5, 0.1);
-          // High recoil kickback
           p.vx -= p.facing * 185;
 
           const muzzleX = p.x + p.w * 0.5 + p.facing * 16;
           const muzzleY = p.y + 16;
           this.particles.burst(muzzleX, muzzleY, '#fef08a', 6, 140, 120, 3);
+          if (this.projectiles.length >= MAX_PROJECTILES) this.projectiles.shift();
           this.projectiles.push(new Projectile(muzzleX, muzzleY, p.facing * 760));
           this._syncHUD();
         }
 
-        _damagePlayer(knockDir = 0, fromPit = false) {
-          if (!fromPit && this.player.invulnTimer > 0) return;
-          this.lives -= 1;
+        _awardEnemyDefeat(enemy, viaStomp = false) {
+          enemy.alive = false;
+          enemy.squashTimer = 0.25;
+          const p = this.player;
+
+          if (enemy.kind === 'slime') {
+            const cx = enemy.x + enemy.w * 0.5;
+            this.sound.slimeSplit();
+            this.particles.burst(cx, enemy.y + enemy.h * 0.5, '#fb923c', 12, 160, 260, 3.5);
+            this.level.enemies.push(
+              new Enemy(cx - 18, enemy.y - 4, 'mini_ember', this.stage, { dir: -1, vy: -290, spawnGrace: 0.22 }),
+              new Enemy(cx + 2, enemy.y - 4, 'mini_ember', this.stage, { dir: 1, vy: -290, spawnGrace: 0.22 })
+            );
+          }
+
+          let bonusCoins = 0;
+          if (viaStomp) {
+            p.airCombo += 1;
+            if (p.airCombo >= 3) {
+              if (p.feverTimer <= 0) {
+                this.sound.feverIgnite();
+                this.banner.show({
+                  kicker: `${p.airCombo}× Air Stomp Combo`,
+                  title: 'FEVER MODE IGNITED!',
+                  sub: 'Blazing aura crushes foes, boosts fuel & awards bonus coins!',
+                  tone: 'unlock'
+                });
+              }
+              p.feverTimer = 6.5;
+              bonusCoins = Math.max(1, Math.round(2 * this.activeBounty.coinMult));
+              this.coins += bonusCoins;
+            }
+          }
+
+          const basePts = enemy.enraged ? 200 : (enemy.kind === 'merc' || enemy.kind === 'fly' || enemy.kind === 'wraith' || enemy.kind === 'mimic') ? 160 : 100;
+          const pts = Math.round(basePts * (p.feverTimer > 0 ? 2 : 1) * this.activeBounty.scoreMult);
+          this.score += pts;
+          this.runKills += 1;
+          this.sound.stomp();
+          this.camera.shake(4, 0.12);
+          this.particles.burst(enemy.x + enemy.w * 0.5, enemy.y + enemy.h * 0.5, p.feverTimer > 0 ? '#f97316' : '#fbbf24', 14, 180);
+          const tag = bonusCoins > 0 ? `+${pts} · +${bonusCoins}c` : viaStomp && p.airCombo >= 2 ? `${p.airCombo}× +${pts}` : `+${pts}`;
+          this.particles.popup(enemy.x + enemy.w * 0.5, enemy.y - 8, tag, p.feverTimer > 0 ? '#fef08a' : '#fbbf24');
+          this._syncHUD();
+        }
+
+        _damagePlayer(knockDir = 0, fromPit = false, reason = '') {
+          if (!fromPit && reason !== 'void' && this.player.invulnTimer > 0) return;
+          this.lives = reason === 'void' ? 0 : this.lives - 1;
+          this.player.airCombo = 0;
+          this.player.feverTimer = 0;
           this.sound.hurt();
-          this.camera.shake(7, 0.2);
-          this.particles.burst(this.player.x + this.player.w * 0.5, this.player.y + this.player.h * 0.5, '#ef4444', 16, 210);
+          this.camera.shake(reason === 'void' ? 11 : 7, 0.24);
+          this.particles.burst(this.player.x + this.player.w * 0.5, this.player.y + this.player.h * 0.5, reason === 'void' ? '#a855f7' : '#ef4444', 18, 220);
           this._syncHUD();
 
           if (this.lives <= 0) {
+            if (reason === 'void') this.deathReason = 'Consumed by the Creeping Void Wall';
+            else if (reason === 'lava') this.deathReason = 'Incinerated in the Lava Dome';
+            else if (reason === 'fireball') this.deathReason = 'Blasted by a Pyro Merc';
+            else this.deathReason = '';
             this.sound.gameOver();
             this._setState('GAME_OVER');
             return;
@@ -3893,9 +6029,17 @@
 
           if (fromPit) {
             this.player.reset(this.level.activeSpawn.x, this.level.activeSpawn.y);
+            this.player.doubleJumpsLeft = this.player.noDoubleJumpCurse ? 0 : 1;
             this.player.invulnTimer = 1.4;
+            if (this.voidWall) this.voidWall.resetNear(this.level.activeSpawn.x);
             this.camera.reset(this.player, this.level, this.viewW, this.viewH);
             this.particles.burst(this.player.x + this.player.w * 0.5, this.player.y + this.player.h * 0.5, '#38bdf8', 14, 150, 120);
+          } else if (reason === 'lava') {
+            this.player.invulnTimer = 1.45;
+            this.player.vy = -610;
+            this.player.vx = this.player.facing * 140;
+            this.player.grounded = false;
+            this.player.standingPlatform = null;
           } else {
             this.player.invulnTimer = 1.45;
             this.player.vy = -340;
@@ -3945,20 +6089,92 @@
           for (const plat of this.level.movingPlatforms) {
             plat.update(dt);
           }
-
-          const prevFuel = this.player.fuel;
-          this.player.update(dt, this.input, this.level, this.particles, this.sound, this.camera, this.time, () => this._fireWeapon(), this.autoRun);
-          if (this.player.upgrades.jetpackTier > 0 && Math.abs(this.player.fuel - prevFuel) > 0.002) {
-            const pct = Math.max(0, Math.min(100, (this.player.fuel / this.player.maxFuel) * 100));
-            this.ui.fuelFill.style.width = `${pct}%`;
+          if (this.level.crumblePlatforms) {
+            for (const cp of this.level.crumblePlatforms) {
+              cp.update(dt, this.particles, this.sound);
+            }
+          }
+          if (this.level.bouncePads) {
+            for (const pad of this.level.bouncePads) {
+              pad.update(dt);
+            }
           }
 
-          if (this.player.y > this.level.height + 48) {
-            this._damagePlayer(0, true);
+          // Compute Gravity / Magnet Drone field forces for airborne player
+          const p = this.player;
+          const pcx0 = p.x + p.w * 0.5;
+          const pcy0 = p.y + p.h * 0.5;
+          let droneAccelY = 0;
+          if (!p.grounded) {
+            for (const enemy of this.level.enemies) {
+              if (!enemy.alive || enemy.kind !== 'drone') continue;
+              const dist = Math.hypot(pcx0 - (enemy.x + enemy.w * 0.5), pcy0 - (enemy.y + enemy.h * 0.5));
+              if (dist <= enemy.fieldRadius) {
+                droneAccelY += enemy.fieldMode === 'reverse' ? -2150 : 980;
+                this.sound.droneWarp(this.time);
+              }
+            }
+          }
+
+          const prevFuel = p.fuel;
+          const prevEmp = p.empFlickerTimer > 0;
+          const prevFever = p.feverTimer > 0;
+          p.update(dt, this.input, this.level, this.particles, this.sound, this.camera, this.time, () => this._fireWeapon(), this.autoRun, droneAccelY);
+          if (p.upgrades.jetpackTier > 0 && Math.abs(p.fuel - prevFuel) > 0.002) {
+            const pct = Math.max(0, Math.min(100, (p.fuel / p.maxFuel) * 100));
+            this.ui.fuelFill.style.width = `${pct}%`;
+          }
+          if (prevEmp !== (p.empFlickerTimer > 0) || prevFever !== (p.feverTimer > 0) || p.feverTimer > 0) {
+            this._syncHUD();
+          }
+
+          // Bounce / Ricochet Pads & Vertical Boost Walls
+          if (this.level.bouncePads) {
+            for (const pad of this.level.bouncePads) {
+              if (pad.pulse > 0.16) continue;
+              if (p.overlapsRect(pad.x - 2, pad.y - 2, pad.w + 4, pad.h + 4)) {
+                pad.trigger();
+                this.sound.bouncePad();
+                p.grounded = false;
+                p.standingPlatform = null;
+                p.doubleJumpsLeft = p.noDoubleJumpCurse ? 0 : 1;
+                if (pad.isWall) {
+                  const dir = pad.kind === 'wall_right' ? -1 : 1;
+                  p.vy = -610;
+                  p.vx = dir * 390;
+                  p.facing = dir;
+                  p.bounceLockTimer = 0.34;
+                } else if (pad.kind === 'diag_right') {
+                  p.vy = -640;
+                  p.vx = 430;
+                  p.facing = 1;
+                  p.bounceLockTimer = 0.24;
+                } else if (pad.kind === 'diag_left') {
+                  p.vy = -640;
+                  p.vx = -430;
+                  p.facing = -1;
+                  p.bounceLockTimer = 0.24;
+                } else {
+                  p.vy = -760;
+                }
+                this.particles.doubleJumpRing(p.x + p.w * 0.5, p.y + p.h, '#67e8f9');
+              }
+            }
+          }
+
+          // Molten Lava Surface in Lava Dome (Stage 20+)
+          if (this.level.isLavaDome && p.y + p.h >= this.level.lavaY + 8) {
+            this.sound.lavaSizzle();
+            this.particles.burst(p.x + p.w * 0.5, this.level.lavaY, '#fb923c', 18, 220, 420, 4);
+            this._damagePlayer(0, false, 'lava');
             if (this.state !== 'PLAYING') return;
           }
 
-          const p = this.player;
+          if (p.y > this.level.height + 48) {
+            this._damagePlayer(0, true, this.level.isLavaDome ? 'lava' : '');
+            if (this.state !== 'PLAYING') return;
+          }
+
           const minCol = Math.max(0, Math.floor(p.x / TILE));
           const maxCol = Math.min(this.level.cols - 1, Math.floor((p.x + p.w) / TILE));
           const minRow = Math.max(0, Math.floor(p.y / TILE));
@@ -3985,7 +6201,7 @@
             }
           }
 
-          // Collectibles + Coin Magnet pull
+          // Collectibles + Coin Magnet pull + Repair Kit
           const pcx = p.x + p.w * 0.5;
           const pcy = p.y + p.h * 0.5;
           const magnetRadius = p.upgrades.magnetTier === 0 ? 0 : p.upgrades.magnetTier === 1 ? 120 : 195;
@@ -3993,14 +6209,26 @@
           for (const item of this.level.collectibles) {
             if (item.collected) continue;
             const dist = Math.hypot(pcx - item.x, pcy - item.y);
-            if (magnetRadius > 0 && item.kind !== 'gun' && dist < magnetRadius && dist > 1) {
+            if (magnetRadius > 0 && item.kind !== 'gun' && item.kind !== 'repair' && dist < magnetRadius && dist > 1) {
               const pull = (320 + p.upgrades.magnetTier * 110) * dt;
               item.x += ((pcx - item.x) / dist) * pull;
               item.y += ((pcy - item.y) / dist) * pull;
             }
             if (dist < item.radius + 16) {
               item.collected = true;
-              if (item.kind === 'gun') {
+              if (item.kind === 'repair') {
+                p.jetpackJammed = false;
+                p.syncUpgrades();
+                this.sound.repair();
+                this.particles.burst(item.x, item.y, '#34d399', 18, 190, 220);
+                this.particles.popup(item.x, item.y - 14, 'JETPACK REPAIRED!', '#34d399');
+                this.banner.show({
+                  kicker: 'Repair Kit Collected',
+                  title: 'Jetpack Restored!',
+                  sub: 'Thrusters cleared and fuel tank refilled.',
+                  tone: 'unlock'
+                });
+              } else if (item.kind === 'gun') {
                 p.upgrades.ammo = p.upgrades.maxAmmo;
                 this.sound.purchase();
                 this.particles.burst(item.x, item.y, '#f59e0b', 18, 190, 220);
@@ -4013,15 +6241,43 @@
                 });
               } else {
                 const isGem = item.kind === 'gem';
-                const coinGain = isGem ? 5 : 1;
-                const pts = isGem ? 50 : 10;
+                const baseCoins = isGem ? 5 : 1;
+                const coinGain = Math.max(1, Math.round(baseCoins * this.activeBounty.coinMult));
+                const pts = Math.round((isGem ? 50 : 10) * this.activeBounty.scoreMult);
                 this.coins += coinGain;
                 this.score += pts;
                 this.sound.coin(isGem);
                 this.particles.burst(item.x, item.y, isGem ? '#38bdf8' : '#fbbf24', isGem ? 16 : 10, 165, 220);
-                this.particles.popup(item.x, item.y - 12, isGem ? '+5 Coins' : '+10', isGem ? '#7dd3fc' : '#fde047');
+                this.particles.popup(item.x, item.y - 12, coinGain > 1 ? `+${coinGain} Coins` : `+${pts}`, isGem ? '#7dd3fc' : '#fde047');
               }
               this._syncHUD();
+            }
+          }
+
+          // Lava Dome Falling Fireball Droplets (accelerated under Double Hazards bounty)
+          if (this.level.isLavaDome) {
+            this.dropletSpawnTimer -= dt;
+            if (this.dropletSpawnTimer <= 0) {
+              const doubleHaz = this.activeBounty.id === 'DOUBLE_HAZARDS';
+              this.dropletSpawnTimer = (doubleHaz ? 0.68 : 1.05) + Math.random() * 0.7;
+              const dropX = Math.max(TILE * 6, Math.min(this.level.width - TILE * 5, p.x + 120 + (Math.random() - 0.3) * 340));
+              if (this.lavaDroplets.length >= MAX_LAVA_DROPLETS) this.lavaDroplets.shift();
+              this.lavaDroplets.push(new LavaDroplet(dropX, 0.88));
+            }
+          }
+          for (let i = this.lavaDroplets.length - 1; i >= 0; i--) {
+            const d = this.lavaDroplets[i];
+            d.update(dt, this.level, this.particles, this.sound);
+            if (!d.alive) {
+              this.lavaDroplets.splice(i, 1);
+              continue;
+            }
+            if (d.warningTimer <= 0 && Math.hypot(pcx - d.x, pcy - d.y) < d.r + 12) {
+              d.alive = false;
+              this.lavaDroplets.splice(i, 1);
+              this.sound.lavaSizzle();
+              this._damagePlayer(Math.sign(pcx - d.x) || 1, false, 'lava');
+              if (this.state !== 'PLAYING') return;
             }
           }
 
@@ -4039,8 +6295,13 @@
             for (const enemy of this.level.enemies) {
               if (!enemy.alive) continue;
               if (b.x + b.r > enemy.x && b.x - b.r < enemy.x + enemy.w && b.y + b.r > enemy.y && b.y - b.r < enemy.y + enemy.h) {
-                if (isArmored) {
-                  // Ricochet harmlessly off bulletproof plating!
+                if (enemy.kind === 'wraith' && enemy.phased) {
+                  // Phased Wraiths cannot be shot head-on
+                  b.alive = false;
+                  this.sound.wraithPhase();
+                  this.particles.burst(b.x, b.y, '#a5f3fc', 6, 120, 120, 3);
+                  this.particles.popup(enemy.x + enemy.w * 0.5, enemy.y - 8, 'PHASED!', '#a5f3fc');
+                } else if (isArmored) {
                   b.ricocheted = true;
                   b.vx = -b.vx * 0.45;
                   b.vy = -220 - Math.random() * 140;
@@ -4050,62 +6311,174 @@
                   this.particles.popup(enemy.x + enemy.w * 0.5, enemy.y - 8, 'RICOCHET', '#cbd5e1');
                 } else {
                   b.alive = false;
-                  enemy.alive = false;
-                  enemy.squashTimer = 0.25;
-                  const pts = enemy.enraged ? 200 : 120;
-                  this.score += pts;
-                  this.runKills += 1;
-                  this.sound.stomp();
-                  this.camera.shake(4, 0.12);
-                  this.particles.burst(enemy.x + enemy.w * 0.5, enemy.y + enemy.h * 0.5, '#f59e0b', 16, 200);
-                  this.particles.popup(enemy.x + enemy.w * 0.5, enemy.y - 8, `+${pts}`, '#fbbf24');
-                  this._syncHUD();
+                  this._awardEnemyDefeat(enemy, false);
                 }
                 break;
               }
             }
           }
 
-          // Enemies (Enrage & Hunt + Stomp)
-          for (const enemy of this.level.enemies) {
-            enemy.update(dt, this.level, this.player, this.particles, (enragedEnemy) => {
-              this.sound.enrage();
-              this.camera.shake(4, 0.15);
-              this.particles.burst(enragedEnemy.x + enragedEnemy.w * 0.5, enragedEnemy.y, '#ef4444', 14, 150);
-              this.particles.popup(enragedEnemy.x + enragedEnemy.w * 0.5, enragedEnemy.y - 12, 'ENRAGED!', '#fca5a5');
-              if (!this.announcedMechanics.enrage) {
-                this.announcedMechanics.enrage = true;
+          // Enemy Fireballs (Mercs) vs Player (Airborne hit jams Jetpack!)
+          for (let i = this.enemyFireballs.length - 1; i >= 0; i--) {
+            const fb = this.enemyFireballs[i];
+            fb.update(dt, this.level, this.particles);
+            if (!fb.alive) {
+              this.enemyFireballs.splice(i, 1);
+              continue;
+            }
+            if (Math.hypot(pcx - fb.x, pcy - fb.y) < fb.r + 12) {
+              fb.alive = false;
+              this.enemyFireballs.splice(i, 1);
+              if (p.upgrades.jetpackTier > 0 && (!p.grounded || p.jetpacking) && !p.jetpackJammed) {
+                p.jetpackJammed = true;
+                p.jetpacking = false;
+                this.sound.jetpackJam();
+                this.particles.burst(pcx, pcy, '#38bdf8', 12, 180, 260, 3);
+                this.particles.burst(pcx, pcy, '#fbbf24', 10, 160, 260, 3);
+                this.particles.smoke(pcx, pcy, 'rgba(30, 41, 59, 0.9)');
+                this.particles.popup(pcx, p.y - 16, 'JETPACK JAMMED!', '#ef4444');
                 this.banner.show({
-                  kicker: 'New Mechanic',
-                  title: 'Enraged Hunters Enabled!',
-                  sub: 'Bypassed enemies gain speed and pursue you across gaps.',
+                  kicker: 'Anti-Air Hit',
+                  title: 'JETPACK JAMMED!',
+                  sub: 'Find a Repair Kit in the stage or repair at the Supply Outpost.',
                   tone: 'showdown'
                 });
+                this._syncHUD();
               }
-            });
+              this._damagePlayer(Math.sign(fb.vx) || 1, false, 'fireball');
+              if (this.state !== 'PLAYING') return;
+            }
+          }
 
-            if (!enemy.alive) continue;
+          // Enemies update & collision (iterate safely since Slimes can append Mini-Embers)
+          for (let idx = 0; idx < this.level.enemies.length; idx++) {
+            const enemy = this.level.enemies[idx];
+            enemy.update(
+              dt,
+              this.level,
+              this.player,
+              this.particles,
+              (enragedEnemy) => {
+                this.sound.enrage();
+                this.camera.shake(4, 0.15);
+                this.particles.burst(enragedEnemy.x + enragedEnemy.w * 0.5, enragedEnemy.y, this.stage >= 80 ? '#a855f7' : '#ef4444', 14, 150);
+                this.particles.popup(enragedEnemy.x + enragedEnemy.w * 0.5, enragedEnemy.y - 12, this.stage >= 80 ? 'PHANTOM ENRAGE!' : 'ENRAGED!', '#fca5a5');
+                if (!this.announcedMechanics.enrage) {
+                  this.announcedMechanics.enrage = true;
+                  this.banner.show({
+                    kicker: 'New Mechanic',
+                    title: 'Enraged Hunters Enabled!',
+                    sub: 'Bypassed enemies gain speed and pursue you across gaps.',
+                    tone: 'showdown'
+                  });
+                }
+              },
+              (mx, my, vx, vy) => {
+                this.sound.fireballWhoosh();
+                this.particles.burst(mx, my, '#fb923c', 7, 130, 120, 3);
+                if (this.enemyFireballs.length >= MAX_ENEMY_FIREBALLS) this.enemyFireballs.shift();
+                this.enemyFireballs.push(new EnemyFireball(mx, my, vx, vy));
+              },
+              this.sound
+            );
+
+            if (!enemy.alive || enemy.spawnGraceTimer > 0) continue;
 
             if (p.overlapsRect(enemy.x + 2, enemy.y + 2, enemy.w - 4, enemy.h - 2)) {
-              const stomping = p.vy > 0 && p.prevBottom <= enemy.y + enemy.h * 0.58;
+              // Phased Wraiths ghost past harmlessly head-on until bypassed
+              if (enemy.kind === 'wraith' && enemy.phased) {
+                if (enemy.phaseBounceCooldown <= 0) {
+                  enemy.phaseBounceCooldown = 0.45;
+                  this.sound.wraithPhase();
+                  this.particles.popup(enemy.x + enemy.w * 0.5, enemy.y - 8, 'INTANGIBLE', '#a5f3fc');
+                }
+                continue;
+              }
+
+              // Disguised Mimic snapping immediately upon touch
+              if (enemy.kind === 'mimic' && enemy.mimicState !== 'lunge') {
+                enemy.mimicState = 'lunge';
+                enemy.enraged = true;
+                this.sound.mimicTrigger();
+              }
+
+              // Fever Mode blazing contact crush
+              if (p.feverTimer > 0) {
+                this._awardEnemyDefeat(enemy, false);
+                continue;
+              }
+
+              const stomping = p.vy > 0 && p.prevBottom <= enemy.y + enemy.h * 0.6;
               if (stomping) {
-                enemy.alive = false;
-                enemy.squashTimer = 0.25;
                 p.vy = this.input.isDown('jump') ? -500 : -370;
+                p.doubleJumpsLeft = p.noDoubleJumpCurse ? 0 : 1;
                 p.scaleX = 1.24;
                 p.scaleY = 0.78;
-                const pts = enemy.enraged ? 200 : 100;
-                this.score += pts;
-                this.runKills += 1;
-                this.sound.stomp();
-                this.camera.shake(4, 0.12);
-                this.particles.burst(enemy.x + enemy.w * 0.5, enemy.y + enemy.h * 0.5, '#fbbf24', 14, 180);
-                this.particles.popup(enemy.x + enemy.w * 0.5, enemy.y - 8, `+${pts}`, '#fbbf24');
-                this._syncHUD();
+                this._awardEnemyDefeat(enemy, true);
               } else {
                 const dir = p.x + p.w * 0.5 < enemy.x + enemy.w * 0.5 ? -1 : 1;
                 this._damagePlayer(dir, false);
                 if (this.state !== 'PLAYING') return;
+              }
+            }
+          }
+
+          // Dynamic Stage Hazard: Blackout / Flicker Intervals (Stage 8+)
+          if (this.level.hasBlackout) {
+            if (this.blackoutTimer > 0) {
+              this.blackoutTimer = Math.max(0, this.blackoutTimer - dt);
+              if (this.blackoutTimer <= 0) {
+                this.blackoutCycleTimer = Math.max(7.5, 13 - this.stage * 0.08);
+              }
+            } else if (this.blackoutWarnTimer > 0) {
+              this.blackoutWarnTimer -= dt;
+              if (this.blackoutWarnTimer <= 0) {
+                this.blackoutTimer = 4.5;
+                this.sound.blackoutFlicker();
+              }
+            } else {
+              this.blackoutCycleTimer -= dt;
+              if (this.blackoutCycleTimer <= 0) {
+                this.blackoutWarnTimer = 0.9;
+                this.sound.blackoutFlicker();
+              }
+            }
+          }
+
+          // Stage 80+ Endgame Terror Tier: Creeping Void Wall & EMP Pulses
+          if (this.level.voidCollapse && this.voidWall) {
+            this.voidWall.update(dt, this.player, this.sound);
+            if (this.voidWall.x >= p.x + 6) {
+              this.sound.voidHum();
+              this._damagePlayer(1, false, 'void');
+              if (this.state !== 'PLAYING') return;
+            }
+
+            if (this.empActiveFlash > 0) {
+              this.empActiveFlash = Math.max(0, this.empActiveFlash - dt);
+            }
+
+            if (this.empWarnTimer > 0) {
+              this.empWarnTimer -= dt;
+              if (this.empWarnTimer <= 0) {
+                this.empActiveFlash = 0.45;
+                this.sound.empPulse();
+                if (!p.grounded && p.upgrades.jetpackTier > 0 && !p.jetpackJammed) {
+                  p.empFlickerTimer = 1.0;
+                  p.jetpacking = false;
+                  this.particles.burst(pcx, pcy, '#38bdf8', 14, 180, 120, 3);
+                  this.particles.popup(pcx, p.y - 14, 'EMP THRUSTER FLICKER!', '#c4b5fd');
+                  this._syncHUD();
+                } else if (p.grounded && p.upgrades.jetpackTier > 0) {
+                  this.particles.popup(pcx, p.y - 12, 'GROUNDED (EMP SAFE)', '#34d399');
+                }
+                this.empCycleTimer = 9.0;
+              }
+            } else {
+              this.empCycleTimer -= dt;
+              if (this.empCycleTimer <= 0) {
+                this.empWarnTimer = 1.5;
+                this.sound.voidHum();
               }
             }
           }
@@ -4115,9 +6488,9 @@
             const activeEnraged = this.level.enemies.filter((e) => e.alive && e.enraged).length;
             if (activeEnraged > 0) {
               this.runEscapes += activeEnraged;
-              this.score += activeEnraged * 150;
+              this.score += Math.round(activeEnraged * 150 * this.activeBounty.scoreMult);
             }
-            this.score += 200;
+            this.score += Math.round(200 * this.activeBounty.scoreMult);
             this.sound.levelClear();
             this._syncHUD();
             this._openShop();
@@ -4138,19 +6511,30 @@
           this.renderer.drawTiles(cam, this.level, this.viewW);
 
           for (const plat of this.level.movingPlatforms) plat.draw(ctx, cam, this.level.theme);
+          if (this.level.crumblePlatforms) {
+            for (const cp of this.level.crumblePlatforms) cp.draw(ctx, cam, this.level.theme);
+          }
+          if (this.level.bouncePads) {
+            for (const pad of this.level.bouncePads) pad.draw(ctx, cam, this.time);
+          }
           for (const cp of this.level.checkpoints) cp.draw(ctx, cam, this.time);
           if (this.level.portal) this.level.portal.draw(ctx, cam, this.time, this.level.theme.portalColor);
           for (const item of this.level.collectibles) item.draw(ctx, cam, this.time);
 
           const isArmored = this.level.modifier.id === 'ARMORED';
-          for (const enemy of this.level.enemies) enemy.draw(ctx, cam, isArmored);
+          for (const enemy of this.level.enemies) enemy.draw(ctx, cam, isArmored, this.stage);
           for (const b of this.projectiles) b.draw(ctx, cam);
+          for (const fb of this.enemyFireballs) fb.draw(ctx, cam, this.time);
+          for (const d of this.lavaDroplets) d.draw(ctx, cam, this.time);
 
           this.player.draw(ctx, cam, this.time);
           this.particles.draw(ctx, cam);
+          this.renderer.drawLava(cam, this.level, this.time, this.viewW, this.viewH);
 
           if (this.state === 'PLAYING') {
+            this.renderer.drawBlackoutOverlay(cam, this.level, this, this.level.enemies, this.level.bouncePads || [], this.time, this.viewW, this.viewH);
             this.renderer.drawHunterWarnings(cam, this.level.enemies, this.time, this.viewW, this.viewH);
+            this.renderer.drawEndgameEffects(cam, this.level, this, this.time, this.viewW, this.viewH);
           }
 
           if (this.transitionFlash > 0) {
